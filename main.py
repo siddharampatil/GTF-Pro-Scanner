@@ -23,4 +23,4 @@ stocks = [
     "AXISBANK.NS"
 ]
 
-results = []
+results = [] 
