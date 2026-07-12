@@ -2,7 +2,7 @@ import requests
 
 import os
 BOT_TOKEN = os.environ["8600535028:AAG1DqnJt66Uj034SBhpEfWgUjHFBSrOiwA"]
-CHAT_ID = "902764304"
+CHAT_ID = os.environ["902764304"]
 
 print("Starting Telegram test...")
 
