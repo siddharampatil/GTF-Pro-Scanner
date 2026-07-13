@@ -13,17 +13,24 @@ results = []
 
 for stock in STOCKS:
     result = scan_stock(stock)
+
     if result:
         results.append(
-            f"✅ {result['symbol']}\n"
-            f"Price: ₹{result['price']}\n"
-            f"RSI: {result['rsi']}"
+            f"""📈 BUY SIGNAL
+
+🏢 Stock: {result['symbol']}
+💰 Entry: ₹{result['price']}
+🎯 Target 1: ₹{result['target1']}
+🎯 Target 2: ₹{result['target2']}
+🛑 Stop Loss: ₹{result['sl']}
+📊 RSI: {result['rsi']}
+"""
         )
 
 if results:
-    message = "📈 GTF Scanner Alerts\n\n" + "\n\n".join(results)
+    message = "🔥 GTF PRO SCANNER 🔥\n\n" + "\n------------------------\n".join(results)
 else:
-    message = "📊 GTF Scanner\n\nNo stocks matched the strategy."
+    message = "📊 GTF PRO SCANNER\n\nNo stocks matched the strategy today."
 
 requests.post(
     url,
