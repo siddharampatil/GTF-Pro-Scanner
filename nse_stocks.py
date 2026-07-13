@@ -1,0 +1,22 @@
+STOCKS = [
+    "RELIANCE.NS",
+    "TCS.NS",
+    "INFY.NS",
+    "HDFCBANK.NS",
+    "ICICIBANK.NS",
+    "SBIN.NS",
+    "LT.NS",
+    "BHARTIARTL.NS",
+    "ITC.NS",
+    "AXISBANK.NS",
+    "KOTAKBANK.NS",
+    "HINDUNILVR.NS",
+    "ASIANPAINT.NS",
+    "MARUTI.NS",
+    "TITAN.NS",
+    "BAJFINANCE.NS",
+    "ULTRACEMCO.NS",
+    "NTPC.NS",
+    "POWERGRID.NS",
+    "ADANIPORTS.NS"
+]
