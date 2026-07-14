@@ -3,8 +3,32 @@ from ta.trend import EMAIndicator, MACD
 from ta.momentum import RSIIndicator
 
 
+def market_is_bullish():
+    try:
+        nifty = yf.download(
+            "^NSEI",
+            period="6mo",
+            interval="1d",
+            progress=False,
+            auto_adjust=True
+        )
+
+        close = nifty["Close"].squeeze()
+
+        ema20 = EMAIndicator(close, window=20).ema_indicator()
+        ema50 = EMAIndicator(close, window=50).ema_indicator()
+
+        return close.iloc[-1] > ema20.iloc[-1] > ema50.iloc[-1]
+
+    except:
+        return True
+
+
 def scan_stock(symbol):
     try:
+
+        market_bullish = market_is_bullish()
+
         df = yf.download(
             symbol,
             period="1y",
@@ -19,7 +43,6 @@ def scan_stock(symbol):
         close = df["Close"].squeeze()
         volume = df["Volume"].squeeze()
 
-        # Indicators
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
         ema200 = EMAIndicator(close, window=200).ema_indicator()
@@ -59,19 +82,15 @@ def scan_stock(symbol):
             score += 10
             reasons.append("✅ MACD Bullish Crossover")
 
-        # Trend & Confidence
         if score >= 90:
             trend = "🟢 Strong Bullish"
             confidence = "🔥 Very High"
-
         elif score >= 80:
             trend = "🟢 Bullish"
             confidence = "✅ High"
-
         elif score >= 60:
             trend = "🟡 Moderate"
             confidence = "⚠ Medium"
-
         else:
             trend = "🔴 Weak"
             confidence = "❌ Low"
@@ -100,6 +119,7 @@ def scan_stock(symbol):
             "score": score,
             "trend": trend,
             "confidence": confidence,
+            "market": "🟢 Bullish" if market_bullish else "🔴 Bearish",
             "reason": "\n".join(reasons),
             "buy": buy,
             "sl": sl,
