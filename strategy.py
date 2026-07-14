@@ -63,4 +63,19 @@ def scan_stock(symbol):
 
         t1 = round(buy + risk, 2)
         t2 = round(buy + (2 * risk), 2)
-        t3 = round(buy
+        t3 = round(buy + (3 * risk), 2)
+
+return {
+    "symbol": symbol.replace(".NS", ""),
+    "score": score,
+    "buy": buy,
+    "sl": sl,
+    "t1": t1,
+    "t2": t2,
+    "t3": t3,
+    "rsi": round(float(rsi.iloc[-1]), 2),
+}
+
+except Exception as e:
+    print(f"{symbol}: {e}")
+    return None
