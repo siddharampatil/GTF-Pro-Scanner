@@ -17,24 +17,28 @@ for stock in stocks:
     if result:
         results.append(result)
 
-# Sort by highest score
+# Sort by score
 results = sorted(results, key=lambda x: x["score"], reverse=True)
 
-# Keep only Top 10
+# Show Top 10
 top_results = results[:10]
 
 if top_results:
-    message = "🔥 GTF PRO SCANNER - TOP 10 STOCKS 🔥\n\n"
+    message = "🔥 GTF PRO SCANNER - TOP 10 🔥\n\n"
 
-    for stock in top_results:
+    for s in top_results:
         message += (
-            f"📈 {stock['symbol']}\n"
-            f"💰 Price: ₹{stock['price']}\n"
-            f"📊 RSI: {stock['rsi']}\n"
-            f"⭐ Score: {stock['score']}/100\n\n"
+            f"📈 {s['symbol']}\n"
+            f"⭐ Score: {s['score']}/100\n"
+            f"💰 Buy: ₹{s['buy']}\n"
+            f"🛑 Stop Loss: ₹{s['sl']}\n"
+            f"🎯 Target 1: ₹{s['t1']}\n"
+            f"🎯 Target 2: ₹{s['t2']}\n"
+            f"🎯 Target 3: ₹{s['t3']}\n"
+            f"📊 RSI: {s['rsi']}\n\n"
         )
 else:
-    message = "No stocks found."
+    message = "❌ No stocks found."
 
 requests.post(
     url,
