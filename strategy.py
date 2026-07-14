@@ -88,7 +88,9 @@ def scan_stock(symbol):
 
         if 50 <= rsi.iloc[-1] <= 70:
             score += 20
-            reasons.append(f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})")
+            reasons.append(
+                f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})"
+            )
 
         if rvol >= 1:
             score += 10
@@ -98,7 +100,8 @@ def scan_stock(symbol):
             score += 10
             reasons.append("✅ MACD Bullish Crossover")
 
-        breakout = close.iloc[-1] >= high.iloc[-20:].max()
+        # Correct 20-Day Breakout (excluding today's candle)
+        breakout = close.iloc[-1] > high.iloc[-21:-1].max()
 
         if breakout:
             score += 10
@@ -133,6 +136,9 @@ def scan_stock(symbol):
             2
         )
 
+        if sl >= buy:
+            sl = round(buy * 0.98, 2)
+
         risk = round(buy - sl, 2)
 
         if risk <= 0:
@@ -143,33 +149,20 @@ def scan_stock(symbol):
         t3 = round(buy + (3 * risk), 2)
 
         return {
-
             "symbol": symbol.replace(".NS", ""),
-
             "score": score,
-
             "trend": trend,
-
             "confidence": confidence,
-
             "market": "🟢 Bullish" if market_bullish else "🔴 Bearish",
-
             "reason": "\n".join(reasons),
-
             "buy": buy,
-
             "sl": sl,
-
             "t1": t1,
-
             "t2": t2,
-
             "t3": t3,
-
             "rsi": round(float(rsi.iloc[-1]), 2),
-
-            "rvol": rvol
-
+            "rvol": rvol,
+            "atr": round(atr_value, 2)
         }
 
     except Exception as e:
