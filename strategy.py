@@ -13,6 +13,7 @@ def scan_stock(symbol):
         )
 
         if len(df) < 60:
+            print(f"{symbol}: Not enough data")
             return None
 
         close = df["Close"]
@@ -20,9 +21,7 @@ def scan_stock(symbol):
 
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
-
         rsi = RSIIndicator(close, window=14).rsi()
-
         avg_volume = volume.rolling(20).mean()
 
         score = 0
@@ -49,5 +48,6 @@ def scan_stock(symbol):
             "score": score,
         }
 
-    except Exception:
+    except Exception as e:
+        print(f"Error in {symbol}: {e}")
         return None
