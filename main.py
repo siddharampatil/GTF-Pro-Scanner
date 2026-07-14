@@ -12,44 +12,50 @@ url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 stocks = get_stock_list()
 results = []
 
+# Scan all stocks
 for stock in stocks:
     result = scan_stock(stock)
 
-    # Show only stocks with Score 50 or above
-    if result and result["score"] >= 50:
+    # Only High Quality Stocks
+    if result and result["score"] >= 80:
         results.append(result)
 
-# Sort by highest score
+# Highest score first
 results = sorted(results, key=lambda x: x["score"], reverse=True)
 
 # Top 10
 top_results = results[:10]
 
 if top_results:
-    message = "🚀 GTF PRO SCANNER V2.3 🚀\n\n"
+
+    message = "🚀 GTF PRO SCANNER V2.4 🚀\n\n"
 
     for s in top_results:
+
         message += (
             f"📈 {s['symbol']}\n"
-            f"📊 Market: {s['market']}\n"
+            f"📊 Market : {s['market']}\n"
             f"{s['trend']}\n"
             f"{s['confidence']}\n"
-            f"⭐ Score: {s['score']}/100\n\n"
+            f"⭐ Score : {s['score']}/110\n\n"
 
-            f"💰 Buy: ₹{s['buy']}\n"
-            f"🛑 Stop Loss: ₹{s['sl']}\n"
+            f"💰 Buy : ₹{s['buy']}\n"
+            f"🛑 Stop Loss : ₹{s['sl']}\n"
 
-            f"🎯 Target 1: ₹{s['t1']}\n"
-            f"🎯 Target 2: ₹{s['t2']}\n"
-            f"🎯 Target 3: ₹{s['t3']}\n\n"
+            f"🎯 Target 1 : ₹{s['t1']}\n"
+            f"🎯 Target 2 : ₹{s['t2']}\n"
+            f"🎯 Target 3 : ₹{s['t3']}\n\n"
 
-            f"📊 RSI: {s['rsi']}\n\n"
+            f"📊 RSI : {s['rsi']}\n"
+            f"🚀 Relative Volume : {s['rvol']}x\n\n"
 
             f"📌 Reasons:\n{s['reason']}\n"
 
-            f"{'─'*30}\n\n"
+            f"{'─'*35}\n\n"
         )
+
 else:
+
     message = "❌ No High Confidence Stocks Found Today."
 
 requests.post(
