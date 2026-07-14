@@ -16,8 +16,8 @@ def scan_stock(symbol):
             print(f"{symbol}: Not enough data")
             return None
 
-        close = df["Close"]
-        volume = df["Volume"]
+        close = df["Close"].squeeze()
+        volume = df["Volume"].squeeze()
 
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
