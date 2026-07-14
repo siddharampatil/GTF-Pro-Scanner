@@ -1,6 +1,7 @@
 import yfinance as yf
 from ta.trend import EMAIndicator
 from ta.momentum import RSIIndicator
+from ta.volatility import AverageTrueRange
 
 def scan_stock(symbol):
     try:
