@@ -7,13 +7,13 @@ def scan_stock(symbol):
     try:
         df = yf.download(
             symbol,
-            period="6mo",
+            period="1y",
             interval="1d",
             progress=False,
             auto_adjust=True
         )
 
-        # Need at least 200 days for EMA200
+        # Need at least 200 trading days
         if len(df) < 200:
             return None
 
@@ -25,7 +25,6 @@ def scan_stock(symbol):
         ema200 = EMAIndicator(close, window=200).ema_indicator()
 
         rsi = RSIIndicator(close, window=14).rsi()
-
         avg_volume = volume.rolling(20).mean()
 
         score = 0
@@ -42,11 +41,11 @@ def scan_stock(symbol):
         if ema50.iloc[-1] > ema200.iloc[-1]:
             score += 20
 
-        # RSI Bullish
+        # RSI between 50 and 70
         if 50 <= rsi.iloc[-1] <= 70:
             score += 20
 
-        # Volume above average
+        # Volume above 20-day average
         if volume.iloc[-1] > avg_volume.iloc[-1]:
             score += 20
 
@@ -58,13 +57,11 @@ def scan_stock(symbol):
 
         sl = min(last5_low, percent_sl)
 
-        # Ensure Stop Loss is always below Buy
         if sl >= buy:
             sl = percent_sl
 
         risk = round(buy - sl, 2)
 
-        # Safety check
         if risk <= 0:
             risk = round(buy * 0.02, 2)
 
