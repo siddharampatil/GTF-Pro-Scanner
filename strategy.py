@@ -13,7 +13,7 @@ def scan_stock(symbol):
             auto_adjust=True
         )
 
-        if len(df) < 60:
+        if len(df) < 200:
             return None
 
         close = df["Close"].squeeze()
