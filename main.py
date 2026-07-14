@@ -2,35 +2,39 @@ import os
 import requests
 
 from strategy import scan_stock
-from nse_stocks import STOCKS
+from stock_list import get_stock_list
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
 
 url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
+stocks = get_stock_list()
 results = []
 
-for stock in STOCKS:
+for stock in stocks:
     result = scan_stock(stock)
-
     if result:
-        results.append(
-            f"""📈 BUY SIGNAL
+        results.append(result)
 
-🏢 Stock: {result['symbol']}
-💰 Entry: ₹{result['price']}
-🎯 Target 1: ₹{result['target1']}
-🎯 Target 2: ₹{result['target2']}
-🛑 Stop Loss: ₹{result['sl']}
-📊 RSI: {result['rsi']}
-"""
+# Sort by highest score
+results = sorted(results, key=lambda x: x["score"], reverse=True)
+
+# Keep only Top 10
+top_results = results[:10]
+
+if top_results:
+    message = "🔥 GTF PRO SCANNER - TOP 10 STOCKS 🔥\n\n"
+
+    for stock in top_results:
+        message += (
+            f"📈 {stock['symbol']}\n"
+            f"💰 Price: ₹{stock['price']}\n"
+            f"📊 RSI: {stock['rsi']}\n"
+            f"⭐ Score: {stock['score']}/100\n\n"
         )
-
-if results:
-    message = "🔥 GTF PRO SCANNER 🔥\n\n" + "\n------------------------\n".join(results)
 else:
-    message = "📊 GTF PRO SCANNER\n\nNo stocks matched the strategy today."
+    message = "No stocks found."
 
 requests.post(
     url,
