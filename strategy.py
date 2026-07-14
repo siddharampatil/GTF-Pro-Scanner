@@ -33,34 +33,51 @@ def scan_stock(symbol):
         avg_volume = volume.rolling(20).mean()
 
         score = 0
+        reasons = []
 
-        # Price above EMA20
         if close.iloc[-1] > ema20.iloc[-1]:
             score += 20
+            reasons.append("✅ Price above EMA20")
 
-        # EMA20 above EMA50
         if ema20.iloc[-1] > ema50.iloc[-1]:
             score += 20
+            reasons.append("✅ EMA20 above EMA50")
 
-        # EMA50 above EMA200
         if ema50.iloc[-1] > ema200.iloc[-1]:
             score += 20
+            reasons.append("✅ EMA50 above EMA200")
 
-        # RSI Strength
         if 50 <= rsi.iloc[-1] <= 70:
             score += 20
+            reasons.append(f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})")
 
-        # Volume Confirmation
         if volume.iloc[-1] > avg_volume.iloc[-1]:
             score += 10
+            reasons.append("✅ Volume above 20-Day Average")
 
-        # MACD Bullish
         if macd_line.iloc[-1] > signal_line.iloc[-1]:
             score += 10
+            reasons.append("✅ MACD Bullish Crossover")
+
+        # Trend & Confidence
+        if score >= 90:
+            trend = "🟢 Strong Bullish"
+            confidence = "🔥 Very High"
+
+        elif score >= 80:
+            trend = "🟢 Bullish"
+            confidence = "✅ High"
+
+        elif score >= 60:
+            trend = "🟡 Moderate"
+            confidence = "⚠ Medium"
+
+        else:
+            trend = "🔴 Weak"
+            confidence = "❌ Low"
 
         buy = round(float(close.iloc[-1]), 2)
 
-        # Stop Loss
         last5_low = round(float(close.iloc[-5:].min()), 2)
         percent_sl = round(buy * 0.98, 2)
 
@@ -81,6 +98,9 @@ def scan_stock(symbol):
         return {
             "symbol": symbol.replace(".NS", ""),
             "score": score,
+            "trend": trend,
+            "confidence": confidence,
+            "reason": "\n".join(reasons),
             "buy": buy,
             "sl": sl,
             "t1": t1,
