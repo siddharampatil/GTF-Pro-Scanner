@@ -1,5 +1,5 @@
 import yfinance as yf
-from ta.trend import EMAIndicator, MACD
+from ta.trend import EMAIndicator, MACD, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
@@ -47,6 +47,7 @@ def scan_stock(symbol):
         low = df["Low"].squeeze()
         volume = df["Volume"].squeeze()
 
+        # Indicators
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
         ema200 = EMAIndicator(close, window=200).ema_indicator()
@@ -57,6 +58,13 @@ def scan_stock(symbol):
         macd_line = macd.macd()
         signal_line = macd.macd_signal()
 
+        adx = ADXIndicator(
+            high,
+            low,
+            close,
+            window=14
+        ).adx()
+
         atr = AverageTrueRange(
             high,
             low,
@@ -66,10 +74,7 @@ def scan_stock(symbol):
 
         avg_volume = volume.rolling(20).mean()
 
-        rvol = round(
-            float(volume.iloc[-1] / avg_volume.iloc[-1]),
-            2
-        )
+        rvol = round(float(volume.iloc[-1] / avg_volume.iloc[-1]), 2)
 
         score = 0
         reasons = []
@@ -86,28 +91,44 @@ def scan_stock(symbol):
             score += 20
             reasons.append("✅ EMA50 above EMA200")
 
-        if 50 <= rsi.iloc[-1] <= 70:
+        if 55 <= rsi.iloc[-1] <= 68:
             score += 20
-            reasons.append(
-                f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})"
-            )
+            reasons.append(f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})")
 
-        if rvol >= 1:
+        if rvol >= 2:
+            score += 15
+            reasons.append(f"✅ High Relative Volume ({rvol}x)")
+        elif rvol >= 1.5:
             score += 10
-            reasons.append(f"✅ Relative Volume {rvol}x")
+            reasons.append(f"✅ Relative Volume ({rvol}x)")
+        elif rvol >= 1.2:
+            score += 5
+            reasons.append(f"✅ Relative Volume ({rvol}x)")
 
         if macd_line.iloc[-1] > signal_line.iloc[-1]:
             score += 10
             reasons.append("✅ MACD Bullish Crossover")
 
-        # Correct 20-Day Breakout (excluding today's candle)
         breakout = close.iloc[-1] > high.iloc[-21:-1].max()
 
         if breakout:
             score += 10
             reasons.append("✅ 20-Day Breakout")
 
-        if score >= 100:
+        adx_value = round(float(adx.iloc[-1]), 1)
+
+        if adx_value >= 30:
+            score += 15
+            reasons.append(f"✅ Strong Trend (ADX {adx_value})")
+        elif adx_value >= 25:
+            score += 10
+            reasons.append(f"✅ Good Trend (ADX {adx_value})")
+
+        if score >= 120:
+            trend = "🟢 Super Bullish"
+            confidence = "💎 Institutional"
+
+        elif score >= 100:
             trend = "🟢 Strong Bullish"
             confidence = "🔥 Excellent"
 
@@ -131,10 +152,7 @@ def scan_stock(symbol):
 
         atr_value = float(atr.iloc[-1])
 
-        sl = round(
-            buy - (1.5 * atr_value),
-            2
-        )
+        sl = round(buy - (1.5 * atr_value), 2)
 
         if sl >= buy:
             sl = round(buy * 0.98, 2)
@@ -162,6 +180,7 @@ def scan_stock(symbol):
             "t3": t3,
             "rsi": round(float(rsi.iloc[-1]), 2),
             "rvol": rvol,
+            "adx": adx_value,
             "atr": round(atr_value, 2)
         }
 
