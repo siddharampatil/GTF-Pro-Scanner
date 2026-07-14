@@ -1,5 +1,5 @@
 import yfinance as yf
-from ta.trend import EMAIndicator
+from ta.trend import EMAIndicator, MACD
 from ta.momentum import RSIIndicator
 
 
@@ -13,18 +13,23 @@ def scan_stock(symbol):
             auto_adjust=True
         )
 
-        # Need at least 200 trading days
         if len(df) < 200:
             return None
 
         close = df["Close"].squeeze()
         volume = df["Volume"].squeeze()
 
+        # Indicators
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
         ema200 = EMAIndicator(close, window=200).ema_indicator()
 
         rsi = RSIIndicator(close, window=14).rsi()
+
+        macd = MACD(close)
+        macd_line = macd.macd()
+        signal_line = macd.macd_signal()
+
         avg_volume = volume.rolling(20).mean()
 
         score = 0
@@ -41,17 +46,21 @@ def scan_stock(symbol):
         if ema50.iloc[-1] > ema200.iloc[-1]:
             score += 20
 
-        # RSI between 50 and 70
+        # RSI Strength
         if 50 <= rsi.iloc[-1] <= 70:
             score += 20
 
-        # Volume above 20-day average
+        # Volume Confirmation
         if volume.iloc[-1] > avg_volume.iloc[-1]:
-            score += 20
+            score += 10
+
+        # MACD Bullish
+        if macd_line.iloc[-1] > signal_line.iloc[-1]:
+            score += 10
 
         buy = round(float(close.iloc[-1]), 2)
 
-        # Stop Loss = Lower of last 5-day low or 2% below Buy
+        # Stop Loss
         last5_low = round(float(close.iloc[-5:].min()), 2)
         percent_sl = round(buy * 0.98, 2)
 
