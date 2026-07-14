@@ -3,6 +3,7 @@ from ta.trend import EMAIndicator, MACD
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
+
 def scan_stock(symbol):
     try:
         df = yf.download(
@@ -66,7 +67,7 @@ def scan_stock(symbol):
         if macd_line.iloc[-1] > signal_line.iloc[-1]:
             score += 10
 
-        # 20 Day Breakout
+        # 20-Day Breakout
         if close.iloc[-1] >= high.iloc[-20:].max():
             score += 10
 
@@ -78,4 +79,21 @@ def scan_stock(symbol):
 
         risk = buy - stop_loss
 
-        target1 = round(buy + risk, 
+        target1 = round(buy + risk, 2)
+        target2 = round(buy + (2 * risk), 2)
+        target3 = round(buy + (3 * risk), 2)
+
+        return {
+            "symbol": symbol.replace(".NS", ""),
+            "score": score,
+            "buy": buy,
+            "sl": stop_loss,
+            "t1": target1,
+            "t2": target2,
+            "t3": target3,
+            "rsi": round(float(rsi.iloc[-1]), 2),
+        }
+
+    except Exception as e:
+        print(f"{symbol}: {e}")
+        return None
