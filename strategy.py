@@ -13,10 +13,11 @@ def scan_stock(symbol):
         )
 
         if len(df) < 60:
-            print(f"{symbol}: Not enough data")
             return None
 
         close = df["Close"].squeeze()
+        high = df["High"].squeeze()
+        low = df["Low"].squeeze()
         volume = df["Volume"].squeeze()
 
         ema20 = EMAIndicator(close, window=20).ema_indicator()
@@ -38,16 +39,26 @@ def scan_stock(symbol):
         if volume.iloc[-1] > avg_volume.iloc[-1]:
             score += 15
 
-        if close.iloc[-1] >= close.iloc[-20:].max():
+        if close.iloc[-1] >= high.iloc[-20:].max():
             score += 15
+
+        buy = round(float(close.iloc[-1]), 2)
+        sl = round(float(low.iloc[-5:].min()), 2)
+        target1 = round(buy * 1.03, 2)
+        target2 = round(buy * 1.05, 2)
+        target3 = round(buy * 1.08, 2)
 
         return {
             "symbol": symbol.replace(".NS", ""),
-            "price": round(float(close.iloc[-1]), 2),
+            "price": buy,
             "rsi": round(float(rsi.iloc[-1]), 2),
             "score": score,
+            "buy": buy,
+            "sl": sl,
+            "t1": target1,
+            "t2": target2,
+            "t3": target3,
         }
 
-    except Exception as e:
-        print(f"Error in {symbol}: {e}")
+    except Exception:
         return None
