@@ -15,8 +15,9 @@ results = []
 for stock in stocks:
     result = scan_stock(stock)
 
-    # Only keep high-quality signals
-    if result and result["score"] >= 50:
+    print(f"{stock} -> {result}")
+
+    if result:
         results.append(result)
 
 # Sort by score (highest first)
