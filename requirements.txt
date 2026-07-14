@@ -1,6 +1,5 @@
-python-telegram-bot==22.2
-yfinance
 pandas
+yfinance
 ta
 requests
-nsetools
+python-telegram-bot==22.2
