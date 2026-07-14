@@ -26,11 +26,12 @@ results = sorted(results, key=lambda x: x["score"], reverse=True)
 top_results = results[:10]
 
 if top_results:
-    message = "🚀 GTF PRO SCANNER V2.2 🚀\n\n"
+    message = "🚀 GTF PRO SCANNER V2.3 🚀\n\n"
 
     for s in top_results:
         message += (
             f"📈 {s['symbol']}\n"
+            f"📊 Market: {s['market']}\n"
             f"{s['trend']}\n"
             f"{s['confidence']}\n"
             f"⭐ Score: {s['score']}/100\n\n"
