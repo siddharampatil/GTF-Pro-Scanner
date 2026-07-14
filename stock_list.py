@@ -1,13 +1,4 @@
-from nsetools import Nse
-
-
 def get_stock_list():
-    nse = Nse()
-
-    stocks = []
-
-    for symbol in nse.get_stock_codes().keys():
-        if symbol != "SYMBOL":
-            stocks.append(symbol + ".NS")
-
+    with open("stocks.txt", "r") as f:
+        stocks = [line.strip() for line in f if line.strip()]
     return stocks
