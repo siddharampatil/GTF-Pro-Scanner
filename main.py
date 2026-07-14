@@ -11,33 +11,37 @@ url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 stocks = get_stock_list()
 
-print(f"Total Stocks: {len(stocks)}")
-
 results = []
 
 for stock in stocks:
-    print(f"Scanning {stock}...")
-
     result = scan_stock(stock)
 
-    print(f"Result: {result}")
-
-    if result:
+    # Only include stocks with Score 50 or higher
+    if result and result["score"] >= 50:
         results.append(result)
 
+# Sort by highest score
 results = sorted(results, key=lambda x: x["score"], reverse=True)
 
-print(f"Matched Stocks: {len(results)}")
+# Show only Top 10
+top_results = results[:10]
 
-if results:
-    message = "DEBUG SCANNER\n\n"
+if top_results:
+    message = "🔥 GTF PRO SCANNER - TOP STOCKS 🔥\n\n"
 
-    for s in results:
+    for s in top_results:
         message += (
-            f"{s['symbol']} | Score: {s['score']} | Buy: ₹{s['buy']}\n"
+            f"📈 {s['symbol']}\n"
+            f"⭐ Score: {s['score']}/100\n"
+            f"💰 Buy: ₹{s['buy']}\n"
+            f"🛑 Stop Loss: ₹{s['sl']}\n"
+            f"🎯 Target 1: ₹{s['t1']}\n"
+            f"🎯 Target 2: ₹{s['t2']}\n"
+            f"🎯 Target 3: ₹{s['t3']}\n"
+            f"📊 RSI: {s['rsi']}\n\n"
         )
 else:
-    message = "No stocks found."
+    message = "❌ No High Confidence Stocks Found Today."
 
 requests.post(
     url,
