@@ -10,39 +10,34 @@ CHAT_ID = os.environ["CHAT_ID"]
 url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 stocks = get_stock_list()
+
+print(f"Total Stocks: {len(stocks)}")
+
 results = []
 
 for stock in stocks:
+    print(f"Scanning {stock}...")
+
     result = scan_stock(stock)
 
-    print(f"{stock} -> {result}")
+    print(f"Result: {result}")
 
     if result:
         results.append(result)
 
-# Sort by score (highest first)
 results = sorted(results, key=lambda x: x["score"], reverse=True)
 
-# Show Top 10
-top_results = results[:10]
+print(f"Matched Stocks: {len(results)}")
 
-if top_results:
-    message = "🔥 GTF PRO SCANNER - HIGH CONFIDENCE STOCKS 🔥\n\n"
+if results:
+    message = "DEBUG SCANNER\n\n"
 
-    for s in top_results:
+    for s in results:
         message += (
-            f"📈 {s['symbol']}\n"
-            f"⭐ Score: {s['score']}/100\n"
-            f"💰 Buy: ₹{s['buy']}\n"
-            f"🛑 Stop Loss: ₹{s['sl']}\n"
-            f"🎯 Target 1: ₹{s['t1']}\n"
-            f"🎯 Target 2: ₹{s['t2']}\n"
-            f"🎯 Target 3: ₹{s['t3']}\n"
-            f"📊 RSI: {s['rsi']}\n"
-            f"────────────────────\n"
+            f"{s['symbol']} | Score: {s['score']} | Buy: ₹{s['buy']}\n"
         )
 else:
-    message = "❌ No High Confidence Stocks Found Today."
+    message = "No stocks found."
 
 requests.post(
     url,
