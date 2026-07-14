@@ -15,15 +15,18 @@ results = []
 for stock in stocks:
     result = scan_stock(stock)
 
-    if result and result["score"] >= 50:
+    # Show ALL scanned stocks (for debugging)
+    if result:
         results.append(result)
 
+# Sort by highest score
 results = sorted(results, key=lambda x: x["score"], reverse=True)
 
+# Top 10
 top_results = results[:10]
 
 if top_results:
-    message = "🔥 GTF PRO SCANNER - TOP STOCKS 🔥\n\n"
+    message = "🔥 GTF PRO SCANNER - DEBUG MODE 🔥\n\n"
 
     for s in top_results:
         message += (
@@ -37,7 +40,7 @@ if top_results:
             f"📊 RSI: {s['rsi']}\n\n"
         )
 else:
-    message = "❌ No High Confidence Stocks Found Today."
+    message = "❌ No stocks found."
 
 requests.post(
     url,
