@@ -2,6 +2,7 @@ import yfinance as yf
 from ta.trend import EMAIndicator
 from ta.momentum import RSIIndicator
 
+
 def scan_stock(symbol):
     try:
         df = yf.download(
@@ -26,29 +27,40 @@ def scan_stock(symbol):
 
         score = 0
 
+        # Price above EMA20
         if close.iloc[-1] > ema20.iloc[-1]:
             score += 25
 
+        # EMA20 above EMA50
         if ema20.iloc[-1] > ema50.iloc[-1]:
             score += 25
 
+        # RSI Bullish
         if 50 <= rsi.iloc[-1] <= 70:
             score += 25
 
+        # Volume above average
         if volume.iloc[-1] > avg_volume.iloc[-1]:
             score += 25
 
-        return {
-            "symbol": symbol.replace(".NS", ""),
-            "score": score,
-            "buy": round(float(close.iloc[-1]), 2),
-            "sl": round(float(close.iloc[-5:].min()), 2),
-            "t1": round(float(close.iloc[-1]) * 1.03, 2),
-            "t2": round(float(close.iloc[-1]) * 1.05, 2),
-            "t3": round(float(close.iloc[-1]) * 1.08, 2),
-            "rsi": round(float(rsi.iloc[-1]), 2),
-        }
+        buy = round(float(close.iloc[-1]), 2)
 
-    except Exception as e:
-        print(f"{symbol}: {e}")
-        return None
+        # Stop Loss = Lower of 5-day low or 2% below Buy
+        last5_low = round(float(close.iloc[-5:].min()), 2)
+        percent_sl = round(buy * 0.98, 2)
+
+        sl = min(last5_low, percent_sl)
+
+        # Ensure SL is always below Buy
+        if sl >= buy:
+            sl = percent_sl
+
+        risk = round(buy - sl, 2)
+
+        # Safety check
+        if risk <= 0:
+            risk = round(buy * 0.02, 2)
+
+        t1 = round(buy + risk, 2)
+        t2 = round(buy + (2 * risk), 2)
+        t3 = round(buy
