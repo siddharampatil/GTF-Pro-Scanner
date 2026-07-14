@@ -1,6 +1,7 @@
 import yfinance as yf
 from ta.trend import EMAIndicator, MACD
 from ta.momentum import RSIIndicator
+from ta.volatility import AverageTrueRange
 
 
 def market_is_bullish():
@@ -25,6 +26,7 @@ def market_is_bullish():
 
 
 def scan_stock(symbol):
+
     try:
 
         market_bullish = market_is_bullish()
@@ -41,6 +43,8 @@ def scan_stock(symbol):
             return None
 
         close = df["Close"].squeeze()
+        high = df["High"].squeeze()
+        low = df["Low"].squeeze()
         volume = df["Volume"].squeeze()
 
         ema20 = EMAIndicator(close, window=20).ema_indicator()
@@ -53,7 +57,19 @@ def scan_stock(symbol):
         macd_line = macd.macd()
         signal_line = macd.macd_signal()
 
+        atr = AverageTrueRange(
+            high,
+            low,
+            close,
+            window=14
+        ).average_true_range()
+
         avg_volume = volume.rolling(20).mean()
+
+        rvol = round(
+            float(volume.iloc[-1] / avg_volume.iloc[-1]),
+            2
+        )
 
         score = 0
         reasons = []
@@ -74,36 +90,48 @@ def scan_stock(symbol):
             score += 20
             reasons.append(f"✅ RSI Bullish ({round(float(rsi.iloc[-1]),2)})")
 
-        if volume.iloc[-1] > avg_volume.iloc[-1]:
+        if rvol >= 1:
             score += 10
-            reasons.append("✅ Volume above 20-Day Average")
+            reasons.append(f"✅ Relative Volume {rvol}x")
 
         if macd_line.iloc[-1] > signal_line.iloc[-1]:
             score += 10
             reasons.append("✅ MACD Bullish Crossover")
 
-        if score >= 90:
+        breakout = close.iloc[-1] >= high.iloc[-20:].max()
+
+        if breakout:
+            score += 10
+            reasons.append("✅ 20-Day Breakout")
+
+        if score >= 100:
+            trend = "🟢 Strong Bullish"
+            confidence = "🔥 Excellent"
+
+        elif score >= 90:
             trend = "🟢 Strong Bullish"
             confidence = "🔥 Very High"
+
         elif score >= 80:
             trend = "🟢 Bullish"
             confidence = "✅ High"
+
         elif score >= 60:
             trend = "🟡 Moderate"
             confidence = "⚠ Medium"
+
         else:
             trend = "🔴 Weak"
             confidence = "❌ Low"
 
         buy = round(float(close.iloc[-1]), 2)
 
-        last5_low = round(float(close.iloc[-5:].min()), 2)
-        percent_sl = round(buy * 0.98, 2)
+        atr_value = float(atr.iloc[-1])
 
-        sl = min(last5_low, percent_sl)
-
-        if sl >= buy:
-            sl = percent_sl
+        sl = round(
+            buy - (1.5 * atr_value),
+            2
+        )
 
         risk = round(buy - sl, 2)
 
@@ -115,18 +143,33 @@ def scan_stock(symbol):
         t3 = round(buy + (3 * risk), 2)
 
         return {
+
             "symbol": symbol.replace(".NS", ""),
+
             "score": score,
+
             "trend": trend,
+
             "confidence": confidence,
+
             "market": "🟢 Bullish" if market_bullish else "🔴 Bearish",
+
             "reason": "\n".join(reasons),
+
             "buy": buy,
+
             "sl": sl,
+
             "t1": t1,
+
             "t2": t2,
+
             "t3": t3,
+
             "rsi": round(float(rsi.iloc[-1]), 2),
+
+            "rvol": rvol
+
         }
 
     except Exception as e:
