@@ -59,17 +59,20 @@ def safe_float(value, default=0.0):
 
 def scan_stock(symbol):
 
-    try:
-
-        market_bullish = market_is_bullish()
+     try:
+    market_bullish = market_is_bullish()
+except:
+    market_bullish = True
 
         df = yf.download(
-            symbol,
-            period="1y",
-            interval="1d",
-            auto_adjust=True,
-            progress=False
-        )
+    symbol,
+    period="6mo",
+    interval="1d",
+    auto_adjust=True,
+    progress=False,
+    threads=False,
+    timeout=30
+)
 
         if df.empty or len(df) < 60:
             return None
