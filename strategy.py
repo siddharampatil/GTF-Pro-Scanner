@@ -1,12 +1,7 @@
 import math
 import yfinance as yf
 
-from ta.trend import (
-    EMAIndicator,
-    MACD,
-    ADXIndicator
-)
-
+from ta.trend import EMAIndicator, MACD, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
@@ -16,9 +11,7 @@ from ta.volatility import AverageTrueRange
 # ==========================================
 
 def market_is_bullish():
-
     try:
-
         nifty = yf.download(
             "^NSEI",
             period="6mo",
@@ -36,12 +29,10 @@ def market_is_bullish():
         ema50 = EMAIndicator(close, window=50).ema_indicator()
 
         return (
-            close.iloc[-1] >
-            ema20.iloc[-1] >
-            ema50.iloc[-1]
+            close.iloc[-1] > ema20.iloc[-1] > ema50.iloc[-1]
         )
 
-    except:
+    except Exception:
         return True
 
 
@@ -49,8 +40,7 @@ def market_is_bullish():
 # SAFE FLOAT
 # ==========================================
 
-def safe_float(value, default=0):
-
+def safe_float(value, default=0.0):
     try:
         value = float(value)
 
@@ -59,7 +49,7 @@ def safe_float(value, default=0):
 
         return value
 
-    except:
+    except Exception:
         return default
 
 
@@ -89,16 +79,34 @@ def scan_stock(symbol):
         low = df["Low"].squeeze()
         volume = df["Volume"].squeeze()
 
-        ema20 = EMAIndicator(close, window=20).ema_indicator().fillna(method="bfill")
-ema50 = EMAIndicator(close, window=50).ema_indicator().fillna(method="bfill")
-ema200 = EMAIndicator(close, window=200).ema_indicator().fillna(method="bfill")
+        # EMA
+        ema20 = EMAIndicator(
+            close,
+            window=20
+        ).ema_indicator().bfill()
 
-rsi = RSIIndicator(close, window=14).rsi().fillna(50)
+        ema50 = EMAIndicator(
+            close,
+            window=50
+        ).ema_indicator().bfill()
 
+        ema200 = EMAIndicator(
+            close,
+            window=200
+        ).ema_indicator().bfill()
+
+        # RSI
+        rsi = RSIIndicator(
+            close,
+            window=14
+        ).rsi().fillna(50)
+
+        # MACD
         macd = MACD(close)
-        macd_line = macd.macd()
-        signal_line = macd.macd_signal()
 
+        macd_line = macd.macd().fillna(0)
+        signal_line = macd.macd_signal().fillna(0)
+        # ADX
         adx = ADXIndicator(
             high=high,
             low=low,
@@ -106,6 +114,7 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
             window=14
         ).adx().fillna(0)
 
+        # ATR
         atr = AverageTrueRange(
             high=high,
             low=low,
@@ -113,6 +122,7 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
             window=14
         ).average_true_range().fillna(0)
 
+        # Relative Volume
         avg_volume = volume.rolling(20).mean()
 
         if avg_volume.iloc[-1] > 0:
@@ -124,7 +134,10 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
         else:
             rvol = 1.0
 
-        buy = round(safe_float(close.iloc[-1]), 2)
+        buy = round(
+            safe_float(close.iloc[-1]),
+            2
+        )
 
         if buy <= 0:
             return None
@@ -139,11 +152,17 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
             1
         )
 
+        rsi_value = round(
+            safe_float(rsi.iloc[-1]),
+            2
+        )
+
         score = 0
         reasons = []
-        # ==========================================
-        # EMA CONDITIONS
-        # ==========================================
+
+        # ============================
+        # EMA Trend
+        # ============================
 
         if buy > ema20.iloc[-1]:
             score += 20
@@ -157,24 +176,19 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
             score += 20
             reasons.append("✅ EMA50 above EMA200")
 
-        # ==========================================
+        # ============================
         # RSI
-        # ==========================================
+        # ============================
 
-        rsi_value = round(
-            safe_float(rsi.iloc[-1]),
-            2
-        )
-
-        if 55 <= rsi_value <= 68:
+        if 55 <= rsi_value <= 70:
             score += 20
             reasons.append(
                 f"✅ RSI Bullish ({rsi_value})"
             )
 
-        # ==========================================
-        # RELATIVE VOLUME
-        # ==========================================
+        # ============================
+        # Relative Volume
+        # ============================
 
         if rvol >= 2:
             score += 15
@@ -194,19 +208,19 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
                 f"✅ Relative Volume ({rvol}x)"
             )
 
-        # ==========================================
+        # ============================
         # MACD
-        # ==========================================
+        # ============================
 
         if macd_line.iloc[-1] > signal_line.iloc[-1]:
             score += 10
             reasons.append(
-                "✅ MACD Bullish Crossover"
+                "✅ MACD Bullish"
             )
 
-        # ==========================================
-        # BREAKOUT
-        # ==========================================
+        # ============================
+        # Breakout
+        # ============================
 
         breakout = buy > high.iloc[-21:-1].max()
 
@@ -216,25 +230,24 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
                 "✅ 20-Day Breakout"
             )
 
-        # ==========================================
+        # ============================
         # ADX
-        # ==========================================
+        # ============================
 
         if adx_value >= 30:
             score += 15
             reasons.append(
-                f"✅ Strong Trend (ADX {adx_value})"
+                f"✅ Strong Trend ({adx_value})"
             )
 
         elif adx_value >= 25:
             score += 10
             reasons.append(
-                f"✅ Good Trend (ADX {adx_value})"
+                f"✅ Good Trend ({adx_value})"
             )
-
-        # ==========================================
-        # RATING
-        # ==========================================
+        # ============================
+        # Rating
+        # ============================
 
         if score >= 120:
             trend = "🟢 Super Bullish"
@@ -259,9 +272,14 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
         else:
             trend = "🔴 Weak"
             confidence = "❌ Low"
-        # ==========================================
-        # RISK MANAGEMENT
-        # ==========================================
+
+        # Filter weak setups
+        if score < 40:
+            return None
+
+        # ============================
+        # Risk Management
+        # ============================
 
         sl = round(buy - (1.5 * atr_value), 2)
 
@@ -276,10 +294,6 @@ rsi = RSIIndicator(close, window=14).rsi().fillna(50)
         t1 = round(buy + risk, 2)
         t2 = round(buy + (2 * risk), 2)
         t3 = round(buy + (3 * risk), 2)
-
-        # ==========================================
-        # RETURN RESULT
-        # ==========================================
 
         return {
             "symbol": symbol.replace(".NS", ""),
