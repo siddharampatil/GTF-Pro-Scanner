@@ -18,10 +18,15 @@ print(f"Scanning {len(stocks)} stocks...")
 # Scan all stocks
 # -----------------------------
 for stock in stocks:
+    print(f"Checking: {stock}")
+
     result = scan_stock(stock)
 
     if result:
+        print(f"PASS: {stock} Score={result['score']}")
         results.append(result)
+    else:
+        print(f"FAIL: {stock}")
 
 # -----------------------------
 # Sort by Score & Relative Volume
