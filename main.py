@@ -69,12 +69,15 @@ if top_results:
 else:
     message = "❌ No quality stocks found today."
 
-requests.post(
+response = requests.post(
     url,
     data={
         "chat_id": CHAT_ID,
         "text": message
     }
 )
+
+print("Telegram Status:", response.status_code)
+print("Telegram Response:", response.text)
 
 print(message)
