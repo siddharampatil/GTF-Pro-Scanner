@@ -59,22 +59,25 @@ def scan_stock(symbol):
         signal_line = macd.macd_signal()
 
         adx = ADXIndicator(
-            high,
-            low,
-            close,
-            window=14
-        ).adx()
+    high=high,
+    low=low,
+    close=close,
+    window=14
+).adx().fillna(0)
 
         atr = AverageTrueRange(
             high,
             low,
             close,
             window=14
-        ).average_true_range()
+        ).average_true_range().fillna(0)
 
         avg_volume = volume.rolling(20).mean()
 
-        rvol = round(float(volume.iloc[-1] / avg_volume.iloc[-1]), 2)
+        if avg_volume.iloc[-1] > 0:
+    rvol = round(float(volume.iloc[-1] / avg_volume.iloc[-1]), 2)
+else:
+    rvol = 1.0
 
         score = 0
         reasons = []
@@ -115,7 +118,12 @@ def scan_stock(symbol):
             score += 10
             reasons.append("✅ 20-Day Breakout")
 
-        adx_value = round(float(adx.iloc[-1]), 1)
+        adx_value = float(adx.iloc[-1])
+
+if adx_value != adx_value:
+    adx_value = 0
+
+adx_value = round(adx_value, 1)
 
         if adx_value >= 30:
             score += 15
@@ -148,9 +156,17 @@ def scan_stock(symbol):
             trend = "🔴 Weak"
             confidence = "❌ Low"
 
-        buy = round(float(close.iloc[-1]), 2)
+        buy = float(close.iloc[-1])
+
+if buy != buy:
+    return None
+
+buy = round(buy, 2)
 
         atr_value = float(atr.iloc[-1])
+
+if atr_value != atr_value or atr_value <= 0:
+    atr_value = buy * 0.02
 
         sl = round(buy - (1.5 * atr_value), 2)
 
@@ -167,6 +183,9 @@ def scan_stock(symbol):
         t3 = round(buy + (3 * risk), 2)
 
         return {
+print(
+    f"{symbol} | Buy={buy} | ATR={atr_value} | ADX={adx_value}"
+)
             "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
