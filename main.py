@@ -14,28 +14,36 @@ results = []
 
 print(f"Scanning {len(stocks)} stocks...")
 
+# -----------------------------
+# Scan all stocks
+# -----------------------------
 for stock in stocks:
     result = scan_stock(stock)
 
-    # Only keep quality stocks
     if result:
-    results.append(result)
+        results.append(result)
 
-# Sort by Score then Relative Volume
+# -----------------------------
+# Sort by Score & Relative Volume
+# -----------------------------
 results = sorted(
     results,
     key=lambda x: (x["score"], x["rvol"]),
     reverse=True
 )
 
+# Keep Top 5
 top_results = results[:5]
 
+# -----------------------------
+# Build Telegram Message
+# -----------------------------
 if len(top_results) > 0:
 
     top_pick = top_results[0]
 
     message = (
-        "🚀 GTF PRO SCANNER V4 🚀"
+        "🚀 GTF PRO SCANNER V4 🚀\n\n"
         f"🏆 TOP PICK : {top_pick['symbol']}\n"
         f"⭐ Score : {top_pick['score']}/125\n\n"
     )
@@ -48,27 +56,25 @@ if len(top_results) > 0:
             f"{s['trend']}\n"
             f"{s['confidence']}\n"
             f"⭐ Score : {s['score']}/125\n\n"
-
             f"💰 Buy : ₹{s['buy']}\n"
             f"🛑 Stop Loss : ₹{s['sl']}\n"
-
             f"🎯 Target 1 : ₹{s['t1']}\n"
             f"🎯 Target 2 : ₹{s['t2']}\n"
             f"🎯 Target 3 : ₹{s['t3']}\n\n"
-
             f"📊 RSI : {s['rsi']}\n"
             f"📈 ADX : {s['adx']}\n"
             f"🚀 Relative Volume : {s['rvol']}x\n"
             f"📏 ATR : {s['atr']}\n\n"
-
             f"📌 Reasons:\n{s['reason']}\n"
-
             f"{'─'*35}\n\n"
         )
 
 else:
-    message = "❌ No quality stocks found today."
+    message = "❌ No stocks found."
 
+# -----------------------------
+# Send Telegram Message
+# -----------------------------
 response = requests.post(
     url,
     data={
