@@ -238,11 +238,11 @@ def scan_stock(symbol):
         if risk <= 0:
             risk = round(buy * 0.02, 2)
 
-        t1 = round(buy + risk, 2)
+                t1 = round(buy + risk, 2)
         t2 = round(buy + (2 * risk), 2)
         t3 = round(buy + (3 * risk), 2)
 
-                return {
+        return {
             "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
@@ -263,8 +263,28 @@ def scan_stock(symbol):
     except Exception as e:
         print(f"{symbol}: {e}")
         return None
+        t2 = round(buy + (2 * risk), 2)
+        t3 = round(buy + (3 * risk), 2)
+
+        return {
             "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
             "confidence": confidence,
-            "market": "🟢 Bullish" if market
+            "market": "🟢 Bullish" if market_bullish else "🔴 Bearish",
+            "reason": "\n".join(reasons),
+            "buy": buy,
+            "sl": sl,
+            "t1": t1,
+            "t2": t2,
+            "t3": t3,
+            "rsi": rsi_value,
+            "rvol": rvol,
+            "adx": adx_value,
+            "atr": round(atr_value, 2)
+        }
+
+    except Exception as e:
+        print(f"{symbol}: {e}")
+        return None
+            
