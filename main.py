@@ -18,8 +18,8 @@ for stock in stocks:
     result = scan_stock(stock)
 
     # Only keep quality stocks
-    if result and result["score"] >= 70:
-        results.append(result)
+    if result:
+    results.append(result)
 
 # Sort by Score then Relative Volume
 results = sorted(
@@ -28,14 +28,14 @@ results = sorted(
     reverse=True
 )
 
-top_results = results[:10]
+top_results = results[:5]
 
-if top_results:
+if len(top_results) > 0:
 
     top_pick = top_results[0]
 
     message = (
-        "🚀 GTF PRO SCANNER V3.0 🚀\n\n"
+        "🚀 GTF PRO SCANNER V4 🚀"
         f"🏆 TOP PICK : {top_pick['symbol']}\n"
         f"⭐ Score : {top_pick['score']}/125\n\n"
     )
