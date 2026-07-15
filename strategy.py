@@ -81,7 +81,7 @@ def scan_stock(symbol):
             progress=False
         )
 
-        if df.empty or len(df) < 200:
+        if df.empty or len(df) < 60:
             return None
 
         close = df["Close"].squeeze()
@@ -89,11 +89,11 @@ def scan_stock(symbol):
         low = df["Low"].squeeze()
         volume = df["Volume"].squeeze()
 
-        ema20 = EMAIndicator(close, window=20).ema_indicator()
-        ema50 = EMAIndicator(close, window=50).ema_indicator()
-        ema200 = EMAIndicator(close, window=200).ema_indicator()
+        ema20 = EMAIndicator(close, window=20).ema_indicator().fillna(method="bfill")
+ema50 = EMAIndicator(close, window=50).ema_indicator().fillna(method="bfill")
+ema200 = EMAIndicator(close, window=200).ema_indicator().fillna(method="bfill")
 
-        rsi = RSIIndicator(close, window=14).rsi()
+rsi = RSIIndicator(close, window=14).rsi().fillna(50)
 
         macd = MACD(close)
         macd_line = macd.macd()
