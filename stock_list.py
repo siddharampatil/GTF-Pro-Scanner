@@ -2,18 +2,50 @@ import pandas as pd
 
 NIFTY500_URL = "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
 
-FALLBACK_STOCKS = [
-    "RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS","ICICIBANK.NS",
-    "SBIN.NS","LT.NS","ITC.NS","BHARTIARTL.NS","AXISBANK.NS",
-    "KOTAKBANK.NS","MARUTI.NS","BAJFINANCE.NS","ASIANPAINT.NS",
-    "TITAN.NS","ULTRACEMCO.NS","SUNPHARMA.NS","ADANIPORTS.NS",
-    "NTPC.NS","POWERGRID.NS"
-]
 
 def get_stock_list():
+
     try:
+
         df = pd.read_csv(NIFTY500_URL)
-        return [f"{s}.NS" for s in df["Symbol"].dropna().unique()]
+
+        stocks = (
+            df["Symbol"]
+            .dropna()
+            .astype(str)
+            .str.strip()
+            .unique()
+            .tolist()
+        )
+
+        return [f"{symbol}.NS" for symbol in stocks]
+
     except Exception as e:
-        print("Using fallback list:", e)
-        return FALLBACK_STOCKS
+
+        print(f"Unable to download NIFTY500 list: {e}")
+
+        # Fallback list
+        return [
+
+            "RELIANCE.NS",
+            "TCS.NS",
+            "INFY.NS",
+            "HDFCBANK.NS",
+            "ICICIBANK.NS",
+            "SBIN.NS",
+            "AXISBANK.NS",
+            "KOTAKBANK.NS",
+            "BHARTIARTL.NS",
+            "LT.NS",
+            "ITC.NS",
+            "HCLTECH.NS",
+            "ULTRACEMCO.NS",
+            "MARUTI.NS",
+            "BAJFINANCE.NS",
+            "TITAN.NS",
+            "ASIANPAINT.NS",
+            "SUNPHARMA.NS",
+            "NTPC.NS",
+            "POWERGRID.NS"
+
+        ]
