@@ -1,3 +1,4 @@
+
 import math
 import time
 import pandas as pd
@@ -6,7 +7,6 @@ import yfinance as yf
 from ta.trend import EMAIndicator, MACD, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
-
 
 # ==========================================
 # SAFE FLOAT
@@ -20,9 +20,8 @@ def safe_float(value, default=0.0):
     except:
         return default
 
-
 # ==========================================
-# DOWNLOAD DATA
+# DOWNLOAD DATA (OPTIMIZED)
 # ==========================================
 
 def download_stock(symbol):
@@ -41,7 +40,7 @@ def download_stock(symbol):
                 time.sleep(1)
                 continue
 
-            # Handle MultiIndex columns
+            # Handle MultiIndex columns safely
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
 
@@ -53,32 +52,32 @@ def download_stock(symbol):
         except Exception as e:
             print(f"{symbol}: {e}")
 
-        time.sleep(2)
+        time.sleep(1)
 
     return None
 
-
 # ==========================================
-# MARKET TREND
+# GLOBAL MARKET TREND (CACHED ONCE)
 # ==========================================
 
-def market_is_bullish():
+def get_market_trend():
+    """Download market index once to prevent nested loop API throttling."""
     try:
         nifty = download_stock("^NSEI")
-
         if nifty is None:
-            return True
+            return "🟢 Bullish"
 
         close = nifty["Close"]
-
         ema20 = EMAIndicator(close, window=20).ema_indicator()
         ema50 = EMAIndicator(close, window=50).ema_indicator()
 
-        return close.iloc[-1] > ema20.iloc[-1] > ema50.iloc[-1]
-
+        is_bullish = close.iloc[-1] > ema20.iloc[-1] > ema50.iloc[-1]
+        return "🟢 Bullish" if is_bullish else "🔴 Bearish"
     except:
-        return True
+        return "🟢 Bullish"
 
+# Initialize market condition globally once before running your loop
+MARKET_CONDITION = get_market_trend()
 
 # ==========================================
 # MAIN SCANNER
@@ -108,21 +107,10 @@ def scan_stock(symbol):
 
         macd = MACD(close)
         macd_line = macd.macd()
-        macd_signal = macd.macd_signal()
+        macd_signal = macd.macd_signal()  # Safe reference pointer
 
-        adx = ADXIndicator(
-            high=high,
-            low=low,
-            close=close,
-            window=14
-        ).adx()
-
-        atr = AverageTrueRange(
-            high=high,
-            low=low,
-            close=close,
-            window=14
-        ).average_true_range()
+        adx = ADXIndicator(high=high, low=low, close=close, window=14).adx()
+        atr = AverageTrueRange(high=high, low=low, close=close, window=14).average_true_range()
 
         avg_volume = volume.rolling(20).mean()
 
@@ -131,7 +119,6 @@ def scan_stock(symbol):
         # ==============================
 
         buy = safe_float(close.iloc[-1])
-
         if buy <= 0:
             return None
 
@@ -143,93 +130,84 @@ def scan_stock(symbol):
             atr_value = round(buy * 0.02, 2)
 
         if avg_volume.iloc[-1] > 0:
-            rvol = round(
-                safe_float(volume.iloc[-1]) /
-                safe_float(avg_volume.iloc[-1]),
-                2
-            )
+            rvol = round(safe_float(volume.iloc[-1]) / safe_float(avg_volume.iloc[-1]), 2)
         else:
             rvol = 1.0
 
         # ==============================
-        # SCORE ENGINE
+        # UPGRADED SCORE ENGINE
         # ==============================
 
         score = 0
         reasons = []
 
+        # Price above EMA20
         if buy > ema20.iloc[-1]:
-            score += 20
+            score += 10
             reasons.append("✅ Price above EMA20")
 
+        # EMA Trend
         if ema20.iloc[-1] > ema50.iloc[-1]:
-            score += 20
+            score += 10
             reasons.append("✅ EMA20 above EMA50")
 
         if ema50.iloc[-1] > ema200.iloc[-1]:
-            score += 20
+            score += 10
             reasons.append("✅ EMA50 above EMA200")
 
-        if 55 <= rsi_value <= 70:
-            score += 20
+        # RSI
+        if 55 <= rsi_value <= 68:
+            score += 15
             reasons.append(f"✅ RSI Bullish ({rsi_value})")
 
+        # MACD
         if macd_line.iloc[-1] > macd_signal.iloc[-1]:
             score += 10
             reasons.append("✅ MACD Bullish")
 
+        # ADX
         if adx_value >= 30:
             score += 15
             reasons.append(f"✅ Strong Trend ({adx_value})")
-
         elif adx_value >= 25:
             score += 10
             reasons.append(f"✅ Good Trend ({adx_value})")
 
+        # Relative Volume
         if rvol >= 2:
             score += 15
             reasons.append(f"✅ High Relative Volume ({rvol}x)")
-
         elif rvol >= 1.5:
             score += 10
             reasons.append(f"✅ Relative Volume ({rvol}x)")
 
-        elif rvol >= 1.2:
-            score += 5
-            reasons.append(f"✅ Relative Volume ({rvol}x)")
-
-        breakout = buy > high.iloc[-21:-1].max()
-
-        if breakout:
-            score += 10
+        # 20-Day Breakout
+        if buy > high.iloc[-21:-1].max():
+            score += 15
             reasons.append("✅ 20-Day Breakout")
 
         # ==============================
-        # TREND
+        # TREND & CONFIDENCE
         # ==============================
 
-        if score >= 110:
+        if score >= 85:
             trend = "🟢 Super Bullish"
             confidence = "💎 Institutional"
-
-        elif score >= 90:
+        elif score >= 75:
             trend = "🟢 Strong Bullish"
             confidence = "🔥 Excellent"
-
-        elif score >= 75:
+        elif score >= 60:
             trend = "🟢 Bullish"
             confidence = "✅ High"
-
-        elif score >= 60:
+        elif score >= 45:
             trend = "🟡 Moderate"
             confidence = "⚠ Medium"
-
         else:
             trend = "🔴 Weak"
             confidence = "❌ Low"
 
-        # Ignore very weak stocks
-        if score < 40:
+        # Minimum score filter threshold
+        if score < 45:
             return None
 
         # ==============================
@@ -237,12 +215,10 @@ def scan_stock(symbol):
         # ==============================
 
         sl = round(buy - (1.5 * atr_value), 2)
-
         if sl >= buy:
             sl = round(buy * 0.98, 2)
 
         risk = round(buy - sl, 2)
-
         if risk <= 0:
             risk = round(buy * 0.02, 2)
 
@@ -250,16 +226,12 @@ def scan_stock(symbol):
         t2 = round(buy + (2 * risk), 2)
         t3 = round(buy + (3 * risk), 2)
 
-        # ==============================
-        # RETURN RESULT
-        # ==============================
-
         return {
             "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
             "confidence": confidence,
-            "market": "🟢 Bullish" if market_is_bullish() else "🔴 Bearish",
+            "market": MARKET_CONDITION,
             "reason": "\n".join(reasons),
             "buy": round(buy, 2),
             "sl": sl,
