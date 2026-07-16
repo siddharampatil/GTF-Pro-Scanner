@@ -7,7 +7,7 @@ from stock_list import get_stock_list
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
 
-url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+url = f"https://telegram.org{BOT_TOKEN}/sendMessage"
 
 stocks = get_stock_list()
 results = []
@@ -29,57 +29,65 @@ results = sorted(
 )
 
 top_results = results[:10]
+qualified = len(results)
+scanned = len(stocks)
 
 if top_results:
 
-    top_pick = top_results[0]
+    top = top_results[0]
 
     message = (
-        "🚀 GTF PRO SCANNER V5 🚀\n\n"
-        f"🏆 TOP PICK : {top_pick['symbol']}\n"
-        f"⭐ Score : {top_pick['score']}/130\n\n"
+        "🚀 GTF PRO SCANNER V6 🚀\n\n"
+        f"📊 Stocks Scanned : {scanned}\n"
+        f"✅ Qualified : {qualified}\n\n"
+
+        f"🏆 TOP PICK : {top['symbol']}\n"
+        f"⭐ Score : {top['score']}/100\n\n"
+
+        f"💰 Buy : ₹{top['buy']}\n"
+        f"🛑 Stop Loss : ₹{top['sl']}\n"
+        f"🎯 T1 : ₹{top['t1']}\n"
+        f"🎯 T2 : ₹{top['t2']}\n"
+        f"🎯 T3 : ₹{top['t3']}\n\n"
+
+        f"📊 RSI : {top['rsi']}\n"
+        f"📈 ADX : {top['adx']}\n"
+        f"🚀 RVOL : {top['rvol']}x\n\n"
+
+        "━━━━━━━━━━━━━━━━━━\n"
+        "📈 TOP 10 STOCKS\n\n"
     )
+
+    rank = 1
 
     for s in top_results:
 
         message += (
-            f"📈 {s['symbol']}\n"
-            f"📊 Market : {s['market']}\n"
-            f"{s['trend']}\n"
-            f"{s['confidence']}\n"
-            f"⭐ Score : {s['score']}/130\n\n"
-
-            f"💰 Buy : ₹{s['buy']}\n"
-            f"🛑 SL : ₹{s['sl']}\n"
-
-            f"🎯 T1 : ₹{s['t1']}\n"
-            f"🎯 T2 : ₹{s['t2']}\n"
-            f"🎯 T3 : ₹{s['t3']}\n\n"
-
-            f"📊 RSI : {s['rsi']}\n"
-            f"📈 ADX : {s['adx']}\n"
-            f"🚀 RVOL : {s['rvol']}x\n"
-            f"📏 ATR : {s['atr']}\n\n"
-
-            f"📌 Reasons:\n{s['reason']}\n"
-            f"{'─'*35}\n\n"
+            f"{rank}. {s['symbol']}\n"
+            f"⭐ {s['score']}/100\n"
+            f"💰 ₹{s['buy']}\n\n"
         )
+
+        rank += 1
 
 else:
 
-    message = "❌ No quality stocks found today."
+    message = (
+        "🚀 GTF PRO SCANNER V6\n\n"
+        "❌ No quality stocks found today."
+    )
 
-response = requests.post(
-    url,
-    data={
-        "chat_id": CHAT_ID,
-        "text": message
-    }
-)
+MAX_LEN = 4000
 
-print("Telegram Status:", response.status_code)
-print("Telegram Response:", response.text)
+for i in range(0, len(message), MAX_LEN):
 
-if response.status_code != 200:
-    raise Exception(response.text)
-print(message)
+    response = requests.post(
+        url,
+        data={
+            "chat_id": CHAT_ID,
+            "text": message[i:i+MAX_LEN]
+        }
+    )
+
+    print("Telegram Status:", response.status_code)
+    print(response.text)
