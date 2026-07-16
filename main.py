@@ -44,7 +44,7 @@ results = sorted(
 )
 
 # Keep Top 5
-top_results = results[:5]
+top_results = results[:10]
 
 # -----------------------------
 # Build Telegram Message
