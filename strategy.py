@@ -28,6 +28,14 @@ def safe_float(value, default=0):
 # DOWNLOAD WITH RETRY
 # ==========================================
 def download_stock(symbol):
+print(f"\n===== {symbol} =====")
+print(df.tail())
+
+print("\nColumns:")
+print(df.columns)
+
+print("\nLast Close:")
+print(df["Close"].tail())
 
     for attempt in range(3):
 
