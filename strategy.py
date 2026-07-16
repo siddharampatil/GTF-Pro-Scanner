@@ -28,24 +28,32 @@ def safe_float(value, default=0):
 # DOWNLOAD WITH RETRY
 # ==========================================
 def download_stock(symbol):
-    for attempt in range(3): 
-        try: 
-            df = yf.download( 
-                symbol, 
-                period="1y", 
-                interval="1d", 
-                auto_adjust=True, 
-                progress=False, 
-                threads=False 
-            ) 
-            if not df.empty: 
-                # Handles recent yfinance multi-index structural changes safely
-                if isinstance(df.columns, pd.MultiIndex):
-                    df.columns = df.columns.get_level_values(0)
-                return df 
-        except Exception: 
-            pass 
-        time.sleep(2) 
+
+    for attempt in range(3):
+
+        try:
+
+            df = yf.download(
+                symbol,
+                period="1y",
+                interval="1d",
+                auto_adjust=True,
+                progress=False,
+                threads=False
+            )
+
+            print(f"\n===== {symbol} =====")
+            print(df.tail())
+            print(df.columns)
+
+            if not df.empty:
+                return df
+
+        except Exception as e:
+            print(e)
+
+        time.sleep(2)
+
     return None 
 
 # ==========================================
