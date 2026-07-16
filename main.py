@@ -62,4 +62,21 @@ if top_results:
             f"📏 ATR : {s['atr']}\n\n"
 
             f"📌 Reasons:\n{s['reason']}\n"
-            f"{'─'*35}\n
+            f"{'─'*35}\n\n"
+        )
+
+else:
+
+    message = "❌ No quality stocks found today."
+
+response = requests.post(
+    url,
+    data={
+        "chat_id": CHAT_ID,
+        "text": message
+    }
+)
+
+print(response.status_code)
+print(response.text)
+print(message)
