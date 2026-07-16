@@ -9,54 +9,35 @@ CHAT_ID = os.environ["CHAT_ID"]
 
 url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-stocks = [
-    "RELIANCE.NS",
-    "TCS.NS",
-    "HDFCBANK.NS",
-    "ICICIBANK.NS",
-    "INFY.NS",
-    "SBIN.NS",
-    "LT.NS",
-    "ITC.NS",
-    "BHARTIARTL.NS",
-    "AXISBANK.NS"
-]
+stocks = get_stock_list()
 results = []
 
 print(f"Scanning {len(stocks)} stocks...")
 
-# -----------------------------
-# Scan all stocks
-# -----------------------------
 for stock in stocks:
+
     result = scan_stock(stock)
 
-    if result:
+    if result is not None:
         results.append(result)
 
-# -----------------------------
-# Sort by Score & Relative Volume
-# -----------------------------
+# Highest score first
 results = sorted(
     results,
     key=lambda x: (x["score"], x["rvol"]),
     reverse=True
 )
 
-# Keep Top 5
 top_results = results[:10]
 
-# -----------------------------
-# Build Telegram Message
-# -----------------------------
-if len(top_results) > 0:
+if top_results:
 
     top_pick = top_results[0]
 
     message = (
-        "🚀 GTF PRO SCANNER V4 🚀\n\n"
+        "🚀 GTF PRO SCANNER V5 🚀\n\n"
         f"🏆 TOP PICK : {top_pick['symbol']}\n"
-        f"⭐ Score : {top_pick['score']}/125\n\n"
+        f"⭐ Score : {top_pick['score']}/130\n\n"
     )
 
     for s in top_results:
@@ -66,35 +47,19 @@ if len(top_results) > 0:
             f"📊 Market : {s['market']}\n"
             f"{s['trend']}\n"
             f"{s['confidence']}\n"
-            f"⭐ Score : {s['score']}/125\n\n"
+            f"⭐ Score : {s['score']}/130\n\n"
+
             f"💰 Buy : ₹{s['buy']}\n"
-            f"🛑 Stop Loss : ₹{s['sl']}\n"
-            f"🎯 Target 1 : ₹{s['t1']}\n"
-            f"🎯 Target 2 : ₹{s['t2']}\n"
-            f"🎯 Target 3 : ₹{s['t3']}\n\n"
+            f"🛑 SL : ₹{s['sl']}\n"
+
+            f"🎯 T1 : ₹{s['t1']}\n"
+            f"🎯 T2 : ₹{s['t2']}\n"
+            f"🎯 T3 : ₹{s['t3']}\n\n"
+
             f"📊 RSI : {s['rsi']}\n"
             f"📈 ADX : {s['adx']}\n"
-            f"🚀 Relative Volume : {s['rvol']}x\n"
+            f"🚀 RVOL : {s['rvol']}x\n"
             f"📏 ATR : {s['atr']}\n\n"
+
             f"📌 Reasons:\n{s['reason']}\n"
-            f"{'─'*35}\n\n"
-        )
-
-else:
-    message = "❌ No stocks found."
-
-# -----------------------------
-# Send Telegram Message
-# -----------------------------
-response = requests.post(
-    url,
-    data={
-        "chat_id": CHAT_ID,
-        "text": message
-    }
-)
-
-print("Telegram Status:", response.status_code)
-print("Telegram Response:", response.text)
-
-print(message)
+            f"{'─'*35}\n
