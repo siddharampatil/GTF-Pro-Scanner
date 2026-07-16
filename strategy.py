@@ -86,10 +86,29 @@ def scan_stock(symbol):
         if len(df) < 200: 
             return None 
             
-        close = df["Close"].squeeze() 
-        high = df["High"].squeeze() 
-        low = df["Low"].squeeze() 
-        volume = df["Volume"].squeeze() 
+        # Handle MultiIndex returned by yfinance
+        if hasattr(df.columns, "levels"):
+            close = df["Close"].iloc[:, 0]
+            high = df["High"].iloc[:, 0]
+            low = df["Low"].iloc[:, 0]
+            volume = df["Volume"].iloc[:, 0]
+        else:
+            close = df["Close"]
+            high = df["High"]
+            low = df["Low"]
+            volume = df["Volume"]
+
+        close = close.astype(float)
+        high = high.astype(float)
+        low = low.astype(float)
+        volume = volume.astype(float)
+        
+        # Current Values & Debug Prints
+        buy = float(close.iloc[-1].item() if hasattr(close.iloc[-1], "item") else close.iloc[-1])
+        print("BUY:", buy)
+        print("HIGH:", high.iloc[-1])
+        print("LOW:", low.iloc[-1])
+        print("VOLUME:", volume.iloc[-1])
         
         # Calculate Technical Indicators
         ema20 = EMAIndicator(close, window=20).ema_indicator().bfill() 
@@ -105,8 +124,8 @@ def scan_stock(symbol):
         atr = AverageTrueRange(high=high, low=low, close=close, window=14).average_true_range().fillna(0) 
         avg_volume = volume.rolling(20).mean() 
         
-        # Current Values
-        buy = round(safe_float(close.iloc[-1]), 2) 
+        # Rounded Values for Rules
+        buy_rounded = round(buy, 2)
         rsi_value = round(safe_float(rsi.iloc[-1]), 2) 
         adx_value = round(safe_float(adx.iloc[-1]), 1) 
         atr_value = round(safe_float(atr.iloc[-1]), 2) 
@@ -120,7 +139,7 @@ def scan_stock(symbol):
         reasons = [] 
         
         # 1. EMA Rules
-        if buy > ema20.iloc[-1]: 
+        if buy_rounded > ema20.iloc[-1]: 
             score += 20 
             reasons.append("✅ Price above EMA20") 
         if ema20.iloc[-1] > ema50.iloc[-1]: 
@@ -161,7 +180,7 @@ def scan_stock(symbol):
             
         # 6. Breakout Rule (Looking strictly at the previous 20 completed days)
         past_20_days_high = high.iloc[-21:-1].max()
-        breakout = buy > past_20_days_high 
+        breakout = buy_rounded > past_20_days_high 
         if breakout: 
             score += 10 
             reasons.append("✅ 20-Day Breakout") 
@@ -189,19 +208,19 @@ def scan_stock(symbol):
             
         # Risk Management Configurations
         if atr_value <= 0: 
-            atr_value = buy * 0.02 
+            atr_value = buy_rounded * 0.02 
             
-        sl = round(buy - (1.5 * atr_value), 2) 
-        if sl >= buy: 
-            sl = round(buy * 0.98, 2) 
+        sl = round(buy_rounded - (1.5 * atr_value), 2) 
+        if sl >= buy_rounded: 
+            sl = round(buy_rounded * 0.98, 2) 
             
-        risk = buy - sl 
+        risk = buy_rounded - sl 
         if risk <= 0: 
-            risk = buy * 0.02 
+            risk = buy_rounded * 0.02 
             
-        t1 = round(buy + risk, 2) 
-        t2 = round(buy + (2 * risk), 2) 
-        t3 = round(buy + (3 * risk), 2) 
+        t1 = round(buy_rounded + risk, 2) 
+        t2 = round(buy_rounded + (2 * risk), 2) 
+        t3 = round(buy_rounded + (3 * risk), 2) 
         
         return { 
             "symbol": symbol.replace(".NS", ""), 
@@ -210,7 +229,7 @@ def scan_stock(symbol):
             "confidence": confidence, 
             "market": get_market_trend(), 
             "reason": "\n".join(reasons), 
-            "buy": buy, 
+            "buy": buy_rounded, 
             "sl": sl, 
             "t1": t1, 
             "t2": t2, 
