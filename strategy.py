@@ -58,21 +58,21 @@ def safe_float(value, default=0.0):
 # ==========================================
 
 def scan_stock(symbol):
-
-     try:
-    market_bullish = market_is_bullish()
-except:
-    market_bullish = True
+    try:
+        try:
+            market_bullish = market_is_bullish()
+        except Exception:
+            market_bullish = True
 
         df = yf.download(
-    symbol,
-    period="6mo",
-    interval="1d",
-    auto_adjust=True,
-    progress=False,
-    threads=False,
-    timeout=30
-)
+            symbol,
+            period="6mo",
+            interval="1d",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=30
+        )
 
         if df.empty or len(df) < 60:
             return None
@@ -109,6 +109,7 @@ except:
 
         macd_line = macd.macd().fillna(0)
         signal_line = macd.macd_signal().fillna(0)
+        
         # ADX
         adx = ADXIndicator(
             high=high,
@@ -248,6 +249,7 @@ except:
             reasons.append(
                 f"✅ Good Trend ({adx_value})"
             )
+            
         # ============================
         # Rating
         # ============================
