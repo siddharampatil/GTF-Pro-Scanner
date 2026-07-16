@@ -77,6 +77,9 @@ response = requests.post(
     }
 )
 
-print(response.status_code)
-print(response.text)
+print("Telegram Status:", response.status_code)
+print("Telegram Response:", response.text)
+
+if response.status_code != 200:
+    raise Exception(response.text)
 print(message)
