@@ -84,7 +84,8 @@
         "t1": 1061.1,
         "t2": 1098.15,
         "t3": 1135.2,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AEGISVOPAK.NS",
