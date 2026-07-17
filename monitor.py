@@ -41,8 +41,34 @@ for signal in signals:
         if df.empty:
             continue
 
-        current = round(float(df["Close"].iloc[-1]), 2)
+        current = round(float(df["Close"].iloc[-1].item()), 2)
+# Buy Alert
+if signal.get("entry_alert", False) is False:
 
+    if current >= signal["buy"]:
+
+        send_message(
+            f"🚀 BUY SIGNAL\n\n"
+            f"{signal['symbol']}\n\n"
+            f"Buy Price : ₹{signal['buy']}\n"
+            f"Current : ₹{current}\n\n"
+            f"🎯 T1 : ₹{signal['t1']}\n"
+            f"🎯 T2 : ₹{signal['t2']}\n"
+            f"🎯 T3 : ₹{signal['t3']}\n"
+            f"🛑 SL : ₹{signal['sl']}"
+        )
+
+        signal["entry_alert"] = True
+        updated = True
+print(
+    f"{signal['symbol']} | "
+    f"Current={current} | "
+    f"Buy={signal['buy']} | "
+    f"T1={signal['t1']} | "
+    f"T2={signal['t2']} | "
+    f"T3={signal['t3']} | "
+    f"SL={signal['sl']}"
+)
         # Stop Loss
         if current <= signal["sl"]:
 
