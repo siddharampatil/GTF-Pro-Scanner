@@ -6,7 +6,8 @@
         "t1": 144.79,
         "t2": 149.83,
         "t3": 154.87,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TECHM.NS",
@@ -64,7 +65,8 @@
         "t1": 1826.69,
         "t2": 1913.18,
         "t3": 1999.67,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "J&KBANK.NS",
