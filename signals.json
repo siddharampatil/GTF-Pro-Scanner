@@ -26,7 +26,8 @@
         "t1": 730.71,
         "t2": 757.02,
         "t3": 783.33,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BALRAMCHIN.NS",
