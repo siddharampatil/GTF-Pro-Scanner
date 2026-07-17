@@ -10,7 +10,6 @@ URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 
 def send_message(text):
-
     response = requests.post(
         URL,
         data={
@@ -18,17 +17,14 @@ def send_message(text):
             "text": text
         }
     )
-
-    print("Telegram Status:", response.status_code)
-    print("Telegram Response:", response.text)
+    print(response.text)
 
 
+# Load signals
 with open("signals.json", "r") as f:
     signals = json.load(f)
 
 updated = False
-
-print(f"Monitoring {len(signals)} signals...")
 
 for signal in signals:
 
@@ -41,13 +37,11 @@ for signal in signals:
             signal["symbol"],
             period="2d",
             interval="5m",
-            progress=False,
             auto_adjust=True,
-            threads=False
+            progress=False
         )
 
         if df.empty:
-            print(f"{signal['symbol']} : No Data")
             continue
 
         current = round(float(df["Close"].iloc[-1].item()), 2)
@@ -61,74 +55,87 @@ for signal in signals:
             f"T3={signal['t3']} | "
             f"SL={signal['sl']}"
         )
-        # ==============================
+
         # BUY ALERT
-        # ==============================
         if not signal.get("entry_alert", False):
 
             if current >= signal["buy"]:
 
                 send_message(
                     f"🚀 BUY SIGNAL\n\n"
-                    f"📈 {signal['symbol']}\n\n"
-                    f"💰 Buy : ₹{signal['buy']}\n"
-                    f"📍 Current : ₹{current}\n\n"
-                    f"🛑 Stop Loss : ₹{signal['sl']}\n"
-                    f"🎯 Target 1 : ₹{signal['t1']}\n"
-                    f"🎯 Target 2 : ₹{signal['t2']}\n"
-                    f"🎯 Target 3 : ₹{signal['t3']}"
+                    f"{signal['symbol']}\n\n"
+                    f"Buy Price : ₹{signal['buy']}\n"
+                    f"Current : ₹{current}\n\n"
+                    f"🎯 T1 : ₹{signal['t1']}\n"
+                    f"🎯 T2 : ₹{signal['t2']}\n"
+                    f"🎯 T3 : ₹{signal['t3']}\n"
+                    f"🛑 SL : ₹{signal['sl']}"
                 )
 
                 signal["entry_alert"] = True
                 updated = True
 
-        # ==============================
         # STOP LOSS
-        # ==============================
         if current <= signal["sl"]:
 
             send_message(
                 f"🛑 STOP LOSS HIT\n\n"
-                f"📈 {signal['symbol']}\n\n"
-                f"💰 Buy : ₹{signal['buy']}\n"
-                f"📍 Current : ₹{current}\n"
-                f"🛑 Stop Loss : ₹{signal['sl']}"
+                f"{signal['symbol']}\n\n"
+                f"Buy : ₹{signal['buy']}\n"
+                f"Current : ₹{current}\n"
+                f"SL : ₹{signal['sl']}"
             )
 
             signal["status"] = "STOPLOSS"
             updated = True
             continue
 
-        # ==============================
-        # TARGET 1
-        # ==============================
-        if current >= signal["t1"] and signal["status"] == "OPEN":
+        # TARGET 3
+        if current >= signal["t3"]:
 
             send_message(
-                f"🎯 TARGET 1 HIT\n\n"
-                f"📈 {signal['symbol']}\n\n"
-                f"📍 Current : ₹{current}"
+                f"🎯 TARGET 3 HIT\n\n"
+                f"{signal['symbol']}\n\n"
+                f"Current : ₹{current}"
             )
 
-            signal["status"] = "TARGET1"
+            signal["status"] = "TARGET3"
             updated = True
             continue
-        # ==============================
+
         # TARGET 2
-        # ==============================
-        if current >= signal["t2"] and signal["status"] == "TARGET1":
+        if current >= signal["t2"]:
 
             send_message(
                 f"🎯 TARGET 2 HIT\n\n"
-                f"📈 {signal['symbol']}\n\n"
-                f"📍 Current : ₹{current}"
+                f"{signal['symbol']}\n\n"
+                f"Current : ₹{current}"
             )
 
             signal["status"] = "TARGET2"
             updated = True
             continue
 
-        # ==============================
-        # TARGET 3
-        # ==============================
-       
+        # TARGET 1
+        if current >= signal["t1"]:
+
+            send_message(
+                f"🎯 TARGET 1 HIT\n\n"
+                f"{signal['symbol']}\n\n"
+                f"Current : ₹{current}"
+            )
+
+            signal["status"] = "TARGET1"
+            updated = True
+            continue
+
+    except Exception as e:
+        print(signal["symbol"], e)
+
+# Save updated signals
+if updated:
+
+    with open("signals.json", "w") as f:
+        json.dump(signals, f, indent=4)
+
+print("Monitoring completed.")
