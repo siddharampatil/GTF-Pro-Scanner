@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 
 from strategy import scan_stock
@@ -29,6 +30,21 @@ results = sorted(
 )
 
 top_results = results[:10]
+signals = []
+
+for s in top_results:
+    signals.append({
+        "symbol": s["symbol"] + ".NS",
+        "buy": s["buy"],
+        "sl": s["sl"],
+        "t1": s["t1"],
+        "t2": s["t2"],
+        "t3": s["t3"],
+        "status": "OPEN"
+    })
+
+with open("signals.json", "w") as f:
+    json.dump(signals, f, indent=4)
 qualified = len(results)
 scanned = len(stocks)
 
