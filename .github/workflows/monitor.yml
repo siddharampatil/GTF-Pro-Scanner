@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Every 15 minutes Monday-Friday
+    # Every 15 minutes during Indian market hours (Mon-Fri)
     - cron: "*/15 4-10 * * 1-5"
 
 permissions:
@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
@@ -36,7 +35,9 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python monitor.py
+        run: |
+          echo "Starting GTF Monitor..."
+          python monitor.py
 
       - name: Commit Updated Signals
         run: |
@@ -45,6 +46,9 @@ jobs:
 
           git add signals.json
 
-          git diff --cached --quiet || git commit -m "Update signal status"
-
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Update signal status"
+            git push
+          else
+            echo "No changes to commit."
+          fi
