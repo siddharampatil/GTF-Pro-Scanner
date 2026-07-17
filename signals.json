@@ -15,7 +15,8 @@
         "t1": 1609.38,
         "t2": 1680.06,
         "t3": 1750.74,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SONACOMS.NS",
@@ -33,7 +34,8 @@
         "t1": 632.85,
         "t2": 658.7,
         "t3": 684.55,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "HSCL.NS",
@@ -42,7 +44,8 @@
         "t1": 774.69,
         "t2": 816.33,
         "t3": 857.97,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BAJFINANCE.NS",
@@ -51,7 +54,8 @@
         "t1": 1086.94,
         "t2": 1122.58,
         "t3": 1158.22,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ADANIENSOL.NS",
@@ -87,6 +91,7 @@
         "t1": 289.7,
         "t2": 314.0,
         "t3": 338.3,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
