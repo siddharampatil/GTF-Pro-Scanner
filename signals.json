@@ -1,1 +1,92 @@
-[]
+[
+    {
+        "symbol": "JSWCEMENT.NS",
+        "buy": 140.05,
+        "sl": 135.01,
+        "t1": 145.09,
+        "t2": 150.13,
+        "t3": 155.17,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "TECHM.NS",
+        "buy": 1534.5,
+        "sl": 1463.82,
+        "t1": 1605.18,
+        "t2": 1675.86,
+        "t3": 1746.54,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "EXIDEIND.NS",
+        "buy": 431.75,
+        "sl": 415.3,
+        "t1": 448.2,
+        "t2": 464.65,
+        "t3": 481.1,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "BALRAMCHIN.NS",
+        "buy": 608.85,
+        "sl": 583.0,
+        "t1": 634.7,
+        "t2": 660.55,
+        "t3": 686.4,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SONACOMS.NS",
+        "buy": 698.5,
+        "sl": 672.65,
+        "t1": 724.35,
+        "t2": 750.2,
+        "t3": 776.05,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "HSCL.NS",
+        "buy": 735.7,
+        "sl": 694.06,
+        "t1": 777.34,
+        "t2": 818.98,
+        "t3": 860.62,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "ADANIENSOL.NS",
+        "buy": 1739.0,
+        "sl": 1652.51,
+        "t1": 1825.49,
+        "t2": 1911.98,
+        "t3": 1998.47,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "BAJFINANCE.NS",
+        "buy": 1053.1,
+        "sl": 1017.46,
+        "t1": 1088.74,
+        "t2": 1124.38,
+        "t3": 1160.02,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "J&KBANK.NS",
+        "buy": 183.2,
+        "sl": 171.81,
+        "t1": 194.59,
+        "t2": 205.98,
+        "t3": 217.37,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "AEGISVOPAK.NS",
+        "buy": 269.44,
+        "sl": 245.14,
+        "t1": 293.74,
+        "t2": 318.04,
+        "t3": 342.34,
+        "status": "OPEN"
+    }
+]
