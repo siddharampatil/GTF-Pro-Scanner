@@ -1,101 +1,65 @@
 [
     {
-        "symbol": "JSWCEMENT.NS",
-        "buy": 139.75,
-        "sl": 134.71,
-        "t1": 144.79,
-        "t2": 149.83,
-        "t3": 154.87,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "TECHM.NS",
-        "buy": 1538.7,
-        "sl": 1468.02,
-        "t1": 1609.38,
-        "t2": 1680.06,
-        "t3": 1750.74,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "SONACOMS.NS",
-        "buy": 704.4,
-        "sl": 678.09,
-        "t1": 730.71,
-        "t2": 757.02,
-        "t3": 783.33,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "BALRAMCHIN.NS",
-        "buy": 607.0,
-        "sl": 581.15,
-        "t1": 632.85,
-        "t2": 658.7,
-        "t3": 684.55,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "HSCL.NS",
-        "buy": 733.05,
-        "sl": 691.41,
-        "t1": 774.69,
-        "t2": 816.33,
-        "t3": 857.97,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
         "symbol": "BAJFINANCE.NS",
-        "buy": 1051.3,
-        "sl": 1015.66,
-        "t1": 1086.94,
-        "t2": 1122.58,
-        "t3": 1158.22,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "ADANIENSOL.NS",
-        "buy": 1740.2,
-        "sl": 1653.71,
-        "t1": 1826.69,
-        "t2": 1913.18,
-        "t3": 1999.67,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "J&KBANK.NS",
-        "buy": 182.7,
-        "sl": 171.31,
-        "t1": 194.09,
-        "t2": 205.48,
-        "t3": 216.87,
+        "buy": 1047.0,
+        "sl": 1012.2,
+        "t1": 1081.8,
+        "t2": 1116.6,
+        "t3": 1151.4,
         "status": "OPEN"
     },
     {
-        "symbol": "INDUSINDBK.NS",
-        "buy": 1024.05,
-        "sl": 987.0,
-        "t1": 1061.1,
-        "t2": 1098.15,
-        "t3": 1135.2,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "SUNPHARMA.NS",
+        "buy": 1940.4,
+        "sl": 1895.87,
+        "t1": 1984.93,
+        "t2": 2029.46,
+        "t3": 2073.99,
+        "status": "OPEN"
     },
     {
-        "symbol": "AEGISVOPAK.NS",
-        "buy": 265.4,
-        "sl": 241.1,
-        "t1": 289.7,
-        "t2": 314.0,
-        "t3": 338.3,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "ICICIBANK.NS",
+        "buy": 1445.1,
+        "sl": 1406.29,
+        "t1": 1483.91,
+        "t2": 1522.72,
+        "t3": 1561.53,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "TITAN.NS",
+        "buy": 4643.7,
+        "sl": 4525.14,
+        "t1": 4762.26,
+        "t2": 4880.82,
+        "t3": 4999.38,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SBIN.NS",
+        "buy": 1044.5,
+        "sl": 1016.12,
+        "t1": 1072.88,
+        "t2": 1101.26,
+        "t3": 1129.64,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "BHARTIARTL.NS",
+        "buy": 1932.2,
+        "sl": 1880.01,
+        "t1": 1984.39,
+        "t2": 2036.58,
+        "t3": 2088.77,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "ULTRACEMCO.NS",
+        "buy": 11770.0,
+        "sl": 11468.8,
+        "t1": 12071.2,
+        "t2": 12372.4,
+        "t3": 12673.6,
+        "status": "OPEN"
     }
 ]
