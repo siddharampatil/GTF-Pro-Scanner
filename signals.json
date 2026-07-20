@@ -15,7 +15,8 @@
         "t1": 1984.93,
         "t2": 2029.46,
         "t3": 2073.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ICICIBANK.NS",
@@ -24,7 +25,8 @@
         "t1": 1483.91,
         "t2": 1522.72,
         "t3": 1561.53,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TITAN.NS",
@@ -33,7 +35,8 @@
         "t1": 4762.26,
         "t2": 4880.82,
         "t3": 4999.38,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SBIN.NS",
@@ -51,7 +54,8 @@
         "t1": 1984.39,
         "t2": 2036.58,
         "t3": 2088.77,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ULTRACEMCO.NS",
@@ -60,6 +64,7 @@
         "t1": 12071.2,
         "t2": 12372.4,
         "t3": 12673.6,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
