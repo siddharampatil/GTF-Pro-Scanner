@@ -6,7 +6,8 @@
         "t1": 1083.49,
         "t2": 1118.88,
         "t3": 1154.27,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SUNPHARMA.NS",
@@ -15,7 +16,8 @@
         "t1": 1997.52,
         "t2": 2042.14,
         "t3": 2086.76,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ICICIBANK.NS",
@@ -24,7 +26,8 @@
         "t1": 1490.21,
         "t2": 1529.52,
         "t3": 1568.83,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TITAN.NS",
@@ -42,7 +45,8 @@
         "t1": 1073.08,
         "t2": 1101.46,
         "t3": 1129.84,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BHARTIARTL.NS",
@@ -51,7 +55,8 @@
         "t1": 1985.47,
         "t2": 2037.94,
         "t3": 2090.41,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ULTRACEMCO.NS",
@@ -60,6 +65,7 @@
         "t1": 12125.01,
         "t2": 12431.02,
         "t3": 12737.03,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
