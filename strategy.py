@@ -23,17 +23,38 @@ def safe_float(value, default=0.0):
 # DOWNLOAD DATA (OPTIMIZED)
 # ==========================================
 
-def download_stock(symbol):
+def download_stock(symbol, interval="1d", period="1y"):
+
     for _ in range(3):
+
         try:
+
             df = yf.download(
                 tickers=symbol,
-                period="1y",
-                interval="1d",
+                period=period,
+                interval=interval,
                 auto_adjust=True,
                 progress=False,
                 threads=False
             )
+
+            if df is None or df.empty:
+                time.sleep(1)
+                continue
+
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+
+            df = df.dropna()
+
+            return df
+
+        except Exception as e:
+            print(f"{symbol}: {e}")
+
+        time.sleep(1)
+
+    return None
 
             if df is None or df.empty:
                 time.sleep(1)
@@ -74,6 +95,32 @@ def get_market_trend():
         return "🟢 Bullish" if is_bullish else "🔴 Bearish"
     except:
         return "🟢 Bullish"
+def get_weekly_trend(symbol):
+
+    try:
+
+        weekly = download_stock(
+            symbol,
+            interval="1wk",
+            period="3y"
+        )
+
+        if weekly is None or len(weekly) < 50:
+            return False
+
+        close = weekly["Close"]
+
+        ema20 = EMAIndicator(close, window=20).ema_indicator()
+        ema50 = EMAIndicator(close, window=50).ema_indicator()
+
+        return (
+            close.iloc[-1] > ema20.iloc[-1]
+            and ema20.iloc[-1] > ema50.iloc[-1]
+        )
+
+    except:
+
+        return False
 
 # Initialize market condition globally once before running your loop
 MARKET_CONDITION = get_market_trend()
@@ -173,17 +220,24 @@ def scan_stock(symbol):
             reasons.append(f"✅ Good Trend ({adx_value})")
 
         # Relative Volume
-        if rvol >= 2:
-            score += 15
-            reasons.append(f"✅ High Relative Volume ({rvol}x)")
-        elif rvol >= 1.5:
-            score += 10
-            reasons.append(f"✅ Relative Volume ({rvol}x)")
+if rvol >= 2:
+    score += 15
+    reasons.append(f"✅ High Relative Volume ({rvol}x)")
+elif rvol >= 1.5:
+    score += 10
+    reasons.append(f"✅ Relative Volume ({rvol}x)")
 
-        # 20-Day breakout (Fixed syntax and indentation error)
-        if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
-            score += 15
-            reasons.append("✅ 20-Day Breakout")
+# Weekly Trend Confirmation
+weekly_bullish = get_weekly_trend(symbol)
+
+if weekly_bullish:
+    score += 15
+    reasons.append("✅ Weekly Trend Bullish")
+
+# 20-Day Breakout
+if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
+    score += 15
+    reasons.append("✅ 20-Day Breakout")
 
         # ==============================
         # TREND & CONFIDENCE
