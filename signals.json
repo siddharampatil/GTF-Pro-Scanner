@@ -6,7 +6,8 @@
         "t1": 1117.89,
         "t2": 1170.18,
         "t3": 1222.47,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KARURVYSYA.NS",
@@ -87,6 +88,7 @@
         "t1": 146.0,
         "t2": 150.88,
         "t3": 155.76,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
