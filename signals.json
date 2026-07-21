@@ -16,7 +16,8 @@
         "t1": 337.72,
         "t2": 353.14,
         "t3": 368.56,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PAYTM.NS",
@@ -25,7 +26,8 @@
         "t1": 1385.71,
         "t2": 1453.42,
         "t3": 1521.13,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SOBHA.NS",
@@ -34,7 +36,8 @@
         "t1": 1541.16,
         "t2": 1611.72,
         "t3": 1682.28,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "IDFCFIRSTB.NS",
