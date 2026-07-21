@@ -24,7 +24,8 @@
         "t1": 365.18,
         "t2": 381.71,
         "t3": 398.24,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BALRAMCHIN.NS",
@@ -69,7 +70,8 @@
         "t1": 12331.67,
         "t2": 12656.34,
         "t3": 12981.01,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LAURUSLABS.NS",
@@ -78,7 +80,8 @@
         "t1": 1646.56,
         "t2": 1705.42,
         "t3": 1764.28,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KARURVYSYA.NS",
@@ -87,6 +90,7 @@
         "t1": 348.87,
         "t2": 364.59,
         "t3": 380.31,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
