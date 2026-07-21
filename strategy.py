@@ -181,8 +181,10 @@ def scan_stock(symbol):
             score += 10
             reasons.append(f"✅ Relative Volume ({rvol}x)")
 
-        # 20-Day Breakout
-        if buy > high.iloc[-21:-1].max():
+        # 20-Day breakout = (
+    buy > high.iloc[-21:-1].max()
+    and rvol >= 1.5
+):
             score += 15
             reasons.append("✅ 20-Day Breakout")
 
