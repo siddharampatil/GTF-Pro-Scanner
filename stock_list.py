@@ -1,69 +1,43 @@
-import os
 import pandas as pd
 
-NIFTY500_URL = "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
-
-
-def load_symbols(df):
-    stocks = (
-        df["Symbol"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .unique()
-        .tolist()
-    )
-    return [f"{s}.NS" for s in stocks]
+URLS = [
+    "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
+    "https://archives.nseindia.com/content/indices/ind_niftymidcap150list.csv",
+    "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
+    "https://archives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+    "https://archives.nseindia.com/content/fo/fo_mktlots.csv"
+]
 
 
 def get_stock_list():
 
-    # Try downloading from NSE
-    try:
-        print("Downloading NIFTY500 list...")
-        df = pd.read_csv(NIFTY500_URL)
+    stocks = set()
 
-        if len(df) > 400:
-            print(f"Downloaded {len(df)} stocks.")
-            return load_symbols(df)
+    for url in URLS:
 
-    except Exception as e:
-        print(f"NSE download failed: {e}")
+        try:
 
-    # Use local CSV
-    try:
-        print("Loading local nifty500.csv...")
-        df = pd.read_csv("nifty500.csv")
+            df = pd.read_csv(url)
 
-        if len(df) > 400:
-            print(f"Loaded {len(df)} stocks from local file.")
-            return load_symbols(df)
+            for col in df.columns:
 
-    except Exception as e:
-        print(f"Local CSV failed: {e}")
+                if col.lower() == "symbol":
+                    symbols = (
+                        df[col]
+                        .dropna()
+                        .astype(str)
+                        .str.strip()
+                    )
 
-    # Emergency fallback
-    print("Using emergency fallback list.")
+                    for s in symbols:
+                        if s:
+                            stocks.add(s + ".NS")
 
-    return [
-        "RELIANCE.NS",
-        "TCS.NS",
-        "INFY.NS",
-        "HDFCBANK.NS",
-        "ICICIBANK.NS",
-        "SBIN.NS",
-        "AXISBANK.NS",
-        "KOTAKBANK.NS",
-        "BHARTIARTL.NS",
-        "LT.NS",
-        "ITC.NS",
-        "HCLTECH.NS",
-        "ULTRACEMCO.NS",
-        "MARUTI.NS",
-        "BAJFINANCE.NS",
-        "TITAN.NS",
-        "ASIANPAINT.NS",
-        "SUNPHARMA.NS",
-        "NTPC.NS",
-        "POWERGRID.NS",
-    ]
+        except Exception as e:
+            print(f"Unable to load {url}: {e}")
+
+    stocks = sorted(list(stocks))
+
+    print(f"Loaded {len(stocks)} stocks")
+
+    return stocks
