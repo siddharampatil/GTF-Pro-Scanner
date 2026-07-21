@@ -20,11 +20,11 @@ for stock in stocks:
     result = scan_stock(stock)
 
     if (
-    result is not None
-    and result["score"] >= 85
-    and result["rvol"] >= 1.5
-):
-    results.append(result)
+        result is not None
+        and result["score"] >= 85
+        and result["rvol"] >= 1.5
+    ):
+        results.append(result)
 
 # Highest score first
 results = sorted(
