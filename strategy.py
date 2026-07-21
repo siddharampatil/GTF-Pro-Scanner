@@ -155,10 +155,15 @@ def scan_stock(symbol):
             reasons.append("✅ EMA50 above EMA200")
 
         # RSI
-        if 55 <= rsi_value <= 68:
-            score += 15
-            reasons.append(f"✅ RSI Bullish ({rsi_value})")
+        # RSI
+if 55 <= rsi_value <= 68:
+    score += 15
+    reasons.append(f"✅ RSI Bullish ({rsi_value})")
 
+# Avoid buying overextended stocks
+if rsi_value > 75:
+    score -= 15
+    reasons.append("⚠ RSI Overbought")
         # MACD
         if macd_line.iloc[-1] > macd_signal.iloc[-1]:
             score += 10
@@ -193,9 +198,14 @@ def scan_stock(symbol):
             pass
 
         # 20-Day Breakout
-        if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
-            score += 15
-            reasons.append("✅ 20-Day Breakout")
+if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
+    score += 15
+    reasons.append("✅ 20-Day Breakout")
+
+# 200-Day High Breakout
+if buy >= high.iloc[-200:].max():
+    score += 10
+    reasons.append("🚀 200-Day High Breakout")
 
         # ==============================
         # TREND & CONFIDENCE
@@ -237,8 +247,10 @@ def scan_stock(symbol):
         t2 = round(buy + (2 * risk), 2)
         t3 = round(buy + (3 * risk), 2)
 
-        return {
-            "symbol": symbol.replace(".NS", ""),
+# Limit score to 100
+score = max(0, min(score, 100))
+
+return {           "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
             "confidence": confidence,
