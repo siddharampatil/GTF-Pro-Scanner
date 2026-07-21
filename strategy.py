@@ -24,11 +24,8 @@ def safe_float(value, default=0.0):
 # ==========================================
 
 def download_stock(symbol, interval="1d", period="1y"):
-
     for _ in range(3):
-
         try:
-
             df = yf.download(
                 tickers=symbol,
                 period=period,
@@ -42,31 +39,13 @@ def download_stock(symbol, interval="1d", period="1y"):
                 time.sleep(1)
                 continue
 
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-
-            df = df.dropna()
-
-            return df
-
-        except Exception as e:
-            print(f"{symbol}: {e}")
-
-        time.sleep(1)
-
-    return None
-
-            if df is None or df.empty:
-                time.sleep(1)
-                continue
-
             # Handle MultiIndex columns safely
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
 
             df = df.dropna()
 
-            if len(df) >= 200:
+            if len(df) >= 200 or interval == "1wk":
                 return df
 
         except Exception as e:
@@ -95,32 +74,6 @@ def get_market_trend():
         return "🟢 Bullish" if is_bullish else "🔴 Bearish"
     except:
         return "🟢 Bullish"
-def get_weekly_trend(symbol):
-
-    try:
-
-        weekly = download_stock(
-            symbol,
-            interval="1wk",
-            period="3y"
-        )
-
-        if weekly is None or len(weekly) < 50:
-            return False
-
-        close = weekly["Close"]
-
-        ema20 = EMAIndicator(close, window=20).ema_indicator()
-        ema50 = EMAIndicator(close, window=50).ema_indicator()
-
-        return (
-            close.iloc[-1] > ema20.iloc[-1]
-            and ema20.iloc[-1] > ema50.iloc[-1]
-        )
-
-    except:
-
-        return False
 
 # Initialize market condition globally once before running your loop
 MARKET_CONDITION = get_market_trend()
@@ -133,7 +86,7 @@ def scan_stock(symbol):
     try:
         df = download_stock(symbol)
 
-        if df is None:
+        if df is None or len(df) < 200:
             return None
 
         close = df["Close"]
@@ -153,7 +106,7 @@ def scan_stock(symbol):
 
         macd = MACD(close)
         macd_line = macd.macd()
-        macd_signal = macd.macd_signal()  # Safe reference pointer
+        macd_signal = macd.macd_signal()
 
         adx = ADXIndicator(high=high, low=low, close=close, window=14).adx()
         atr = AverageTrueRange(high=high, low=low, close=close, window=14).average_true_range()
@@ -220,24 +173,29 @@ def scan_stock(symbol):
             reasons.append(f"✅ Good Trend ({adx_value})")
 
         # Relative Volume
-if rvol >= 2:
-    score += 15
-    reasons.append(f"✅ High Relative Volume ({rvol}x)")
-elif rvol >= 1.5:
-    score += 10
-    reasons.append(f"✅ Relative Volume ({rvol}x)")
+        if rvol >= 2:
+            score += 15
+            reasons.append(f"✅ High Relative Volume ({rvol}x)")
+        elif rvol >= 1.5:
+            score += 10
+            reasons.append(f"✅ Relative Volume ({rvol}x)")
 
-# Weekly Trend Confirmation
-weekly_bullish = get_weekly_trend(symbol)
+        # Weekly Trend Confirmation (Calculated from daily data to avoid API limit)
+        try:
+            weekly_close = close.resample('W').last()
+            if len(weekly_close) >= 50:
+                w_ema20 = EMAIndicator(weekly_close, window=20).ema_indicator()
+                w_ema50 = EMAIndicator(weekly_close, window=50).ema_indicator()
+                if weekly_close.iloc[-1] > w_ema20.iloc[-1] > w_ema50.iloc[-1]:
+                    score += 15
+                    reasons.append("✅ Weekly Trend Bullish")
+        except:
+            pass
 
-if weekly_bullish:
-    score += 15
-    reasons.append("✅ Weekly Trend Bullish")
-
-# 20-Day Breakout
-if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
-    score += 15
-    reasons.append("✅ 20-Day Breakout")
+        # 20-Day Breakout
+        if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
+            score += 15
+            reasons.append("✅ 20-Day Breakout")
 
         # ==============================
         # TREND & CONFIDENCE
