@@ -24,7 +24,8 @@
         "t1": 1577.86,
         "t2": 1667.22,
         "t3": 1756.58,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MANAPPURAM.NS",
@@ -33,7 +34,8 @@
         "t1": 367.88,
         "t2": 384.01,
         "t3": 400.14,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PAYTM.NS",
@@ -51,7 +53,8 @@
         "t1": 288.36,
         "t2": 307.65,
         "t3": 326.94,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TVSMOTOR.NS",
@@ -60,7 +63,8 @@
         "t1": 3935.25,
         "t2": 4078.5,
         "t3": 4221.75,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "INDUSINDBK.NS",
@@ -69,7 +73,8 @@
         "t1": 1100.23,
         "t2": 1137.01,
         "t3": 1173.79,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "FLUOROCHEM.NS",
@@ -78,7 +83,8 @@
         "t1": 4809.99,
         "t2": 5012.88,
         "t3": 5215.77,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TMB.NS",
@@ -87,6 +93,7 @@
         "t1": 860.21,
         "t2": 901.97,
         "t3": 943.73,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
