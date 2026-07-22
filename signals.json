@@ -6,7 +6,8 @@
         "t1": 782.34,
         "t2": 824.43,
         "t3": 866.52,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GABRIEL.NS",
@@ -15,7 +16,8 @@
         "t1": 1519.99,
         "t2": 1616.48,
         "t3": 1712.97,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NESTLEIND.NS",
@@ -24,7 +26,8 @@
         "t1": 1538.08,
         "t2": 1582.76,
         "t3": 1627.44,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CHENNPETRO.NS",
@@ -33,7 +36,8 @@
         "t1": 1388.27,
         "t2": 1469.84,
         "t3": 1551.41,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "INDUSINDBK.NS",
@@ -69,7 +73,8 @@
         "t1": 414.15,
         "t2": 437.15,
         "t3": 460.15,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "VAIBHAVGBL.NS",
@@ -78,7 +83,8 @@
         "t1": 274.48,
         "t2": 290.99,
         "t3": 307.5,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MEDANTA.NS",
