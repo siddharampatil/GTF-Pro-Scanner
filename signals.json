@@ -24,7 +24,7 @@
         "t1": 1577.86,
         "t2": 1667.22,
         "t3": 1756.58,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true
     },
     {
@@ -63,7 +63,7 @@
         "t1": 3935.25,
         "t2": 4078.5,
         "t3": 4221.75,
-        "status": "OPEN",
+        "status": "TARGET1",
         "entry_alert": true
     },
     {
