@@ -15,7 +15,8 @@
         "t1": 645.87,
         "t2": 673.89,
         "t3": 701.91,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GABRIEL.NS",
