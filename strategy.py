@@ -23,7 +23,7 @@ def safe_float(value, default=0.0):
 # DOWNLOAD DATA (OPTIMIZED)
 # ==========================================
 
-def download_stock(symbol, interval="1d", period="1y"):
+def download_stock(symbol, interval="1d", period="2y"):  # Increased to 2y for stable 200 EMA warmup
     for _ in range(3):
         try:
             df = yf.download(
@@ -39,9 +39,9 @@ def download_stock(symbol, interval="1d", period="1y"):
                 time.sleep(1)
                 continue
 
-            # Handle MultiIndex columns safely
+            # Handle MultiIndex columns safely by flattening them
             if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
+                df.columns = [col[0] for col in df.columns]
 
             df = df.dropna()
 
@@ -154,7 +154,7 @@ def scan_stock(symbol):
             score += 10
             reasons.append("✅ EMA50 above EMA200")
 
-                # RSI
+        # RSI
         if 55 <= rsi_value <= 68:
             score += 15
             reasons.append(f"✅ RSI Bullish ({rsi_value})")
@@ -163,6 +163,7 @@ def scan_stock(symbol):
         if rsi_value > 75:
             score -= 15
             reasons.append("⚠ RSI Overbought")
+            
         # MACD
         if macd_line.iloc[-1] > macd_signal.iloc[-1]:
             score += 10
@@ -184,7 +185,7 @@ def scan_stock(symbol):
             score += 10
             reasons.append(f"✅ Relative Volume ({rvol}x)")
 
-        # Weekly Trend Confirmation (Calculated from daily data to avoid API limit)
+        # Weekly Trend Confirmation
         try:
             weekly_close = close.resample('W').last()
             if len(weekly_close) >= 50:
@@ -196,15 +197,18 @@ def scan_stock(symbol):
         except:
             pass
 
-        # 20-Day Breakout
-if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
-    score += 15
-    reasons.append("✅ 20-Day Breakout")
+        # 20-Day Breakout (Fixed Indentation)
+        if buy > high.iloc[-21:-1].max() and rvol >= 1.5:
+            score += 15
+            reasons.append("✅ 20-Day Breakout")
 
-# 200-Day High Breakout
-if buy >= high.iloc[-200:].max():
-    score += 10
-    reasons.append("🚀 200-Day High Breakout")
+        # 200-Day High Breakout (Fixed Lookback Slice & Indentation)
+        if buy >= high.iloc[-201:-1].max():
+            score += 10
+            reasons.append("🚀 200-Day High Breakout")
+
+        # Limit score to 100 before establishing category levels
+        score = max(0, min(score, 100))
 
         # ==============================
         # TREND & CONFIDENCE
@@ -246,10 +250,8 @@ if buy >= high.iloc[-200:].max():
         t2 = round(buy + (2 * risk), 2)
         t3 = round(buy + (3 * risk), 2)
 
-# Limit score to 100
-score = max(0, min(score, 100))
-
-return {           "symbol": symbol.replace(".NS", ""),
+        return {
+            "symbol": symbol.replace(".NS", ""),
             "score": score,
             "trend": trend,
             "confidence": confidence,
