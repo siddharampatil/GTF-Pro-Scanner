@@ -154,16 +154,15 @@ def scan_stock(symbol):
             score += 10
             reasons.append("✅ EMA50 above EMA200")
 
-        # RSI
-        # RSI
-if 55 <= rsi_value <= 68:
-    score += 15
-    reasons.append(f"✅ RSI Bullish ({rsi_value})")
+                # RSI
+        if 55 <= rsi_value <= 68:
+            score += 15
+            reasons.append(f"✅ RSI Bullish ({rsi_value})")
 
-# Avoid buying overextended stocks
-if rsi_value > 75:
-    score -= 15
-    reasons.append("⚠ RSI Overbought")
+        # Avoid buying overextended stocks
+        if rsi_value > 75:
+            score -= 15
+            reasons.append("⚠ RSI Overbought")
         # MACD
         if macd_line.iloc[-1] > macd_signal.iloc[-1]:
             score += 10
