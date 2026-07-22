@@ -1,100 +1,92 @@
 [
     {
-        "symbol": "RAIN.NS",
-        "buy": 223.4,
-        "sl": 208.49,
-        "t1": 238.31,
-        "t2": 253.22,
-        "t3": 268.13,
+        "symbol": "JUBLINGREA.NS",
+        "buy": 740.25,
+        "sl": 698.16,
+        "t1": 782.34,
+        "t2": 824.43,
+        "t3": 866.52,
         "status": "OPEN"
-    },
-    {
-        "symbol": "BALRAMCHIN.NS",
-        "buy": 617.85,
-        "sl": 589.83,
-        "t1": 645.87,
-        "t2": 673.89,
-        "t3": 701.91,
-        "status": "OPEN",
-        "entry_alert": true
     },
     {
         "symbol": "GABRIEL.NS",
-        "buy": 1488.5,
-        "sl": 1399.14,
-        "t1": 1577.86,
-        "t2": 1667.22,
-        "t3": 1756.58,
-        "status": "STOPLOSS",
-        "entry_alert": true
-    },
-    {
-        "symbol": "MANAPPURAM.NS",
-        "buy": 351.75,
-        "sl": 335.62,
-        "t1": 367.88,
-        "t2": 384.01,
-        "t3": 400.14,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "PAYTM.NS",
-        "buy": 1300.5,
-        "sl": 1232.62,
-        "t1": 1368.38,
-        "t2": 1436.26,
-        "t3": 1504.14,
+        "buy": 1423.5,
+        "sl": 1327.01,
+        "t1": 1519.99,
+        "t2": 1616.48,
+        "t3": 1712.97,
         "status": "OPEN"
     },
     {
-        "symbol": "DIACABS.NS",
-        "buy": 269.07,
-        "sl": 249.78,
-        "t1": 288.36,
-        "t2": 307.65,
-        "t3": 326.94,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "NESTLEIND.NS",
+        "buy": 1493.4,
+        "sl": 1448.72,
+        "t1": 1538.08,
+        "t2": 1582.76,
+        "t3": 1627.44,
+        "status": "OPEN"
     },
     {
-        "symbol": "TVSMOTOR.NS",
-        "buy": 3792.0,
-        "sl": 3648.75,
-        "t1": 3935.25,
-        "t2": 4078.5,
-        "t3": 4221.75,
-        "status": "TARGET1",
-        "entry_alert": true
+        "symbol": "CHENNPETRO.NS",
+        "buy": 1306.7,
+        "sl": 1225.13,
+        "t1": 1388.27,
+        "t2": 1469.84,
+        "t3": 1551.41,
+        "status": "OPEN"
     },
     {
         "symbol": "INDUSINDBK.NS",
-        "buy": 1063.45,
-        "sl": 1026.67,
-        "t1": 1100.23,
-        "t2": 1137.01,
-        "t3": 1173.79,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 1069.95,
+        "sl": 1033.42,
+        "t1": 1106.48,
+        "t2": 1143.01,
+        "t3": 1179.54,
+        "status": "OPEN"
     },
     {
-        "symbol": "FLUOROCHEM.NS",
-        "buy": 4607.1,
-        "sl": 4404.21,
-        "t1": 4809.99,
-        "t2": 5012.88,
-        "t3": 5215.77,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "BAJAJ-AUTO.NS",
+        "buy": 11005.0,
+        "sl": 10652.23,
+        "t1": 11357.77,
+        "t2": 11710.54,
+        "t3": 12063.31,
+        "status": "OPEN"
     },
     {
-        "symbol": "TMB.NS",
-        "buy": 818.45,
-        "sl": 776.69,
-        "t1": 860.21,
-        "t2": 901.97,
-        "t3": 943.73,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "AIIL.NS",
+        "buy": 543.35,
+        "sl": 507.59,
+        "t1": 579.11,
+        "t2": 614.87,
+        "t3": 650.63,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SENCO.NS",
+        "buy": 391.15,
+        "sl": 368.15,
+        "t1": 414.15,
+        "t2": 437.15,
+        "t3": 460.15,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "VAIBHAVGBL.NS",
+        "buy": 257.97,
+        "sl": 241.46,
+        "t1": 274.48,
+        "t2": 290.99,
+        "t3": 307.5,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "MEDANTA.NS",
+        "buy": 1353.5,
+        "sl": 1305.07,
+        "t1": 1401.93,
+        "t2": 1450.36,
+        "t3": 1498.79,
+        "status": "OPEN"
     }
 ]
