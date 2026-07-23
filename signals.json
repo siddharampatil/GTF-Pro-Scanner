@@ -33,7 +33,8 @@
         "t1": 597.63,
         "t2": 627.31,
         "t3": 656.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PTCIL.NS",
@@ -51,7 +52,8 @@
         "t1": 696.3,
         "t2": 731.7,
         "t3": 767.1,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TANLA.NS",
