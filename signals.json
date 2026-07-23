@@ -6,7 +6,8 @@
         "t1": 662.64,
         "t2": 695.18,
         "t3": 727.72,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TANLA.NS",
