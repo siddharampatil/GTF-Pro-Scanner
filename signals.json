@@ -1,98 +1,20 @@
 [
     {
-        "symbol": "JUBLINGREA.NS",
-        "buy": 740.25,
-        "sl": 698.16,
-        "t1": 782.34,
-        "t2": 824.43,
-        "t3": 866.52,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "GABRIEL.NS",
-        "buy": 1423.5,
-        "sl": 1327.01,
-        "t1": 1519.99,
-        "t2": 1616.48,
-        "t3": 1712.97,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "NESTLEIND.NS",
-        "buy": 1493.4,
-        "sl": 1448.72,
-        "t1": 1538.08,
-        "t2": 1582.76,
-        "t3": 1627.44,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CHENNPETRO.NS",
-        "buy": 1306.7,
-        "sl": 1225.13,
-        "t1": 1388.27,
-        "t2": 1469.84,
-        "t3": 1551.41,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "INDUSINDBK.NS",
-        "buy": 1069.95,
-        "sl": 1033.42,
-        "t1": 1106.48,
-        "t2": 1143.01,
-        "t3": 1179.54,
+        "symbol": "HEG.NS",
+        "buy": 630.1,
+        "sl": 597.56,
+        "t1": 662.64,
+        "t2": 695.18,
+        "t3": 727.72,
         "status": "OPEN"
     },
     {
-        "symbol": "BAJAJ-AUTO.NS",
-        "buy": 11005.0,
-        "sl": 10652.23,
-        "t1": 11357.77,
-        "t2": 11710.54,
-        "t3": 12063.31,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "AIIL.NS",
-        "buy": 543.35,
-        "sl": 507.59,
-        "t1": 579.11,
-        "t2": 614.87,
-        "t3": 650.63,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "SENCO.NS",
-        "buy": 391.15,
-        "sl": 368.15,
-        "t1": 414.15,
-        "t2": 437.15,
-        "t3": 460.15,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "VAIBHAVGBL.NS",
-        "buy": 257.97,
-        "sl": 241.46,
-        "t1": 274.48,
-        "t2": 290.99,
-        "t3": 307.5,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "MEDANTA.NS",
-        "buy": 1353.5,
-        "sl": 1305.07,
-        "t1": 1401.93,
-        "t2": 1450.36,
-        "t3": 1498.79,
+        "symbol": "TANLA.NS",
+        "buy": 639.95,
+        "sl": 602.5,
+        "t1": 677.4,
+        "t2": 714.85,
+        "t3": 752.3,
         "status": "OPEN"
     }
 ]
