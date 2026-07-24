@@ -1,68 +1,20 @@
 [
     {
-        "symbol": "MEDANTA.NS",
-        "buy": 1386.9,
-        "sl": 1337.93,
-        "t1": 1435.87,
-        "t2": 1484.84,
-        "t3": 1533.81,
+        "symbol": "THYROCARE.NS",
+        "buy": 567.8,
+        "sl": 530.75,
+        "t1": 604.85,
+        "t2": 641.9,
+        "t3": 678.95,
         "status": "OPEN"
     },
     {
-        "symbol": "CHENNPETRO.NS",
-        "buy": 1333.6,
-        "sl": 1252.09,
-        "t1": 1415.11,
-        "t2": 1496.62,
-        "t3": 1578.13,
-        "status": "STOPLOSS"
-    },
-    {
-        "symbol": "HEG.NS",
-        "buy": 635.0,
-        "sl": 597.65,
-        "t1": 672.35,
-        "t2": 709.7,
-        "t3": 747.05,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "IIFL.NS",
-        "buy": 567.95,
-        "sl": 538.27,
-        "t1": 597.63,
-        "t2": 627.31,
-        "t3": 656.99,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "PTCIL.NS",
-        "buy": 18227.0,
-        "sl": 17465.36,
-        "t1": 18988.64,
-        "t2": 19750.28,
-        "t3": 20511.92,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "GRAPHITE.NS",
-        "buy": 660.9,
-        "sl": 625.5,
-        "t1": 696.3,
-        "t2": 731.7,
-        "t3": 767.1,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "TANLA.NS",
-        "buy": 632.55,
-        "sl": 595.09,
-        "t1": 670.01,
-        "t2": 707.47,
-        "t3": 744.93,
+        "symbol": "NUVAMA.NS",
+        "buy": 1957.8,
+        "sl": 1852.37,
+        "t1": 2063.23,
+        "t2": 2168.66,
+        "t3": 2274.09,
         "status": "OPEN"
     }
 ]
