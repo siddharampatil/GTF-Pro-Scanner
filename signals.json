@@ -16,7 +16,8 @@
         "t1": 2085.23,
         "t2": 2190.66,
         "t3": 2296.09,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "HEG.NS",
@@ -25,6 +26,7 @@
         "t1": 678.87,
         "t2": 717.89,
         "t3": 756.91,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
