@@ -6,7 +6,8 @@
         "t1": 593.85,
         "t2": 630.9,
         "t3": 667.95,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NUVAMA.NS",
