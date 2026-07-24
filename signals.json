@@ -15,7 +15,7 @@
         "t1": 1415.11,
         "t2": 1496.62,
         "t3": 1578.13,
-        "status": "OPEN"
+        "status": "STOPLOSS"
     },
     {
         "symbol": "HEG.NS",
@@ -24,7 +24,8 @@
         "t1": 672.35,
         "t2": 709.7,
         "t3": 747.05,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "IIFL.NS",
