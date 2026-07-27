@@ -1,32 +1,74 @@
 [
     {
+        "symbol": "IDFCFIRSTB.NS",
+        "buy": 85.74,
+        "sl": 82.5,
+        "t1": 88.98,
+        "t2": 92.22,
+        "t3": 95.46,
+        "status": "OPEN"
+    },
+    {
         "symbol": "THYROCARE.NS",
-        "buy": 556.8,
-        "sl": 519.75,
-        "t1": 593.85,
-        "t2": 630.9,
-        "t3": 667.95,
-        "status": "TARGET1",
-        "entry_alert": true
+        "buy": 604.85,
+        "sl": 564.45,
+        "t1": 645.25,
+        "t2": 685.65,
+        "t3": 726.05,
+        "status": "OPEN"
     },
     {
-        "symbol": "NUVAMA.NS",
-        "buy": 1979.8,
-        "sl": 1874.37,
-        "t1": 2085.23,
-        "t2": 2190.66,
-        "t3": 2296.09,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "LAURUSLABS.NS",
+        "buy": 1687.3,
+        "sl": 1623.24,
+        "t1": 1751.36,
+        "t2": 1815.42,
+        "t3": 1879.48,
+        "status": "OPEN"
     },
     {
-        "symbol": "HEG.NS",
-        "buy": 639.85,
-        "sl": 600.83,
-        "t1": 678.87,
-        "t2": 717.89,
-        "t3": 756.91,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "SENCO.NS",
+        "buy": 417.65,
+        "sl": 391.7,
+        "t1": 443.6,
+        "t2": 469.55,
+        "t3": 495.5,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "LALPATHLAB.NS",
+        "buy": 1863.0,
+        "sl": 1772.61,
+        "t1": 1953.39,
+        "t2": 2043.78,
+        "t3": 2134.17,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "CREDITACC.NS",
+        "buy": 1574.0,
+        "sl": 1495.78,
+        "t1": 1652.22,
+        "t2": 1730.44,
+        "t3": 1808.66,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "CARTRADE.NS",
+        "buy": 2900.0,
+        "sl": 2702.32,
+        "t1": 3097.68,
+        "t2": 3295.36,
+        "t3": 3493.04,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "CAPLIPOINT.NS",
+        "buy": 2620.2,
+        "sl": 2472.85,
+        "t1": 2767.55,
+        "t2": 2914.9,
+        "t3": 3062.25,
+        "status": "OPEN"
     }
 ]
