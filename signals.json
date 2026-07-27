@@ -1,80 +1,92 @@
 [
     {
+        "symbol": "TMB.NS",
+        "buy": 893.65,
+        "sl": 844.54,
+        "t1": 942.76,
+        "t2": 991.87,
+        "t3": 1040.98,
+        "status": "OPEN"
+    },
+    {
         "symbol": "IDFCFIRSTB.NS",
-        "buy": 85.74,
-        "sl": 82.5,
-        "t1": 88.98,
-        "t2": 92.22,
-        "t3": 95.46,
+        "buy": 84.88,
+        "sl": 81.64,
+        "t1": 88.12,
+        "t2": 91.36,
+        "t3": 94.6,
         "status": "OPEN"
     },
     {
         "symbol": "THYROCARE.NS",
-        "buy": 604.85,
-        "sl": 564.45,
-        "t1": 645.25,
-        "t2": 685.65,
-        "t3": 726.05,
+        "buy": 584.05,
+        "sl": 543.65,
+        "t1": 624.45,
+        "t2": 664.85,
+        "t3": 705.25,
         "status": "OPEN"
     },
     {
-        "symbol": "LAURUSLABS.NS",
-        "buy": 1687.3,
-        "sl": 1623.24,
-        "t1": 1751.36,
-        "t2": 1815.42,
-        "t3": 1879.48,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "SPLPETRO.NS",
+        "buy": 760.9,
+        "sl": 722.47,
+        "t1": 799.33,
+        "t2": 837.76,
+        "t3": 876.19,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "LLOYDSME.NS",
+        "buy": 2014.9,
+        "sl": 1917.21,
+        "t1": 2112.59,
+        "t2": 2210.28,
+        "t3": 2307.97,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SUNPHARMA.NS",
+        "buy": 1973.7,
+        "sl": 1927.08,
+        "t1": 2020.32,
+        "t2": 2066.94,
+        "t3": 2113.56,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "ENTERO.NS",
+        "buy": 1273.4,
+        "sl": 1207.09,
+        "t1": 1339.71,
+        "t2": 1406.02,
+        "t3": 1472.33,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "KTKBANK.NS",
+        "buy": 285.55,
+        "sl": 273.1,
+        "t1": 298.0,
+        "t2": 310.45,
+        "t3": 322.9,
+        "status": "OPEN"
     },
     {
         "symbol": "SENCO.NS",
-        "buy": 417.65,
-        "sl": 391.7,
-        "t1": 443.6,
-        "t2": 469.55,
-        "t3": 495.5,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 417.95,
+        "sl": 392.0,
+        "t1": 443.9,
+        "t2": 469.85,
+        "t3": 495.8,
+        "status": "OPEN"
     },
     {
         "symbol": "LALPATHLAB.NS",
-        "buy": 1863.0,
-        "sl": 1772.61,
-        "t1": 1953.39,
-        "t2": 2043.78,
-        "t3": 2134.17,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CREDITACC.NS",
-        "buy": 1574.0,
-        "sl": 1495.78,
-        "t1": 1652.22,
-        "t2": 1730.44,
-        "t3": 1808.66,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CARTRADE.NS",
-        "buy": 2900.0,
-        "sl": 2702.32,
-        "t1": 3097.68,
-        "t2": 3295.36,
-        "t3": 3493.04,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CAPLIPOINT.NS",
-        "buy": 2620.2,
-        "sl": 2472.85,
-        "t1": 2767.55,
-        "t2": 2914.9,
-        "t3": 3062.25,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 1827.2,
+        "sl": 1736.81,
+        "t1": 1917.59,
+        "t2": 2007.98,
+        "t3": 2098.37,
+        "status": "OPEN"
     }
 ]
