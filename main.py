@@ -15,16 +15,22 @@ results = []
 
 print(f"Scanning {len(stocks)} stocks...")
 
-for stock in stocks:
+for i, stock in enumerate(stocks, start=1):
 
-    result = scan_stock(stock)
+    print(f"[{i}/{len(stocks)}] Scanning {stock}")
 
-    if (
-        result is not None
-        and result["score"] >= 85
-        and result["rvol"] >= 1.5
-    ):
-        results.append(result)
+    try:
+        result = scan_stock(stock)
+
+        if (
+            result is not None
+            and result["score"] >= 85
+            and result["rvol"] >= 1.5
+        ):
+            results.append(result)
+
+    except Exception as e:
+        print(f"❌ Error scanning {stock}: {e}")
 
 # Highest score first
 results = sorted(
