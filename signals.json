@@ -6,7 +6,8 @@
         "t1": 942.76,
         "t2": 991.87,
         "t3": 1040.98,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "IDFCFIRSTB.NS",
@@ -15,7 +16,8 @@
         "t1": 88.12,
         "t2": 91.36,
         "t3": 94.6,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "THYROCARE.NS",
@@ -33,7 +35,8 @@
         "t1": 799.33,
         "t2": 837.76,
         "t3": 876.19,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LLOYDSME.NS",
@@ -60,7 +63,8 @@
         "t1": 1339.71,
         "t2": 1406.02,
         "t3": 1472.33,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KTKBANK.NS",
@@ -69,7 +73,8 @@
         "t1": 298.0,
         "t2": 310.45,
         "t3": 322.9,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SENCO.NS",
@@ -78,7 +83,8 @@
         "t1": 443.9,
         "t2": 469.85,
         "t3": 495.8,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LALPATHLAB.NS",
@@ -87,6 +93,7 @@
         "t1": 1917.59,
         "t2": 2007.98,
         "t3": 2098.37,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
