@@ -34,7 +34,8 @@
         "t1": 443.6,
         "t2": 469.55,
         "t3": 495.5,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LALPATHLAB.NS",
