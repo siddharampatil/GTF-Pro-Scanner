@@ -24,7 +24,8 @@
         "t1": 1751.36,
         "t2": 1815.42,
         "t3": 1879.48,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SENCO.NS",
@@ -42,7 +43,8 @@
         "t1": 1953.39,
         "t2": 2043.78,
         "t3": 2134.17,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CREDITACC.NS",
@@ -51,7 +53,8 @@
         "t1": 1652.22,
         "t2": 1730.44,
         "t3": 1808.66,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CARTRADE.NS",
@@ -60,7 +63,8 @@
         "t1": 3097.68,
         "t2": 3295.36,
         "t3": 3493.04,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CAPLIPOINT.NS",
@@ -69,6 +73,7 @@
         "t1": 2767.55,
         "t2": 2914.9,
         "t3": 3062.25,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
