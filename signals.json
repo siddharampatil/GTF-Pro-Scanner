@@ -1,99 +1,20 @@
 [
     {
-        "symbol": "TMB.NS",
-        "buy": 893.65,
-        "sl": 844.54,
-        "t1": 942.76,
-        "t2": 991.87,
-        "t3": 1040.98,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "IDFCFIRSTB.NS",
-        "buy": 84.88,
-        "sl": 81.64,
-        "t1": 88.12,
-        "t2": 91.36,
-        "t3": 94.6,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "THYROCARE.NS",
-        "buy": 584.05,
-        "sl": 543.65,
-        "t1": 624.45,
-        "t2": 664.85,
-        "t3": 705.25,
+        "symbol": "RRKABEL.NS",
+        "buy": 2661.6,
+        "sl": 2485.92,
+        "t1": 2837.28,
+        "t2": 3012.96,
+        "t3": 3188.64,
         "status": "OPEN"
     },
     {
         "symbol": "SPLPETRO.NS",
-        "buy": 760.9,
-        "sl": 722.47,
-        "t1": 799.33,
-        "t2": 837.76,
-        "t3": 876.19,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "LLOYDSME.NS",
-        "buy": 2014.9,
-        "sl": 1917.21,
-        "t1": 2112.59,
-        "t2": 2210.28,
-        "t3": 2307.97,
+        "buy": 766.15,
+        "sl": 727.39,
+        "t1": 804.91,
+        "t2": 843.67,
+        "t3": 882.43,
         "status": "OPEN"
-    },
-    {
-        "symbol": "SUNPHARMA.NS",
-        "buy": 1973.7,
-        "sl": 1927.08,
-        "t1": 2020.32,
-        "t2": 2066.94,
-        "t3": 2113.56,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "ENTERO.NS",
-        "buy": 1273.4,
-        "sl": 1207.09,
-        "t1": 1339.71,
-        "t2": 1406.02,
-        "t3": 1472.33,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "KTKBANK.NS",
-        "buy": 285.55,
-        "sl": 273.1,
-        "t1": 298.0,
-        "t2": 310.45,
-        "t3": 322.9,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "SENCO.NS",
-        "buy": 417.95,
-        "sl": 392.0,
-        "t1": 443.9,
-        "t2": 469.85,
-        "t3": 495.8,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "LALPATHLAB.NS",
-        "buy": 1827.2,
-        "sl": 1736.81,
-        "t1": 1917.59,
-        "t2": 2007.98,
-        "t3": 2098.37,
-        "status": "OPEN",
-        "entry_alert": true
     }
 ]
