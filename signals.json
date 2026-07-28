@@ -6,7 +6,8 @@
         "t1": 249.93,
         "t2": 262.44,
         "t3": 274.95,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TMB.NS",
@@ -15,7 +16,8 @@
         "t1": 926.14,
         "t2": 977.23,
         "t3": 1028.32,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "RADICO.NS",
@@ -24,7 +26,8 @@
         "t1": 4365.06,
         "t2": 4507.82,
         "t3": 4650.58,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "VAIBHAVGBL.NS",
@@ -69,7 +72,8 @@
         "t1": 2713.36,
         "t2": 2889.22,
         "t3": 3065.08,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LAURUSLABS.NS",
