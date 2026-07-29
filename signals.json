@@ -6,7 +6,8 @@
         "t1": 485.07,
         "t2": 504.19,
         "t3": 523.31,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SANOFICONR.NS",
