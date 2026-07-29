@@ -24,7 +24,8 @@
         "t1": 4519.49,
         "t2": 4683.58,
         "t3": 4847.67,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CARTRADE.NS",
@@ -69,6 +70,7 @@
         "t1": 238.51,
         "t2": 251.56,
         "t3": 264.61,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
