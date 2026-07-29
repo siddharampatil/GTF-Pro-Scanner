@@ -15,7 +15,8 @@
         "t1": 4864.94,
         "t2": 5163.88,
         "t3": 5462.82,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PFOCUS.NS",
@@ -42,7 +43,8 @@
         "t1": 607.6,
         "t2": 642.85,
         "t3": 678.1,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LLOYDSME.NS",
@@ -51,7 +53,8 @@
         "t1": 2150.73,
         "t2": 2250.16,
         "t3": 2349.59,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CRAFTSMAN.NS",
@@ -60,7 +63,8 @@
         "t1": 10335.4,
         "t2": 10757.8,
         "t3": 11180.2,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SANOFICONR.NS",
@@ -69,7 +73,8 @@
         "t1": 4934.05,
         "t2": 5122.8,
         "t3": 5311.55,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "RADICO.NS",
@@ -87,6 +92,7 @@
         "t1": 8032.31,
         "t2": 8280.12,
         "t3": 8527.93,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
