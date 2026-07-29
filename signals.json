@@ -1,96 +1,47 @@
 [
     {
-        "symbol": "CUB.NS",
-        "buy": 237.42,
-        "sl": 224.91,
-        "t1": 249.93,
-        "t2": 262.44,
-        "t3": 274.95,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "TI.NS",
+        "buy": 465.95,
+        "sl": 446.83,
+        "t1": 485.07,
+        "t2": 504.19,
+        "t3": 523.31,
+        "status": "OPEN"
     },
     {
-        "symbol": "TMB.NS",
-        "buy": 875.05,
-        "sl": 823.96,
-        "t1": 926.14,
-        "t2": 977.23,
-        "t3": 1028.32,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "SANOFICONR.NS",
+        "buy": 4754.9,
+        "sl": 4573.7,
+        "t1": 4936.1,
+        "t2": 5117.3,
+        "t3": 5298.5,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "PRUDENT.NS",
+        "buy": 3150.2,
+        "sl": 2959.76,
+        "t1": 3340.64,
+        "t2": 3531.08,
+        "t3": 3721.52,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SAIL.NS",
+        "buy": 174.39,
+        "sl": 166.66,
+        "t1": 182.12,
+        "t2": 189.85,
+        "t3": 197.58,
+        "status": "OPEN"
     },
     {
         "symbol": "RADICO.NS",
-        "buy": 4222.3,
-        "sl": 4079.54,
-        "t1": 4365.06,
-        "t2": 4507.82,
-        "t3": 4650.58,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "VAIBHAVGBL.NS",
-        "buy": 272.0,
-        "sl": 254.44,
-        "t1": 289.56,
-        "t2": 307.12,
-        "t3": 324.68,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "JKPAPER.NS",
-        "buy": 397.7,
-        "sl": 374.53,
-        "t1": 420.87,
-        "t2": 444.04,
-        "t3": 467.21,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "SAREGAMA.NS",
-        "buy": 521.45,
-        "sl": 490.69,
-        "t1": 552.21,
-        "t2": 582.97,
-        "t3": 613.73,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "SUNPHARMA.NS",
-        "buy": 1983.3,
-        "sl": 1937.64,
-        "t1": 2028.96,
-        "t2": 2074.62,
-        "t3": 2120.28,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "RRKABEL.NS",
-        "buy": 2537.5,
-        "sl": 2361.64,
-        "t1": 2713.36,
-        "t2": 2889.22,
-        "t3": 3065.08,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "LAURUSLABS.NS",
-        "buy": 1757.5,
-        "sl": 1688.01,
-        "t1": 1826.99,
-        "t2": 1896.48,
-        "t3": 1965.97,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "JLHL.NS",
-        "buy": 331.0,
-        "sl": 316.25,
-        "t1": 345.75,
-        "t2": 360.5,
-        "t3": 375.25,
+        "buy": 4380.2,
+        "sl": 4216.12,
+        "t1": 4544.28,
+        "t2": 4708.36,
+        "t3": 4872.44,
         "status": "OPEN"
     }
 ]
