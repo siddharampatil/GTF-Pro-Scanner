@@ -6,7 +6,8 @@
         "t1": 302.14,
         "t2": 315.68,
         "t3": 329.22,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "REDINGTON.NS",
