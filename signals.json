@@ -15,7 +15,7 @@
         "t1": 4864.94,
         "t2": 5163.88,
         "t3": 5462.82,
-        "status": "OPEN",
+        "status": "TARGET3",
         "entry_alert": true
     },
     {
@@ -34,7 +34,8 @@
         "t1": 3340.01,
         "t2": 3521.52,
         "t3": 3703.03,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "JSFB.NS",
@@ -83,7 +84,8 @@
         "t1": 4537.89,
         "t2": 4701.98,
         "t3": 4866.07,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "DIVISLAB.NS",
