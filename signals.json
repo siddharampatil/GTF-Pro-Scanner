@@ -24,7 +24,8 @@
         "t1": 239.07,
         "t2": 251.53,
         "t3": 263.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SANDUMA.NS",
@@ -33,7 +34,8 @@
         "t1": 225.12,
         "t2": 235.01,
         "t3": 244.9,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "STARHEALTH.NS",
@@ -42,7 +44,8 @@
         "t1": 631.92,
         "t2": 658.79,
         "t3": 685.66,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PRICOLLTD.NS",
@@ -78,7 +81,8 @@
         "t1": 329.37,
         "t2": 346.54,
         "t3": 363.71,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LXCHEM.NS",
@@ -87,6 +91,7 @@
         "t1": 200.64,
         "t2": 213.51,
         "t3": 226.38,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
