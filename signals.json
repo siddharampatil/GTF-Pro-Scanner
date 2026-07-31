@@ -6,7 +6,8 @@
         "t1": 2035.09,
         "t2": 2155.28,
         "t3": 2275.47,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NETWEB.NS",
@@ -24,7 +25,8 @@
         "t1": 1164.53,
         "t2": 1206.46,
         "t3": 1248.39,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PRICOLLTD.NS",
