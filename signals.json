@@ -16,7 +16,8 @@
         "t1": 4840.02,
         "t2": 5130.94,
         "t3": 5421.86,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BAJFINANCE.NS",
