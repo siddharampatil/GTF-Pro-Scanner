@@ -1,98 +1,38 @@
 [
     {
-        "symbol": "KTKBANK.NS",
-        "buy": 288.6,
-        "sl": 275.06,
-        "t1": 302.14,
-        "t2": 315.68,
-        "t3": 329.22,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "REDINGTON.NS",
-        "buy": 315.3,
-        "sl": 296.37,
-        "t1": 334.23,
-        "t2": 353.16,
-        "t3": 372.09,
+        "symbol": "ASTRAMICRO.NS",
+        "buy": 1914.9,
+        "sl": 1794.71,
+        "t1": 2035.09,
+        "t2": 2155.28,
+        "t3": 2275.47,
         "status": "OPEN"
     },
     {
-        "symbol": "GOKULAGRO.NS",
-        "buy": 226.61,
-        "sl": 214.15,
-        "t1": 239.07,
-        "t2": 251.53,
-        "t3": 263.99,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "NETWEB.NS",
+        "buy": 4549.1,
+        "sl": 4258.18,
+        "t1": 4840.02,
+        "t2": 5130.94,
+        "t3": 5421.86,
+        "status": "OPEN"
     },
     {
-        "symbol": "SANDUMA.NS",
-        "buy": 215.23,
-        "sl": 205.34,
-        "t1": 225.12,
-        "t2": 235.01,
-        "t3": 244.9,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "STARHEALTH.NS",
-        "buy": 605.05,
-        "sl": 578.18,
-        "t1": 631.92,
-        "t2": 658.79,
-        "t3": 685.66,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "BAJFINANCE.NS",
+        "buy": 1122.6,
+        "sl": 1080.67,
+        "t1": 1164.53,
+        "t2": 1206.46,
+        "t3": 1248.39,
+        "status": "OPEN"
     },
     {
         "symbol": "PRICOLLTD.NS",
-        "buy": 698.0,
-        "sl": 666.75,
-        "t1": 729.25,
-        "t2": 760.5,
-        "t3": 791.75,
+        "buy": 708.35,
+        "sl": 676.38,
+        "t1": 740.32,
+        "t2": 772.29,
+        "t3": 804.26,
         "status": "OPEN"
-    },
-    {
-        "symbol": "MANAPPURAM.NS",
-        "buy": 373.0,
-        "sl": 356.77,
-        "t1": 389.23,
-        "t2": 405.46,
-        "t3": 421.69,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "SYRMA.NS",
-        "buy": 1421.0,
-        "sl": 1328.39,
-        "t1": 1513.61,
-        "t2": 1606.22,
-        "t3": 1698.83,
-        "status": "OPEN"
-    },
-    {
-        "symbol": "QUESS.NS",
-        "buy": 312.2,
-        "sl": 295.03,
-        "t1": 329.37,
-        "t2": 346.54,
-        "t3": 363.71,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "LXCHEM.NS",
-        "buy": 187.77,
-        "sl": 174.9,
-        "t1": 200.64,
-        "t2": 213.51,
-        "t3": 226.38,
-        "status": "OPEN",
-        "entry_alert": true
     }
 ]
