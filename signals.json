@@ -6,7 +6,8 @@
         "t1": 443.61,
         "t2": 461.07,
         "t3": 478.53,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "JLHL.NS",
@@ -24,7 +25,8 @@
         "t1": 8710.04,
         "t2": 8995.58,
         "t3": 9281.12,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TBOTEK.NS",
