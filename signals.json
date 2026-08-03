@@ -6,7 +6,8 @@
         "t1": 187.21,
         "t2": 197.19,
         "t3": 207.17,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ABCAPITAL.NS",
@@ -24,7 +25,8 @@
         "t1": 333.7,
         "t2": 350.9,
         "t3": 368.1,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MINDACORP.NS",
@@ -60,7 +62,8 @@
         "t1": 1273.99,
         "t2": 1336.48,
         "t3": 1398.97,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "REDINGTON.NS",
@@ -69,7 +72,8 @@
         "t1": 369.83,
         "t2": 391.41,
         "t3": 412.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "DIVISLAB.NS",
