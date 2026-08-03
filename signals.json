@@ -1,41 +1,47 @@
 [
     {
-        "symbol": "ASTRAMICRO.NS",
-        "buy": 1914.9,
-        "sl": 1794.71,
-        "t1": 2035.09,
-        "t2": 2155.28,
-        "t3": 2275.47,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "ABCAPITAL.NS",
+        "buy": 426.15,
+        "sl": 408.69,
+        "t1": 443.61,
+        "t2": 461.07,
+        "t3": 478.53,
+        "status": "OPEN"
     },
     {
-        "symbol": "NETWEB.NS",
-        "buy": 4549.1,
-        "sl": 4258.18,
-        "t1": 4840.02,
-        "t2": 5130.94,
-        "t3": 5421.86,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "JLHL.NS",
+        "buy": 317.65,
+        "sl": 300.44,
+        "t1": 334.86,
+        "t2": 352.07,
+        "t3": 369.28,
+        "status": "OPEN"
     },
     {
-        "symbol": "BAJFINANCE.NS",
-        "buy": 1122.6,
-        "sl": 1080.67,
-        "t1": 1164.53,
-        "t2": 1206.46,
-        "t3": 1248.39,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "DIVISLAB.NS",
+        "buy": 8424.5,
+        "sl": 8138.96,
+        "t1": 8710.04,
+        "t2": 8995.58,
+        "t3": 9281.12,
+        "status": "OPEN"
     },
     {
-        "symbol": "PRICOLLTD.NS",
-        "buy": 708.35,
-        "sl": 676.38,
-        "t1": 740.32,
-        "t2": 772.29,
-        "t3": 804.26,
+        "symbol": "TBOTEK.NS",
+        "buy": 1638.0,
+        "sl": 1549.39,
+        "t1": 1726.61,
+        "t2": 1815.22,
+        "t3": 1903.83,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "GAEL.NS",
+        "buy": 175.94,
+        "sl": 165.97,
+        "t1": 185.91,
+        "t2": 195.88,
+        "t3": 205.85,
         "status": "OPEN"
     }
 ]
