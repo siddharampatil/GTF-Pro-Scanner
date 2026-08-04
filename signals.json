@@ -6,7 +6,8 @@
         "t1": 1540.18,
         "t2": 1636.46,
         "t3": 1732.74,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CAMS.NS",
@@ -24,7 +25,8 @@
         "t1": 5614.89,
         "t2": 5857.18,
         "t3": 6099.47,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SCI.NS",
@@ -42,6 +44,7 @@
         "t1": 677.09,
         "t2": 713.68,
         "t3": 750.27,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
