@@ -6,7 +6,8 @@
         "t1": 1376.24,
         "t2": 1447.98,
         "t3": 1519.72,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CAMS.NS",
@@ -24,7 +25,8 @@
         "t1": 685.24,
         "t2": 718.33,
         "t3": 751.42,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "STLTECH.NS",
@@ -60,7 +62,8 @@
         "t1": 5635.28,
         "t2": 5880.26,
         "t3": 6125.24,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "REDINGTON.NS",
@@ -69,7 +72,8 @@
         "t1": 369.59,
         "t2": 391.43,
         "t3": 413.27,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "WELENT.NS",
@@ -78,7 +82,8 @@
         "t1": 632.79,
         "t2": 657.18,
         "t3": 681.57,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TI.NS",
@@ -87,6 +92,7 @@
         "t1": 503.02,
         "t2": 523.04,
         "t3": 543.06,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
