@@ -52,7 +52,8 @@
         "t1": 2600.25,
         "t2": 2701.9,
         "t3": 2803.55,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GRAPHITE.NS",
