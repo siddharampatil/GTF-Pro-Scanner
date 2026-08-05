@@ -42,7 +42,8 @@
         "t1": 656.42,
         "t2": 691.79,
         "t3": 727.16,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "FIEMIND.NS",
@@ -69,7 +70,8 @@
         "t1": 558.93,
         "t2": 580.96,
         "t3": 602.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NYKAA.NS",
