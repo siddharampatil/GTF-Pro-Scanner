@@ -33,7 +33,8 @@
         "t1": 199.49,
         "t2": 207.2,
         "t3": 214.91,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NYKAA.NS",
@@ -42,6 +43,7 @@
         "t1": 345.19,
         "t2": 357.88,
         "t3": 370.57,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
