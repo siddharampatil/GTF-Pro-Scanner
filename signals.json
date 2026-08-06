@@ -15,7 +15,8 @@
         "t1": 748.41,
         "t2": 786.77,
         "t3": 825.13,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TRAVELFOOD.NS",
@@ -24,7 +25,8 @@
         "t1": 1424.78,
         "t2": 1483.46,
         "t3": 1542.14,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "JAMNAAUTO.NS",
@@ -33,7 +35,8 @@
         "t1": 148.96,
         "t2": 155.65,
         "t3": 162.34,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GRWRHITECH.NS",
@@ -42,7 +45,8 @@
         "t1": 7680.19,
         "t2": 8034.38,
         "t3": 8388.57,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ALIVUS.NS",
@@ -60,7 +64,8 @@
         "t1": 1545.08,
         "t2": 1639.76,
         "t3": 1734.44,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PIDILITIND.NS",
@@ -69,7 +74,8 @@
         "t1": 1671.02,
         "t2": 1722.04,
         "t3": 1773.06,
-        "status": "OPEN"
+        "status": "TARGET1",
+        "entry_alert": true
     },
     {
         "symbol": "STLTECH.NS",
@@ -78,7 +84,8 @@
         "t1": 654.08,
         "t2": 703.71,
         "t3": 753.34,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NETWEB.NS",
@@ -87,6 +94,7 @@
         "t1": 5055.33,
         "t2": 5348.46,
         "t3": 5641.59,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
