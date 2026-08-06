@@ -35,7 +35,8 @@
         "t1": 838.43,
         "t2": 877.61,
         "t3": 916.79,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PGIL.NS",
@@ -54,7 +55,8 @@
         "t1": 1592.31,
         "t2": 1675.62,
         "t3": 1758.93,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AIIL.NS",
@@ -82,7 +84,8 @@
         "t1": 7822.79,
         "t2": 8220.08,
         "t3": 8617.37,
-        "status": "OPEN"
+        "status": "TARGET1",
+        "entry_alert": true
     },
     {
         "symbol": "SHILPAMED.NS",
