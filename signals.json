@@ -1,100 +1,92 @@
 [
     {
         "symbol": "NEULANDLAB.NS",
-        "buy": 21760.0,
-        "sl": 20553.55,
-        "t1": 22966.45,
-        "t2": 24172.9,
-        "t3": 25379.35,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "NAVINFLUOR.NS",
-        "buy": 8420.0,
-        "sl": 8027.28,
-        "t1": 8812.72,
-        "t2": 9205.44,
-        "t3": 9598.16,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "GNFC.NS",
-        "buy": 544.5,
-        "sl": 519.54,
-        "t1": 569.46,
-        "t2": 594.42,
-        "t3": 619.38,
+        "buy": 21612.0,
+        "sl": 20458.11,
+        "t1": 22765.89,
+        "t2": 23919.78,
+        "t3": 25073.67,
         "status": "OPEN"
     },
     {
         "symbol": "TATATECH.NS",
-        "buy": 799.25,
-        "sl": 760.07,
-        "t1": 838.43,
-        "t2": 877.61,
-        "t3": 916.79,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 800.45,
+        "sl": 761.27,
+        "t1": 839.63,
+        "t2": 878.81,
+        "t3": 917.99,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "MIDHANI.NS",
+        "buy": 436.7,
+        "sl": 417.43,
+        "t1": 455.97,
+        "t2": 475.24,
+        "t3": 494.51,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "GNFC.NS",
+        "buy": 541.8,
+        "sl": 519.54,
+        "t1": 564.06,
+        "t2": 586.32,
+        "t3": 608.58,
+        "status": "OPEN"
     },
     {
         "symbol": "PGIL.NS",
-        "buy": 2200.4,
-        "sl": 2072.27,
-        "t1": 2328.53,
-        "t2": 2456.66,
-        "t3": 2584.79,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "IMFA.NS",
-        "buy": 1509.0,
-        "sl": 1425.69,
-        "t1": 1592.31,
-        "t2": 1675.62,
-        "t3": 1758.93,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 2212.9,
+        "sl": 2085.97,
+        "t1": 2339.83,
+        "t2": 2466.76,
+        "t3": 2593.69,
+        "status": "OPEN"
     },
     {
         "symbol": "AIIL.NS",
-        "buy": 588.15,
-        "sl": 553.38,
-        "t1": 622.92,
-        "t2": 657.69,
-        "t3": 692.46,
+        "buy": 587.0,
+        "sl": 554.32,
+        "t1": 619.68,
+        "t2": 652.36,
+        "t3": 685.04,
         "status": "OPEN"
     },
     {
         "symbol": "KTKBANK.NS",
-        "buy": 309.0,
-        "sl": 293.6,
-        "t1": 324.4,
-        "t2": 339.8,
-        "t3": 355.2,
-        "status": "OPEN",
-        "entry_alert": true
+        "buy": 308.45,
+        "sl": 293.71,
+        "t1": 323.19,
+        "t2": 337.93,
+        "t3": 352.67,
+        "status": "OPEN"
     },
     {
-        "symbol": "GRWRHITECH.NS",
-        "buy": 7425.5,
-        "sl": 7028.21,
-        "t1": 7822.79,
-        "t2": 8220.08,
-        "t3": 8617.37,
-        "status": "TARGET1",
-        "entry_alert": true
+        "symbol": "NAVINFLUOR.NS",
+        "buy": 8446.5,
+        "sl": 8056.65,
+        "t1": 8836.35,
+        "t2": 9226.2,
+        "t3": 9616.05,
+        "status": "OPEN"
     },
     {
-        "symbol": "SHILPAMED.NS",
-        "buy": 747.2,
-        "sl": 698.11,
-        "t1": 796.29,
-        "t2": 845.38,
-        "t3": 894.47,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "ASKAUTOLTD.NS",
+        "buy": 672.0,
+        "sl": 630.4,
+        "t1": 713.6,
+        "t2": 755.2,
+        "t3": 796.8,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "ASTERDM.NS",
+        "buy": 860.85,
+        "sl": 821.73,
+        "t1": 899.97,
+        "t2": 939.09,
+        "t3": 978.21,
+        "status": "OPEN"
     }
 ]
