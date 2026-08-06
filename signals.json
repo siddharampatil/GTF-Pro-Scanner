@@ -33,7 +33,8 @@
         "t1": 564.06,
         "t2": 586.32,
         "t3": 608.58,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PGIL.NS",
@@ -51,7 +52,8 @@
         "t1": 619.68,
         "t2": 652.36,
         "t3": 685.04,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KTKBANK.NS",
@@ -60,7 +62,8 @@
         "t1": 323.19,
         "t2": 337.93,
         "t3": 352.67,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NAVINFLUOR.NS",
@@ -69,7 +72,8 @@
         "t1": 8836.35,
         "t2": 9226.2,
         "t3": 9616.05,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ASKAUTOLTD.NS",
@@ -78,7 +82,8 @@
         "t1": 713.6,
         "t2": 755.2,
         "t3": 796.8,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ASTERDM.NS",
@@ -87,6 +92,7 @@
         "t1": 899.97,
         "t2": 939.09,
         "t3": 978.21,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
