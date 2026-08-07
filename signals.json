@@ -6,7 +6,8 @@
         "t1": 102.43,
         "t2": 108.38,
         "t3": 114.33,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AVALON.NS",
@@ -42,7 +43,8 @@
         "t1": 867.46,
         "t2": 907.42,
         "t3": 947.38,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "NAVINFLUOR.NS",
@@ -60,7 +62,8 @@
         "t1": 802.73,
         "t2": 847.66,
         "t3": 892.59,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "RAIN.NS",
@@ -69,7 +72,8 @@
         "t1": 252.32,
         "t2": 266.54,
         "t3": 280.76,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ENRIN.NS",
@@ -78,7 +82,8 @@
         "t1": 3853.12,
         "t2": 4058.24,
         "t3": 4263.36,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "RATEGAIN.NS",
