@@ -15,7 +15,8 @@
         "t1": 99.66,
         "t2": 105.57,
         "t3": 111.48,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ENRIN.NS",
@@ -24,7 +25,8 @@
         "t1": 3831.41,
         "t2": 4035.72,
         "t3": 4240.03,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TATATECH.NS",
