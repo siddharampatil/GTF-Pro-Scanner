@@ -16,7 +16,8 @@
         "t1": 1991.63,
         "t2": 2120.36,
         "t3": 2249.09,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MANORAMA.NS",
@@ -34,7 +35,8 @@
         "t1": 839.71,
         "t2": 885.47,
         "t3": 931.23,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TATATECH.NS",
