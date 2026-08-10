@@ -1,100 +1,92 @@
 [
     {
-        "symbol": "LLOYDSENGG.NS",
-        "buy": 96.48,
-        "sl": 90.53,
-        "t1": 102.43,
-        "t2": 108.38,
-        "t3": 114.33,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "AVALON.NS",
-        "buy": 1862.9,
-        "sl": 1734.17,
-        "t1": 1991.63,
-        "t2": 2120.36,
-        "t3": 2249.09,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "MANORAMA.NS",
-        "buy": 1697.0,
-        "sl": 1623.88,
-        "t1": 1770.12,
-        "t2": 1843.24,
-        "t3": 1916.36,
+        "symbol": "AKUMS.NS",
+        "buy": 732.0,
+        "sl": 695.64,
+        "t1": 768.36,
+        "t2": 804.72,
+        "t3": 841.08,
         "status": "OPEN"
     },
     {
-        "symbol": "VARROC.NS",
-        "buy": 793.95,
-        "sl": 748.19,
-        "t1": 839.71,
-        "t2": 885.47,
-        "t3": 931.23,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "TATATECH.NS",
-        "buy": 827.5,
-        "sl": 787.54,
-        "t1": 867.46,
-        "t2": 907.42,
-        "t3": 947.38,
-        "status": "TARGET1",
-        "entry_alert": true
-    },
-    {
-        "symbol": "NAVINFLUOR.NS",
-        "buy": 8390.5,
-        "sl": 7992.58,
-        "t1": 8788.42,
-        "t2": 9186.34,
-        "t3": 9584.26,
+        "symbol": "TITAN.NS",
+        "buy": 5070.0,
+        "sl": 4923.52,
+        "t1": 5216.48,
+        "t2": 5362.96,
+        "t3": 5509.44,
         "status": "OPEN"
     },
     {
-        "symbol": "SHILPAMED.NS",
-        "buy": 757.8,
-        "sl": 712.87,
-        "t1": 802.73,
-        "t2": 847.66,
-        "t3": 892.59,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "ENTERO.NS",
+        "buy": 1367.0,
+        "sl": 1284.44,
+        "t1": 1449.56,
+        "t2": 1532.12,
+        "t3": 1614.68,
+        "status": "OPEN"
     },
     {
-        "symbol": "RAIN.NS",
-        "buy": 238.1,
-        "sl": 223.88,
-        "t1": 252.32,
-        "t2": 266.54,
-        "t3": 280.76,
-        "status": "STOPLOSS",
-        "entry_alert": true
+        "symbol": "EMIL.NS",
+        "buy": 182.25,
+        "sl": 168.84,
+        "t1": 195.66,
+        "t2": 209.07,
+        "t3": 222.48,
+        "status": "OPEN"
     },
     {
-        "symbol": "ENRIN.NS",
-        "buy": 3648.0,
-        "sl": 3442.88,
-        "t1": 3853.12,
-        "t2": 4058.24,
-        "t3": 4263.36,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "SKYGOLD.NS",
+        "buy": 777.5,
+        "sl": 726.77,
+        "t1": 828.23,
+        "t2": 878.96,
+        "t3": 929.69,
+        "status": "OPEN"
     },
     {
-        "symbol": "RATEGAIN.NS",
-        "buy": 962.1,
-        "sl": 908.19,
-        "t1": 1016.01,
-        "t2": 1069.92,
-        "t3": 1123.83,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "POWERINDIA.NS",
+        "buy": 35835.0,
+        "sl": 33973.39,
+        "t1": 37696.61,
+        "t2": 39558.22,
+        "t3": 41419.83,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "PAYTM.NS",
+        "buy": 1547.8,
+        "sl": 1473.58,
+        "t1": 1622.02,
+        "t2": 1696.24,
+        "t3": 1770.46,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SAILIFE.NS",
+        "buy": 1437.1,
+        "sl": 1366.55,
+        "t1": 1507.65,
+        "t2": 1578.2,
+        "t3": 1648.75,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "POLYMED.NS",
+        "buy": 1797.5,
+        "sl": 1709.11,
+        "t1": 1885.89,
+        "t2": 1974.28,
+        "t3": 2062.67,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "DYNAMATECH.NS",
+        "buy": 11879.0,
+        "sl": 11208.31,
+        "t1": 12549.69,
+        "t2": 13220.38,
+        "t3": 13891.07,
+        "status": "OPEN"
     }
 ]
