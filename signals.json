@@ -16,7 +16,8 @@
         "t1": 5216.48,
         "t2": 5362.96,
         "t3": 5509.44,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ENTERO.NS",
@@ -34,7 +35,8 @@
         "t1": 195.66,
         "t2": 209.07,
         "t3": 222.48,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SKYGOLD.NS",
@@ -72,7 +74,8 @@
         "t1": 1507.65,
         "t2": 1578.2,
         "t3": 1648.75,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "POLYMED.NS",
