@@ -6,7 +6,8 @@
         "t1": 768.36,
         "t2": 804.72,
         "t3": 841.08,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "TITAN.NS",
@@ -51,7 +52,8 @@
         "t1": 37696.61,
         "t2": 39558.22,
         "t3": 41419.83,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PAYTM.NS",
@@ -60,7 +62,8 @@
         "t1": 1622.02,
         "t2": 1696.24,
         "t3": 1770.46,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SAILIFE.NS",
@@ -78,7 +81,8 @@
         "t1": 1885.89,
         "t2": 1974.28,
         "t3": 2062.67,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "DYNAMATECH.NS",
