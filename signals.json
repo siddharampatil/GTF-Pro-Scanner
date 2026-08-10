@@ -45,7 +45,8 @@
         "t1": 828.23,
         "t2": 878.96,
         "t3": 929.69,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "POWERINDIA.NS",
@@ -94,6 +95,6 @@
         "t1": 12549.69,
         "t2": 13220.38,
         "t3": 13891.07,
-        "status": "OPEN"
+        "status": "STOPLOSS"
     }
 ]
