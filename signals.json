@@ -33,7 +33,8 @@
         "t1": 798.02,
         "t2": 836.04,
         "t3": 874.06,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "LUMAXTECH.NS",
@@ -42,7 +43,8 @@
         "t1": 2177.12,
         "t2": 2293.04,
         "t3": 2408.96,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GLAND.NS",
@@ -60,7 +62,8 @@
         "t1": 491.87,
         "t2": 511.49,
         "t3": 531.11,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KPRMILL.NS",
