@@ -56,7 +56,8 @@
         "t1": 3033.33,
         "t2": 3178.06,
         "t3": 3322.79,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "OIL.NS",
