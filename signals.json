@@ -6,7 +6,8 @@
         "t1": 46734.7,
         "t2": 48324.4,
         "t3": 49914.1,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "SHAILY.NS",
@@ -15,7 +16,8 @@
         "t1": 3681.21,
         "t2": 3894.42,
         "t3": 4107.63,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CHENNPETRO.NS",
