@@ -26,7 +26,8 @@
         "t1": 1449.56,
         "t2": 1532.12,
         "t3": 1614.68,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "EMIL.NS",
