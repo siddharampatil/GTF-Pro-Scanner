@@ -51,7 +51,8 @@
         "t1": 1594.02,
         "t2": 1705.74,
         "t3": 1817.46,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ANANDRATHI.NS",
@@ -60,7 +61,8 @@
         "t1": 2248.86,
         "t2": 2324.52,
         "t3": 2400.18,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PNB.NS",
@@ -78,7 +80,8 @@
         "t1": 1501.34,
         "t2": 1562.48,
         "t3": 1623.62,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "HINDCOPPER.NS",
@@ -87,6 +90,7 @@
         "t1": 584.72,
         "t2": 612.44,
         "t3": 640.16,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
