@@ -6,7 +6,8 @@
         "t1": 1450.96,
         "t2": 1509.82,
         "t3": 1568.68,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "QPOWER.NS",
@@ -15,7 +16,8 @@
         "t1": 1391.11,
         "t2": 1481.02,
         "t3": 1570.93,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "VIJAYA.NS",
@@ -24,7 +26,8 @@
         "t1": 1552.65,
         "t2": 1634.8,
         "t3": 1716.95,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ANANDRATHI.NS",
@@ -51,6 +54,7 @@
         "t1": 1570.83,
         "t2": 1683.66,
         "t3": 1796.49,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
