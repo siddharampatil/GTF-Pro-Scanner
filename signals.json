@@ -74,7 +74,8 @@
         "t1": 121.76,
         "t2": 125.14,
         "t3": 128.52,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KPIL.NS",
