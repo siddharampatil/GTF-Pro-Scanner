@@ -24,7 +24,8 @@
         "t1": 1400.06,
         "t2": 1475.12,
         "t3": 1550.18,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "VIJAYA.NS",
