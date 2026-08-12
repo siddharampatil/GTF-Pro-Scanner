@@ -1,90 +1,56 @@
 [
     {
-        "symbol": "BOSCHLTD.NS",
-        "buy": 45145.0,
-        "sl": 43555.3,
-        "t1": 46734.7,
-        "t2": 48324.4,
-        "t3": 49914.1,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "SHAILY.NS",
-        "buy": 3468.0,
-        "sl": 3254.79,
-        "t1": 3681.21,
-        "t2": 3894.42,
-        "t3": 4107.63,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CHENNPETRO.NS",
-        "buy": 1354.9,
-        "sl": 1261.95,
-        "t1": 1447.85,
-        "t2": 1540.8,
-        "t3": 1633.75,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "AKUMS.NS",
-        "buy": 760.0,
-        "sl": 721.98,
-        "t1": 798.02,
-        "t2": 836.04,
-        "t3": 874.06,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "LUMAXTECH.NS",
-        "buy": 2061.2,
-        "sl": 1945.28,
-        "t1": 2177.12,
-        "t2": 2293.04,
-        "t3": 2408.96,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "GLAND.NS",
-        "buy": 2888.6,
-        "sl": 2743.87,
-        "t1": 3033.33,
-        "t2": 3178.06,
-        "t3": 3322.79,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "OIL.NS",
-        "buy": 472.25,
-        "sl": 452.63,
-        "t1": 491.87,
-        "t2": 511.49,
-        "t3": 531.11,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "KPRMILL.NS",
-        "buy": 1121.8,
-        "sl": 1061.2,
-        "t1": 1182.4,
-        "t2": 1243.0,
-        "t3": 1303.6,
+        "symbol": "KPIL.NS",
+        "buy": 1392.1,
+        "sl": 1333.24,
+        "t1": 1450.96,
+        "t2": 1509.82,
+        "t3": 1568.68,
         "status": "OPEN"
     },
     {
-        "symbol": "AARTIDRUGS.NS",
-        "buy": 447.1,
-        "sl": 427.08,
-        "t1": 467.12,
-        "t2": 487.14,
-        "t3": 507.16,
+        "symbol": "QPOWER.NS",
+        "buy": 1301.2,
+        "sl": 1211.29,
+        "t1": 1391.11,
+        "t2": 1481.02,
+        "t3": 1570.93,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "VIJAYA.NS",
+        "buy": 1470.5,
+        "sl": 1388.35,
+        "t1": 1552.65,
+        "t2": 1634.8,
+        "t3": 1716.95,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "ANANDRATHI.NS",
+        "buy": 2188.4,
+        "sl": 2113.47,
+        "t1": 2263.33,
+        "t2": 2338.26,
+        "t3": 2413.19,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "EPL.NS",
+        "buy": 256.83,
+        "sl": 244.6,
+        "t1": 269.06,
+        "t2": 281.29,
+        "t3": 293.52,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "TDPOWERSYS.NS",
+        "buy": 1458.0,
+        "sl": 1345.17,
+        "t1": 1570.83,
+        "t2": 1683.66,
+        "t3": 1796.49,
         "status": "OPEN"
     }
 ]
