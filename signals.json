@@ -15,7 +15,8 @@
         "t1": 1385.33,
         "t2": 1471.66,
         "t3": 1557.99,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KRN.NS",
