@@ -35,7 +35,8 @@
         "t1": 1550.16,
         "t2": 1631.52,
         "t3": 1712.88,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AGARWALEYE.NS",
