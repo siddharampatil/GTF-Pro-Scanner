@@ -1,100 +1,47 @@
 [
     {
+        "symbol": "FLUOROCHEM.NS",
+        "buy": 4820.0,
+        "sl": 4566.31,
+        "t1": 5073.69,
+        "t2": 5327.38,
+        "t3": 5581.07,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "THYROCARE.NS",
+        "buy": 617.6,
+        "sl": 579.38,
+        "t1": 655.82,
+        "t2": 694.04,
+        "t3": 732.26,
+        "status": "OPEN"
+    },
+    {
         "symbol": "EPL.NS",
-        "buy": 246.14,
-        "sl": 233.51,
-        "t1": 258.77,
-        "t2": 271.4,
-        "t3": 284.03,
+        "buy": 248.54,
+        "sl": 237.72,
+        "t1": 259.36,
+        "t2": 270.18,
+        "t3": 281.0,
         "status": "OPEN"
     },
     {
-        "symbol": "QPOWER.NS",
-        "buy": 1299.0,
-        "sl": 1212.67,
-        "t1": 1385.33,
-        "t2": 1471.66,
-        "t3": 1557.99,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "KRN.NS",
-        "buy": 1325.0,
-        "sl": 1249.94,
-        "t1": 1400.06,
-        "t2": 1475.12,
-        "t3": 1550.18,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "VIJAYA.NS",
-        "buy": 1468.8,
-        "sl": 1387.44,
-        "t1": 1550.16,
-        "t2": 1631.52,
-        "t3": 1712.88,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "AGARWALEYE.NS",
-        "buy": 513.75,
-        "sl": 479.08,
-        "t1": 548.42,
-        "t2": 583.09,
-        "t3": 617.76,
+        "symbol": "AZAD.NS",
+        "buy": 2590.0,
+        "sl": 2430.01,
+        "t1": 2749.99,
+        "t2": 2909.98,
+        "t3": 3069.97,
         "status": "OPEN"
     },
     {
-        "symbol": "TDPOWERSYS.NS",
-        "buy": 1482.3,
-        "sl": 1370.58,
-        "t1": 1594.02,
-        "t2": 1705.74,
-        "t3": 1817.46,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "ANANDRATHI.NS",
-        "buy": 2173.2,
-        "sl": 2097.54,
-        "t1": 2248.86,
-        "t2": 2324.52,
-        "t3": 2400.18,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "PNB.NS",
-        "buy": 118.38,
-        "sl": 115.0,
-        "t1": 121.76,
-        "t2": 125.14,
-        "t3": 128.52,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "KPIL.NS",
-        "buy": 1440.2,
-        "sl": 1379.06,
-        "t1": 1501.34,
-        "t2": 1562.48,
-        "t3": 1623.62,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "HINDCOPPER.NS",
-        "buy": 557.0,
-        "sl": 529.28,
-        "t1": 584.72,
-        "t2": 612.44,
-        "t3": 640.16,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "CPPLUS.NS",
+        "buy": 3704.2,
+        "sl": 3450.07,
+        "t1": 3958.33,
+        "t2": 4212.46,
+        "t3": 4466.59,
+        "status": "OPEN"
     }
 ]
