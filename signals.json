@@ -33,7 +33,8 @@
         "t1": 3997.84,
         "t2": 4223.68,
         "t3": 4449.52,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MINDACORP.NS",
@@ -51,7 +52,8 @@
         "t1": 21123.47,
         "t2": 21947.94,
         "t3": 22772.41,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CPPLUS.NS",
@@ -60,7 +62,8 @@
         "t1": 3953.43,
         "t2": 4202.66,
         "t3": 4451.89,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AZAD.NS",
@@ -69,7 +72,8 @@
         "t1": 2817.03,
         "t2": 2976.06,
         "t3": 3135.09,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "BBOX.NS",
