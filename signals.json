@@ -1,51 +1,92 @@
 [
     {
-        "symbol": "FLUOROCHEM.NS",
-        "buy": 4820.0,
-        "sl": 4566.31,
-        "t1": 5073.69,
-        "t2": 5327.38,
-        "t3": 5581.07,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "THYROCARE.NS",
-        "buy": 617.6,
-        "sl": 579.38,
-        "t1": 655.82,
-        "t2": 694.04,
-        "t3": 732.26,
+        "symbol": "MIDHANI.NS",
+        "buy": 445.6,
+        "sl": 419.67,
+        "t1": 471.53,
+        "t2": 497.46,
+        "t3": 523.39,
         "status": "OPEN"
     },
     {
-        "symbol": "EPL.NS",
-        "buy": 248.54,
-        "sl": 237.72,
-        "t1": 259.36,
-        "t2": 270.18,
-        "t3": 281.0,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "FLUOROCHEM.NS",
+        "buy": 4743.3,
+        "sl": 4486.87,
+        "t1": 4999.73,
+        "t2": 5256.16,
+        "t3": 5512.59,
+        "status": "OPEN"
     },
     {
-        "symbol": "AZAD.NS",
-        "buy": 2590.0,
-        "sl": 2430.01,
-        "t1": 2749.99,
-        "t2": 2909.98,
-        "t3": 3069.97,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "THYROCARE.NS",
+        "buy": 610.35,
+        "sl": 570.51,
+        "t1": 650.19,
+        "t2": 690.03,
+        "t3": 729.87,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SANSERA.NS",
+        "buy": 3772.0,
+        "sl": 3546.16,
+        "t1": 3997.84,
+        "t2": 4223.68,
+        "t3": 4449.52,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "MINDACORP.NS",
+        "buy": 715.25,
+        "sl": 677.95,
+        "t1": 752.55,
+        "t2": 789.85,
+        "t3": 827.15,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "SOLARINDS.NS",
+        "buy": 20299.0,
+        "sl": 19474.53,
+        "t1": 21123.47,
+        "t2": 21947.94,
+        "t3": 22772.41,
+        "status": "OPEN"
     },
     {
         "symbol": "CPPLUS.NS",
         "buy": 3704.2,
-        "sl": 3450.07,
-        "t1": 3958.33,
-        "t2": 4212.46,
-        "t3": 4466.59,
-        "status": "OPEN",
-        "entry_alert": true
+        "sl": 3454.97,
+        "t1": 3953.43,
+        "t2": 4202.66,
+        "t3": 4451.89,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "AZAD.NS",
+        "buy": 2658.0,
+        "sl": 2498.97,
+        "t1": 2817.03,
+        "t2": 2976.06,
+        "t3": 3135.09,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "BBOX.NS",
+        "buy": 835.25,
+        "sl": 776.66,
+        "t1": 893.84,
+        "t2": 952.43,
+        "t3": 1011.02,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "TI.NS",
+        "buy": 555.2,
+        "sl": 528.01,
+        "t1": 582.39,
+        "t2": 609.58,
+        "t3": 636.77,
+        "status": "OPEN"
     }
 ]
