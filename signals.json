@@ -6,7 +6,8 @@
         "t1": 5073.69,
         "t2": 5327.38,
         "t3": 5581.07,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "THYROCARE.NS",
@@ -24,7 +25,8 @@
         "t1": 259.36,
         "t2": 270.18,
         "t3": 281.0,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "AZAD.NS",
@@ -33,7 +35,8 @@
         "t1": 2749.99,
         "t2": 2909.98,
         "t3": 3069.97,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CPPLUS.NS",
@@ -42,6 +45,7 @@
         "t1": 3958.33,
         "t2": 4212.46,
         "t3": 4466.59,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
