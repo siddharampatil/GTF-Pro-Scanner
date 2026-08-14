@@ -33,7 +33,8 @@
         "t1": 787.45,
         "t2": 826.65,
         "t3": 865.85,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KRBL.NS",
@@ -51,7 +52,8 @@
         "t1": 915.2,
         "t2": 958.85,
         "t3": 1002.5,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "INDIGOPNTS.NS",
@@ -60,7 +62,8 @@
         "t1": 1205.41,
         "t2": 1263.12,
         "t3": 1320.83,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ELGIEQUIP.NS",
@@ -78,6 +81,7 @@
         "t1": 255.16,
         "t2": 266.67,
         "t3": 278.18,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
