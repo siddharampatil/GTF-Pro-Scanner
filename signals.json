@@ -72,7 +72,8 @@
         "t1": 632.11,
         "t2": 658.07,
         "t3": 684.03,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "ENGINERSIN.NS",
