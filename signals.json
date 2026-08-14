@@ -6,7 +6,7 @@
         "t1": 186.71,
         "t2": 197.08,
         "t3": 207.45,
-        "status": "OPEN"
+        "status": "STOPLOSS"
     },
     {
         "symbol": "MANORAMA.NS",
@@ -24,7 +24,8 @@
         "t1": 517.99,
         "t2": 541.98,
         "t3": 565.97,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MINDACORP.NS",
