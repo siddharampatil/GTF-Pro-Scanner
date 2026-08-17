@@ -6,7 +6,7 @@
         "t1": 19896.49,
         "t2": 20669.98,
         "t3": 21443.47,
-        "status": "OPEN",
+        "status": "TARGET1",
         "entry_alert": true
     },
     {
@@ -44,7 +44,8 @@
         "t1": 247.8,
         "t2": 260.41,
         "t3": 273.02,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "IPCALAB.NS",
@@ -53,7 +54,8 @@
         "t1": 1949.47,
         "t2": 2061.44,
         "t3": 2173.41,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "CONCORDBIO.NS",
