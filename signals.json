@@ -6,7 +6,8 @@
         "t1": 19896.49,
         "t2": 20669.98,
         "t3": 21443.47,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MSTCLTD.NS",
@@ -24,7 +25,8 @@
         "t1": 1811.73,
         "t2": 1917.46,
         "t3": 2023.19,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "GNFC.NS",
