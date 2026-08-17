@@ -1,89 +1,20 @@
 [
     {
-        "symbol": "WELSPUNLIV.NS",
-        "buy": 176.34,
-        "sl": 165.97,
-        "t1": 186.71,
-        "t2": 197.08,
-        "t3": 207.45,
-        "status": "STOPLOSS"
-    },
-    {
-        "symbol": "MANORAMA.NS",
-        "buy": 1826.3,
-        "sl": 1730.18,
-        "t1": 1922.42,
-        "t2": 2018.54,
-        "t3": 2114.66,
+        "symbol": "PTCIL.NS",
+        "buy": 19690.0,
+        "sl": 18916.97,
+        "t1": 20463.03,
+        "t2": 21236.06,
+        "t3": 22009.09,
         "status": "OPEN"
     },
     {
-        "symbol": "HONASA.NS",
-        "buy": 494.0,
-        "sl": 470.01,
-        "t1": 517.99,
-        "t2": 541.98,
-        "t3": 565.97,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "MINDACORP.NS",
-        "buy": 748.25,
-        "sl": 709.05,
-        "t1": 787.45,
-        "t2": 826.65,
-        "t3": 865.85,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "KRBL.NS",
-        "buy": 396.55,
-        "sl": 378.19,
-        "t1": 414.91,
-        "t2": 433.27,
-        "t3": 451.63,
+        "symbol": "IPCALAB.NS",
+        "buy": 1900.0,
+        "sl": 1791.14,
+        "t1": 2008.86,
+        "t2": 2117.72,
+        "t3": 2226.58,
         "status": "OPEN"
-    },
-    {
-        "symbol": "DATAMATICS.NS",
-        "buy": 871.55,
-        "sl": 827.9,
-        "t1": 915.2,
-        "t2": 958.85,
-        "t3": 1002.5,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "INDIGOPNTS.NS",
-        "buy": 1147.7,
-        "sl": 1089.99,
-        "t1": 1205.41,
-        "t2": 1263.12,
-        "t3": 1320.83,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "ELGIEQUIP.NS",
-        "buy": 606.15,
-        "sl": 580.19,
-        "t1": 632.11,
-        "t2": 658.07,
-        "t3": 684.03,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "ENGINERSIN.NS",
-        "buy": 243.65,
-        "sl": 232.14,
-        "t1": 255.16,
-        "t2": 266.67,
-        "t3": 278.18,
-        "status": "OPEN",
-        "entry_alert": true
     }
 ]
