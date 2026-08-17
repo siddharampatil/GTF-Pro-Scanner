@@ -16,7 +16,8 @@
         "t1": 681.47,
         "t2": 720.44,
         "t3": 759.41,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "RUBICON.NS",
@@ -35,7 +36,8 @@
         "t1": 607.78,
         "t2": 630.51,
         "t3": 653.24,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PURVA.NS",
