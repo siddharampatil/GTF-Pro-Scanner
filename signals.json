@@ -66,6 +66,7 @@
         "t1": 1599.56,
         "t2": 1678.52,
         "t3": 1757.48,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     }
 ]
