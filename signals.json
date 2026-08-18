@@ -15,7 +15,8 @@
         "t1": 192.28,
         "t2": 203.32,
         "t3": 214.36,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "PARAS.NS",
