@@ -1,72 +1,47 @@
 [
     {
-        "symbol": "PTCIL.NS",
-        "buy": 19123.0,
-        "sl": 18349.51,
-        "t1": 19896.49,
-        "t2": 20669.98,
-        "t3": 21443.47,
-        "status": "TARGET1",
-        "entry_alert": true
+        "symbol": "WELSPUNLIV.NS",
+        "buy": 180.91,
+        "sl": 169.89,
+        "t1": 191.93,
+        "t2": 202.95,
+        "t3": 213.97,
+        "status": "OPEN"
     },
     {
-        "symbol": "MSTCLTD.NS",
-        "buy": 642.5,
-        "sl": 603.53,
-        "t1": 681.47,
-        "t2": 720.44,
-        "t3": 759.41,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "NEOGEN.NS",
+        "buy": 2470.1,
+        "sl": 2300.08,
+        "t1": 2640.12,
+        "t2": 2810.14,
+        "t3": 2980.16,
+        "status": "OPEN"
     },
     {
-        "symbol": "RUBICON.NS",
-        "buy": 1706.0,
-        "sl": 1600.27,
-        "t1": 1811.73,
-        "t2": 1917.46,
-        "t3": 2023.19,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "PARAS.NS",
+        "buy": 1447.4,
+        "sl": 1360.9,
+        "t1": 1533.9,
+        "t2": 1620.4,
+        "t3": 1706.9,
+        "status": "OPEN"
     },
     {
-        "symbol": "GNFC.NS",
-        "buy": 585.05,
-        "sl": 562.32,
-        "t1": 607.78,
-        "t2": 630.51,
-        "t3": 653.24,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "ETHOSLTD.NS",
+        "buy": 2888.7,
+        "sl": 2692.66,
+        "t1": 3084.74,
+        "t2": 3280.78,
+        "t3": 3476.82,
+        "status": "OPEN"
     },
     {
-        "symbol": "PURVA.NS",
-        "buy": 235.19,
-        "sl": 222.58,
-        "t1": 247.8,
-        "t2": 260.41,
-        "t3": 273.02,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "IPCALAB.NS",
-        "buy": 1837.5,
-        "sl": 1725.53,
-        "t1": 1949.47,
-        "t2": 2061.44,
-        "t3": 2173.41,
-        "status": "OPEN",
-        "entry_alert": true
-    },
-    {
-        "symbol": "CONCORDBIO.NS",
-        "buy": 1520.6,
-        "sl": 1441.64,
-        "t1": 1599.56,
-        "t2": 1678.52,
-        "t3": 1757.48,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "OBEROIRLTY.NS",
+        "buy": 1908.9,
+        "sl": 1830.96,
+        "t1": 1986.84,
+        "t2": 2064.78,
+        "t3": 2142.72,
+        "status": "OPEN"
     }
 ]
