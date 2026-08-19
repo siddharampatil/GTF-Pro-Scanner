@@ -6,7 +6,8 @@
         "t1": 3140.79,
         "t2": 3264.18,
         "t3": 3387.57,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "KRBL.NS",
