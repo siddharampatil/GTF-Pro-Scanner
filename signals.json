@@ -6,7 +6,8 @@
         "t1": 260.11,
         "t2": 273.73,
         "t3": 287.35,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "EDELWEISS.NS",
