@@ -15,7 +15,8 @@
         "t1": 2353.13,
         "t2": 2454.26,
         "t3": 2555.39,
-        "status": "OPEN"
+        "status": "OPEN",
+        "entry_alert": true
     },
     {
         "symbol": "MAHSEAMLES.NS",
