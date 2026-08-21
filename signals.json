@@ -1,21 +1,47 @@
 [
     {
-        "symbol": "GOKULAGRO.NS",
-        "buy": 246.49,
-        "sl": 232.87,
-        "t1": 260.11,
-        "t2": 273.73,
-        "t3": 287.35,
-        "status": "OPEN",
-        "entry_alert": true
+        "symbol": "JSFB.NS",
+        "buy": 596.6,
+        "sl": 558.15,
+        "t1": 635.05,
+        "t2": 673.5,
+        "t3": 711.95,
+        "status": "OPEN"
     },
     {
-        "symbol": "EDELWEISS.NS",
-        "buy": 129.9,
-        "sl": 123.15,
-        "t1": 136.65,
-        "t2": 143.4,
-        "t3": 150.15,
+        "symbol": "WELCORP.NS",
+        "buy": 2252.0,
+        "sl": 2150.87,
+        "t1": 2353.13,
+        "t2": 2454.26,
+        "t3": 2555.39,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "MAHSEAMLES.NS",
+        "buy": 648.0,
+        "sl": 622.07,
+        "t1": 673.93,
+        "t2": 699.86,
+        "t3": 725.79,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "IIFL.NS",
+        "buy": 686.45,
+        "sl": 656.78,
+        "t1": 716.12,
+        "t2": 745.79,
+        "t3": 775.46,
+        "status": "OPEN"
+    },
+    {
+        "symbol": "BALRAMCHIN.NS",
+        "buy": 761.4,
+        "sl": 713.79,
+        "t1": 809.01,
+        "t2": 856.62,
+        "t3": 904.23,
         "status": "OPEN"
     }
 ]
