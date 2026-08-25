@@ -117,17 +117,17 @@
         "adx": 37.63,
         "rvol": 5.83,
         "atr": 32.95,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 729.35,
         "entry_time": "2026-08-24T10:02:22+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 679.92,
+        "exit_time": "2026-08-25T10:30:10+05:30",
+        "result": "LOSS",
+        "pnl_pct": -6.78
     },
     {
         "signal_id": "VOLTAMP.NS_20260822_211649",
