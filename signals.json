@@ -407,13 +407,14 @@
         "entry_alert": true,
         "entry_price": 925.6,
         "entry_time": "2026-08-26T09:56:57+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-08-26T15:32:21+05:30"
     },
     {
         "signal_id": "VOLTAMP.NS_20260822_211649",
