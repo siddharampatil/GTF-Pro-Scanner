@@ -513,13 +513,14 @@
         "entry_price": 631.45,
         "entry_time": "2026-08-24T10:02:21+05:30",
         "t1_hit": true,
-        "t2_hit": false,
+        "t2_hit": true,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
         "pnl_pct": null,
-        "t1_time": "2026-08-25T11:00:46+05:30"
+        "t1_time": "2026-08-25T11:00:46+05:30",
+        "t2_time": "2026-08-26T14:53:26+05:30"
     },
     {
         "signal_id": "EDELWEISS.NS_20260822_211649",
