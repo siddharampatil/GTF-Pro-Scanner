@@ -613,10 +613,10 @@
         "adx": 34.99,
         "rvol": 3.5,
         "atr": 4.94,
-        "status": "WAITING_ENTRY",
-        "entry_alert": false,
-        "entry_price": null,
-        "entry_time": null,
+        "status": "OPEN",
+        "entry_alert": true,
+        "entry_price": 157.32,
+        "entry_time": "2026-08-31T15:37:58+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
@@ -669,13 +669,14 @@
         "entry_alert": true,
         "entry_price": 1943.5,
         "entry_time": "2026-08-26T11:53:02+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-08-31T15:37:59+05:30"
     },
     {
         "signal_id": "AVALON.NS_20260826_103320",
@@ -695,13 +696,14 @@
         "entry_alert": true,
         "entry_price": 2178.5,
         "entry_time": "2026-08-26T11:17:01+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-08-31T15:38:00+05:30"
     },
     {
         "signal_id": "INDIGOPNTS.NS_20260826_103320",
