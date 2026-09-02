@@ -563,17 +563,17 @@
         "adx": 26.68,
         "rvol": 2.32,
         "atr": 37.78,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 1717.0,
         "entry_time": "2026-08-31T23:05:57+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 1660.34,
+        "exit_time": "2026-09-02T18:14:37+05:30",
+        "result": "LOSS",
+        "pnl_pct": -3.3
     },
     {
         "signal_id": "BAJAJ-AUTO.NS_20260831_163254",
