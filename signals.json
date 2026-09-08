@@ -221,10 +221,10 @@
         "adx": 32.7,
         "rvol": 0.52,
         "atr": 229.45,
-        "status": "WAITING_ENTRY",
-        "entry_alert": false,
-        "entry_price": null,
-        "entry_time": null,
+        "status": "OPEN",
+        "entry_alert": true,
+        "entry_price": 8674.0,
+        "entry_time": "2026-09-08T13:51:58+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
@@ -1381,13 +1381,14 @@
         "entry_alert": true,
         "entry_price": 1913.2,
         "entry_time": "2026-09-03T13:49:21+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-09-08T13:52:07+05:30"
     },
     {
         "signal_id": "FINCABLES.NS_20260825_153006",
@@ -1434,13 +1435,14 @@
         "entry_price": 207.91,
         "entry_time": "2026-08-26T09:56:55+05:30",
         "t1_hit": true,
-        "t2_hit": false,
+        "t2_hit": true,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
         "pnl_pct": null,
-        "t1_time": "2026-09-01T14:26:33+05:30"
+        "t1_time": "2026-09-01T14:26:33+05:30",
+        "t2_time": "2026-09-08T13:52:08+05:30"
     },
     {
         "signal_id": "MAHSEAMLES.NS_20260825_153006",
