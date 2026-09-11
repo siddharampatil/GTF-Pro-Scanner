@@ -618,17 +618,17 @@
         "adx": 31.75,
         "rvol": 0.04,
         "atr": 24.74,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 1321.6,
         "entry_time": "2026-09-04T18:13:21+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 1284.49,
+        "exit_time": "2026-09-11T13:50:50+05:30",
+        "result": "LOSS",
+        "pnl_pct": -2.81
     },
     {
         "signal_id": "JINDALSTEL.NS_20260828_091617",
@@ -644,17 +644,17 @@
         "adx": 27.75,
         "rvol": 1.83,
         "atr": 23.17,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 1170.0,
         "entry_time": "2026-08-28T21:12:44+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 1135.25,
+        "exit_time": "2026-09-11T13:50:51+05:30",
+        "result": "LOSS",
+        "pnl_pct": -2.97
     },
     {
         "signal_id": "APARINDS.NS_20260822_211649",
@@ -724,17 +724,17 @@
         "adx": 24.24,
         "rvol": 3.03,
         "atr": 35.92,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 1177.6,
         "entry_time": "2026-08-31T23:05:54+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 1123.72,
+        "exit_time": "2026-09-11T13:50:53+05:30",
+        "result": "LOSS",
+        "pnl_pct": -4.58
     },
     {
         "signal_id": "TBOTEK.NS_20260831_163254",
@@ -862,13 +862,14 @@
         "entry_price": 1650.9,
         "entry_time": "2026-08-28T21:12:41+05:30",
         "t1_hit": true,
-        "t2_hit": false,
+        "t2_hit": true,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
         "pnl_pct": null,
-        "t1_time": "2026-09-09T13:55:00+05:30"
+        "t1_time": "2026-09-09T13:55:00+05:30",
+        "t2_time": "2026-09-11T13:50:54+05:30"
     },
     {
         "signal_id": "KTKBANK.NS_20260828_160228",
@@ -1178,13 +1179,14 @@
         "entry_price": 1261.85,
         "entry_time": "2026-08-25T15:48:09+05:30",
         "t1_hit": true,
-        "t2_hit": false,
+        "t2_hit": true,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
         "pnl_pct": null,
-        "t1_time": "2026-09-09T13:55:03+05:30"
+        "t1_time": "2026-09-09T13:55:03+05:30",
+        "t2_time": "2026-09-11T13:50:58+05:30"
     },
     {
         "signal_id": "DCBBANK.NS_20260825_153006",
