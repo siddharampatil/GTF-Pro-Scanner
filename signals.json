@@ -302,17 +302,17 @@
         "adx": 46.09,
         "rvol": 0.05,
         "atr": 45.98,
-        "status": "OPEN",
+        "status": "STOPLOSS",
         "entry_alert": true,
         "entry_price": 1818.2,
         "entry_time": "2026-09-01T14:26:26+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
-        "exit_price": null,
-        "exit_time": null,
-        "result": null,
-        "pnl_pct": null
+        "exit_price": 1749.24,
+        "exit_time": "2026-09-15T19:40:31+05:30",
+        "result": "LOSS",
+        "pnl_pct": -3.79
     },
     {
         "signal_id": "KRBL.NS_20260902_112742",
