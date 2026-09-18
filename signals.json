@@ -43,13 +43,14 @@
         "entry_alert": true,
         "entry_price": 403.1,
         "entry_time": "2026-09-04T13:45:07+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-09-18T14:01:36+05:30"
     },
     {
         "signal_id": "MOTILALOFS.NS_20260903_103846",
@@ -330,10 +331,10 @@
         "adx": 46.02,
         "rvol": 1.64,
         "atr": 53.89,
-        "status": "WAITING_ENTRY",
-        "entry_alert": false,
-        "entry_price": null,
-        "entry_time": null,
+        "status": "OPEN",
+        "entry_alert": true,
+        "entry_price": 1419.3,
+        "entry_time": "2026-09-18T14:01:38+05:30",
         "t1_hit": false,
         "t2_hit": false,
         "t3_hit": false,
@@ -386,13 +387,14 @@
         "entry_alert": true,
         "entry_price": 16784.0,
         "entry_time": "2026-08-24T10:02:24+05:30",
-        "t1_hit": false,
+        "t1_hit": true,
         "t2_hit": false,
         "t3_hit": false,
         "exit_price": null,
         "exit_time": null,
         "result": null,
-        "pnl_pct": null
+        "pnl_pct": null,
+        "t1_time": "2026-09-18T14:01:39+05:30"
     },
     {
         "signal_id": "ENGINERSIN.NS_20260828_160228",
