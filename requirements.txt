@@ -1,6 +1,7 @@
-yfinance==0.2.65
-pandas==2.3.1
-requests==2.32.4
-ta==0.11.0
-numpy==2.3.1
-lxml==6.0.0
+yfinance
+pandas
+numpy
+ta
+requests
+python-telegram-bot==22.2
+nsetools
