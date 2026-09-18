@@ -1,4 +1,4 @@
-name: GTF PRO Scanner V5
+name: GTF PRO Scanner V8
 
 on:
   workflow_dispatch:
@@ -29,13 +29,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Scanner
+      - name: Run V8 Scanner
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
 
-      - name: Commit updated signals
+      - name: Commit Updated Signals
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -50,7 +50,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update signals"
+          git commit -m "GTF V8 Update Signals"
 
           git pull --rebase origin main
 
