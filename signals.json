@@ -203,13 +203,14 @@
     "entry_alert": true,
     "entry_price": 2190.8,
     "entry_time": "2026-09-02T13:39:42+05:30",
-    "t1_hit": false,
+    "t1_hit": true,
     "t2_hit": false,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
-    "pnl_pct": null
+    "pnl_pct": null,
+    "t1_time": "2026-09-18T18:38:38+05:30"
   },
   {
     "signal_id": "SMARTWORKS.NS_20260903_103846",
@@ -229,13 +230,14 @@
     "entry_alert": true,
     "entry_price": 531.5,
     "entry_time": "2026-09-03T13:49:11+05:30",
-    "t1_hit": false,
+    "t1_hit": true,
     "t2_hit": false,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
-    "pnl_pct": null
+    "pnl_pct": null,
+    "t1_time": "2026-09-18T18:38:39+05:30"
   },
   {
     "signal_id": "VOLTAMP.NS_20260822_211649",
@@ -309,13 +311,14 @@
     "entry_price": 2178.5,
     "entry_time": "2026-08-26T11:17:01+05:30",
     "t1_hit": true,
-    "t2_hit": false,
+    "t2_hit": true,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
     "pnl_pct": null,
-    "t1_time": "2026-08-31T15:38:00+05:30"
+    "t1_time": "2026-08-31T15:38:00+05:30",
+    "t2_time": "2026-09-18T18:38:41+05:30"
   },
   {
     "signal_id": "ALIVUS.NS_20260902_112742",
@@ -655,13 +658,14 @@
     "entry_alert": true,
     "entry_price": 1485.9,
     "entry_time": "2026-08-26T11:17:00+05:30",
-    "t1_hit": false,
+    "t1_hit": true,
     "t2_hit": false,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
-    "pnl_pct": null
+    "pnl_pct": null,
+    "t1_time": "2026-09-18T18:38:45+05:30"
   },
   {
     "signal_id": "LUMAXTECH.NS_20260826_103320",
