@@ -151,13 +151,14 @@
     "entry_price": 126.62,
     "entry_time": "2026-08-24T10:02:21+05:30",
     "t1_hit": true,
-    "t2_hit": false,
+    "t2_hit": true,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
     "pnl_pct": null,
-    "t1_time": "2026-09-03T18:23:39+05:30"
+    "t1_time": "2026-09-03T18:23:39+05:30",
+    "t2_time": "2026-09-21T14:50:01+05:30"
   },
   {
     "signal_id": "IDFCFIRSTB.NS_20260903_143122",
@@ -364,13 +365,14 @@
     "entry_alert": true,
     "entry_price": 764.4,
     "entry_time": "2026-08-26T14:07:52+05:30",
-    "t1_hit": false,
+    "t1_hit": true,
     "t2_hit": false,
     "t3_hit": false,
     "exit_price": null,
     "exit_time": null,
     "result": null,
-    "pnl_pct": null
+    "pnl_pct": null,
+    "t1_time": "2026-09-21T14:50:03+05:30"
   },
   {
     "signal_id": "APARINDS.NS_20260822_211649",
@@ -576,10 +578,10 @@
     "adx": 20.09,
     "rvol": 3.67,
     "atr": 39.94,
-    "status": "WAITING_ENTRY",
-    "entry_alert": false,
-    "entry_price": null,
-    "entry_time": null,
+    "status": "OPEN",
+    "entry_alert": true,
+    "entry_price": 1509.4,
+    "entry_time": "2026-09-21T14:50:05+05:30",
     "t1_hit": false,
     "t2_hit": false,
     "t3_hit": false,
