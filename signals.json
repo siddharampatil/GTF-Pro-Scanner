@@ -471,17 +471,18 @@
     "adx": 20.09,
     "rvol": 3.67,
     "atr": 39.94,
-    "status": "OPEN",
+    "status": "STOPPED",
     "entry_alert": true,
     "entry_price": 1509.4,
     "entry_time": "2026-09-21T14:50:05+05:30",
     "t1_hit": false,
     "t2_hit": false,
     "t3_hit": false,
-    "exit_price": null,
-    "exit_time": null,
-    "result": null,
-    "pnl_pct": null
+    "exit_price": 1449.0,
+    "exit_time": "2026-09-28T10:40:06+05:30",
+    "result": "LOSS",
+    "pnl_pct": -4.0,
+    "pnl_points": -60.4
   },
   {
     "signal_id": "ADANIENT.NS_20260828_091617",
