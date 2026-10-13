@@ -1,7 +1,10 @@
+
 import os
 import json
+import time
 import requests
 import yfinance as yf
+import pandas as pd
 from datetime import datetime, timezone, timedelta
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -20,8 +23,10 @@ def now_ist():
 def load(path, default):
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
+            data = json.load(f)
+        return data if isinstance(data, type(default)) else default
+    except Exception as e:
+        print(f"⚠️ Could not load {path}: {e}")
         return default
 
 
@@ -29,163 +34,263 @@ def save(path, data):
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+        f.flush()
+        os.fsync(f.fileno())
     os.replace(tmp, path)
 
 
 def send(text):
-    r = requests.post(
-        URL,
-        data={"chat_id": CHAT_ID, "text": text},
-        timeout=25,
-    )
-    r.raise_for_status()
+    try:
+        r = requests.post(
+            URL,
+            data={"chat_id": CHAT_ID, "text": text},
+            timeout=25,
+        )
+        r.raise_for_status()
+        result = r.json()
+        if not result.get("ok"):
+            print(f"⚠️ Telegram rejected message: {result}")
+    except Exception as e:
+        # Telegram failure must not prevent saving trade results.
+        print(f"⚠️ Telegram send failed: {e}")
+
+
+def yf_symbol(symbol):
+    """Convert scanner symbols to Yahoo Finance NSE symbols."""
+    symbol = str(symbol).strip().upper()
+
+    if symbol.startswith("^") or "." in symbol or "=" in symbol:
+        return symbol
+
+    return symbol + ".NS"
 
 
 def current_price(symbol):
-    df = yf.download(
-        symbol,
-        period="2d",
-        interval="5m",
-        auto_adjust=True,
-        progress=False,
-        threads=False,
-    )
-    if df is None or df.empty:
-        return None
+    ticker = yf_symbol(symbol)
 
-    if hasattr(df["Close"], "columns"):
-        close = df["Close"].iloc[:, 0]
-    else:
+    try:
+        df = yf.download(
+            ticker,
+            period="5d",
+            interval="5m",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=20,
+        )
+
+        if df is None or df.empty:
+            print(f"⚠️ No price data for {ticker}")
+            return None
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
         close = df["Close"]
 
-    close = close.dropna()
-    if close.empty:
+        if isinstance(close, pd.DataFrame):
+            close = close.iloc[:, 0]
+
+        close = pd.to_numeric(close, errors="coerce").dropna()
+
+        if close.empty:
+            return None
+
+        price = float(close.iloc[-1])
+
+        if price <= 0:
+            return None
+
+        print(f"📊 {ticker}: latest available price ₹{price:.2f}")
+        return round(price, 2)
+
+    except Exception as e:
+        print(f"❌ Price download failed for {ticker}: {e}")
         return None
-    return round(float(close.iloc[-1]), 2)
+
+
+def trade_key(signal):
+    # Prefer a persistent unique ID if your scanner creates one.
+    return str(
+        signal.get("signal_id")
+        or (
+            signal.get("symbol", ""),
+            signal.get("created_at", signal.get("signal_time", "")),
+            signal.get("buy", ""),
+        )
+    )
 
 
 signals = load(SIGNALS_FILE, [])
 history = load(HISTORY_FILE, [])
-updated = False
+
+if not isinstance(signals, list) or not isinstance(history, list):
+    raise RuntimeError("signals.json and trade_history.json must contain JSON lists.")
+
+closed_keys = {
+    trade_key(item)
+    for item in history
+    if isinstance(item, dict)
+}
+
+print(f"🚀 V8 monitor started: {len(signals)} signals, {len(history)} history records")
 
 for signal in signals:
+    if not isinstance(signal, dict):
+        continue
+
     status = signal.get("status")
+
     if status not in ("WAITING_ENTRY", "OPEN"):
         continue
 
-    symbol = signal["symbol"]
-    try:
-        current = current_price(symbol)
-        if current is None:
-            continue
+    symbol = signal.get("symbol", "")
 
+    if not symbol:
+        print("⚠️ Skipping signal with missing symbol")
+        continue
+
+    try:
         buy = float(signal["buy"])
         sl = float(signal["sl"])
         t1 = float(signal["t1"])
         t2 = float(signal["t2"])
         t3 = float(signal["t3"])
 
-        # Entry is confirmed only when price reaches the scanner buy level.
-        if status == "WAITING_ENTRY":
-            if current < buy:
-                continue
-
-            entry = current
-            signal["status"] = "OPEN"
-            signal["entry_alert"] = True
-            signal["entry_price"] = entry
-            signal["entry_time"] = now_ist()
-            updated = True
-
-            send(
-                "🚀 BUY SIGNAL — V8\n\n"
-                f"{symbol}\n\n"
-                f"🎯 Entry : ₹{entry:.2f}\n"
-                f"📌 Scanner Buy : ₹{buy:.2f}\n"
-                f"🛑 SL : ₹{sl:.2f}\n"
-                f"🎯 T1 : ₹{t1:.2f}\n"
-                f"🎯 T2 : ₹{t2:.2f}\n"
-                f"🎯 T3 : ₹{t3:.2f}"
-            )
-
-        # IMPORTANT: all P&L calculations use the actual confirmed entry.
-        entry = float(signal.get("entry_price") or buy)
-
-        # SL is checked before targets to avoid reporting an impossible
-        # target hit and SL hit in the same polling cycle.
-        if current <= sl:
-            signal["status"] = "STOPPED"
-            signal["result"] = "LOSS"
-            signal["exit_price"] = sl
-            signal["exit_time"] = now_ist()
-            signal["pnl_points"] = round(sl - entry, 2)
-            signal["pnl_pct"] = round((sl - entry) / entry * 100, 2)
-            history.append(dict(signal))
-            updated = True
-
-            send(
-                "🛑 STOP LOSS HIT — TRADE CLOSED\n\n"
-                f"{symbol}\n\n"
-                f"📌 Entry : ₹{entry:.2f}\n"
-                f"📍 Current : ₹{current:.2f}\n"
-                f"🛑 SL : ₹{sl:.2f}\n"
-                f"📉 P&L : {signal['pnl_pct']:.2f}%"
-            )
+        if not (0 < sl < buy < t1 <= t2 <= t3):
+            print(f"⚠️ Invalid price levels for {symbol}; skipping")
             continue
 
-        # Targets are milestones. T1/T2 do NOT close the trade.
-        if current >= t1 and not signal.get("t1_hit", False):
-            signal["t1_hit"] = True
-            signal["t1_time"] = now_ist()
-            updated = True
+        current = current_price(symbol)
+
+        if current is None:
+            print(f"⏳ {symbol}: price unavailable; no status change")
+            continue
+
+        # Confirm entry only after price reaches the scanner entry level.
+        if status == "WAITING_ENTRY":
+            if current < buy:
+                print(f"⏳ {symbol}: waiting for entry ₹{buy:.2f}")
+                continue
+
+            signal["status"] = "OPEN"
+            signal["entry_price"] = current
+            signal["entry_time"] = now_ist()
+            signal["entry_alert"] = True
+            status = "OPEN"
+
+            # Persist entry before attempting Telegram delivery.
+            save(SIGNALS_FILE, signals)
+
             send(
-                "🎯 TARGET 1 HIT\n\n"
-                f"{symbol}\n\n"
-                f"📌 Entry : ₹{entry:.2f}\n"
-                f"📍 Current : ₹{current:.2f}\n"
-                f"🎯 T1 : ₹{t1:.2f}\n"
-                f"📈 Unrealised P&L vs entry : {(current-entry)/entry*100:.2f}%"
+                "🚀 BUY ENTRY CONFIRMED — V8\n\n"
+                f"{symbol}\n"
+                f"Entry: ₹{current:.2f}\n"
+                f"Stop Loss: ₹{sl:.2f}\n"
+                f"T1: ₹{t1:.2f}\n"
+                f"T2: ₹{t2:.2f}\n"
+                f"T3: ₹{t3:.2f}"
             )
 
-        if current >= t2 and not signal.get("t2_hit", False):
-            signal["t2_hit"] = True
-            signal["t2_time"] = now_ist()
-            updated = True
-            send(
-                "🎯 TARGET 2 HIT\n\n"
-                f"{symbol}\n\n"
-                f"📌 Entry : ₹{entry:.2f}\n"
-                f"📍 Current : ₹{current:.2f}\n"
-                f"🎯 T2 : ₹{t2:.2f}\n"
-                f"📈 Unrealised P&L vs entry : {(current-entry)/entry*100:.2f}%"
-            )
+        entry = float(signal.get("entry_price") or buy)
 
-        if current >= t3 and not signal.get("t3_hit", False):
-            signal["t3_hit"] = True
-            signal["t3_time"] = now_ist()
-            signal["status"] = "TARGET3"
-            signal["result"] = "WIN"
-            signal["exit_price"] = t3
+        # Use the actual confirmed entry for P&L.
+        if entry <= 0:
+            print(f"⚠️ Invalid entry for {symbol}")
+            continue
+
+        outcome = None
+        exit_price = None
+
+        # Existing policy: stop-loss closes as LOSS;
+        # T3 closes as WIN. T1/T2 are milestones only.
+        if current <= sl:
+            outcome = "LOSS"
+            exit_price = sl
+
+        elif current >= t3:
+            outcome = "WIN"
+            exit_price = t3
+
+        if outcome:
+            signal["status"] = "STOPPED" if outcome == "LOSS" else "TARGET3"
+            signal["result"] = outcome
+            signal["exit_price"] = exit_price
             signal["exit_time"] = now_ist()
-            signal["pnl_points"] = round(t3 - entry, 2)
-            signal["pnl_pct"] = round((t3 - entry) / entry * 100, 2)
-            history.append(dict(signal))
-            updated = True
-
-            send(
-                "🏆 TARGET 3 HIT — TRADE CLOSED\n\n"
-                f"{symbol}\n\n"
-                f"📌 Entry : ₹{entry:.2f}\n"
-                f"📍 Current : ₹{current:.2f}\n"
-                f"🏁 Exit : ₹{t3:.2f}\n"
-                f"📈 P&L : {signal['pnl_pct']:.2f}%"
+            signal["pnl_points"] = round(exit_price - entry, 2)
+            signal["pnl_pct"] = round(
+                (exit_price - entry) / entry * 100, 2
             )
+
+            if outcome == "WIN":
+                signal["t3_hit"] = True
+                signal.setdefault("t3_time", now_ist())
+
+            key = trade_key(signal)
+
+            if key not in closed_keys:
+                history.append(dict(signal))
+                closed_keys.add(key)
+
+            # Save both files BEFORE sending the notification.
+            save(SIGNALS_FILE, signals)
+            save(HISTORY_FILE, history)
+
+            if outcome == "LOSS":
+                send(
+                    "🛑 LOSS — STOP LOSS HIT\n\n"
+                    f"{symbol}\n"
+                    f"Entry: ₹{entry:.2f}\n"
+                    f"Exit: ₹{exit_price:.2f}\n"
+                    f"Latest price: ₹{current:.2f}\n"
+                    f"P&L: {signal['pnl_pct']:.2f}%"
+                )
+            else:
+                send(
+                    "🏆 WIN — TARGET 3 HIT\n\n"
+                    f"{symbol}\n"
+                    f"Entry: ₹{entry:.2f}\n"
+                    f"Exit: ₹{exit_price:.2f}\n"
+                    f"Latest price: ₹{current:.2f}\n"
+                    f"P&L: {signal['pnl_pct']:.2f}%"
+                )
+
+            print(f"✅ {symbol} closed: {outcome} ({signal['pnl_pct']:.2f}%)")
+            continue
+
+        # Record target milestones only once.
+        changed = False
+
+        for target, field, time_field in [
+            (t1, "t1_hit", "t1_time"),
+            (t2, "t2_hit", "t2_time"),
+        ]:
+            if current >= target and not signal.get(field, False):
+                signal[field] = True
+                signal[time_field] = now_ist()
+                changed = True
+
+                send(
+                    f"🎯 {field.upper().replace('_HIT', '')} HIT\n\n"
+                    f"{symbol}\n"
+                    f"Entry: ₹{entry:.2f}\n"
+                    f"Latest price: ₹{current:.2f}\n"
+                    f"Target: ₹{target:.2f}\n"
+                    f"Unrealised P&L: {(current-entry)/entry*100:.2f}%"
+                )
+
+        if changed:
+            save(SIGNALS_FILE, signals)
 
     except Exception as e:
-        print(f"❌ Monitor error {symbol}: {e}")
+        print(f"❌ Monitor error for {symbol}: {e}")
 
-if updated:
-    save(SIGNALS_FILE, signals)
-    save(HISTORY_FILE, history)
+# Always save the final state.
+save(SIGNALS_FILE, signals)
+save(HISTORY_FILE, history)
 
-print("✅ V8 monitor completed")
+print(
+    f"✅ Monitor completed | "
+    f"Open: {sum(1 for s in signals if isinstance(s, dict) and s.get('status') == 'OPEN')} | "
+    f"Closed history: {len(history)}"
+)
