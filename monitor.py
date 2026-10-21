@@ -1,74 +1,95 @@
-
 import os
 import json
-import time
 import requests
 import yfinance as yf
 import pandas as pd
+
 from datetime import datetime, timezone, timedelta
+
+# ==========================================
+# GTF PRO SCANNER V9 - PAPER MONITOR
+# ==========================================
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
+
 URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 SIGNALS_FILE = "signals.json"
 HISTORY_FILE = "trade_history.json"
+
 IST = timezone(timedelta(hours=5, minutes=30))
+
+# Never chase an entry more than 0.5% above
+# the planned reference price.
+MAX_ENTRY_CHASE_PCT = 0.5
+
+# Expire an untriggered signal after 5 days.
+MAX_WAIT_DAYS = 5
 
 
 def now_ist():
     return datetime.now(IST).isoformat(timespec="seconds")
 
 
-def load(path, default):
+def load_json(path, default):
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data if isinstance(data, type(default)) else default
-    except Exception as e:
-        print(f"⚠️ Could not load {path}: {e}")
+
+        if isinstance(data, type(default)):
+            return data
+
+        print(f"Invalid JSON structure: {path}")
         return default
 
+    except FileNotFoundError:
+        return default
 
-def save(path, data):
+    except Exception as e:
+        print(f"Could not read {path}: {e}")
+        raise
+
+
+def save_json(path, data):
     tmp = path + ".tmp"
+
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-        f.flush()
-        os.fsync(f.fileno())
+
     os.replace(tmp, path)
 
 
-def send(text):
-    try:
-        r = requests.post(
-            URL,
-            data={"chat_id": CHAT_ID, "text": text},
-            timeout=25,
-        )
-        r.raise_for_status()
-        result = r.json()
-        if not result.get("ok"):
-            print(f"⚠️ Telegram rejected message: {result}")
-    except Exception as e:
-        # Telegram failure must not prevent saving trade results.
-        print(f"⚠️ Telegram send failed: {e}")
+def send_message(message):
+    response = requests.post(
+        URL,
+        data={
+            "chat_id": CHAT_ID,
+            "text": message
+        },
+        timeout=25
+    )
+
+    response.raise_for_status()
+
+    result = response.json()
+
+    if not result.get("ok"):
+        raise RuntimeError("Telegram message failed")
 
 
-def yf_symbol(symbol):
-    """Convert scanner symbols to Yahoo Finance NSE symbols."""
-    symbol = str(symbol).strip().upper()
-
-    if symbol.startswith("^") or "." in symbol or "=" in symbol:
-        return symbol
-
-    return symbol + ".NS"
-
-
-def current_price(symbol):
-    ticker = yf_symbol(symbol)
+def get_price_data(symbol):
+    """
+    Obtain recent intraday market data.
+    These prices are observations, not confirmed fills.
+    """
 
     try:
+        ticker = symbol.strip().upper()
+
+        if not ticker.endswith(".NS"):
+            ticker += ".NS"
+
         df = yf.download(
             ticker,
             period="5d",
@@ -76,221 +97,336 @@ def current_price(symbol):
             auto_adjust=True,
             progress=False,
             threads=False,
-            timeout=20,
+            timeout=20
         )
 
         if df is None or df.empty:
-            print(f"⚠️ No price data for {ticker}")
             return None
 
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
 
-        close = df["Close"]
-
-        if isinstance(close, pd.DataFrame):
-            close = close.iloc[:, 0]
-
-        close = pd.to_numeric(close, errors="coerce").dropna()
-
-        if close.empty:
+        if "Close" not in df.columns:
             return None
 
-        price = float(close.iloc[-1])
+        df = df.dropna(subset=["Close"])
 
-        if price <= 0:
+        if df.empty:
             return None
 
-        print(f"📊 {ticker}: latest available price ₹{price:.2f}")
-        return round(price, 2)
+        # Reject clearly stale intraday data.
+        latest_time = pd.Timestamp(df.index[-1])
+
+        if latest_time.tzinfo is None:
+            latest_time = latest_time.tz_localize("UTC")
+
+        latest_time = latest_time.tz_convert(IST)
+
+        age_minutes = (
+            datetime.now(IST) - latest_time.to_pydatetime()
+        ).total_seconds() / 60
+
+        if age_minutes > 45:
+            print(
+                f"Stale data for {symbol}: "
+                f"{age_minutes:.0f} minutes old"
+            )
+            return None
+
+        latest = df.iloc[-1]
+
+        return {
+            "price": float(latest["Close"]),
+            "high": float(latest["High"]),
+            "low": float(latest["Low"]),
+            "time": latest_time.isoformat()
+        }
 
     except Exception as e:
-        print(f"❌ Price download failed for {ticker}: {e}")
+        print(f"Price error {symbol}: {e}")
         return None
 
 
 def trade_key(signal):
-    # Prefer a persistent unique ID if your scanner creates one.
-    return str(
-        signal.get("signal_id")
-        or (
-            signal.get("symbol", ""),
-            signal.get("created_at", signal.get("signal_time", "")),
-            signal.get("buy", ""),
-        )
+    return signal.get(
+        "signal_id",
+        f"{signal.get('symbol')}_{signal.get('created_at')}"
     )
 
 
-signals = load(SIGNALS_FILE, [])
-history = load(HISTORY_FILE, [])
+def record_history(history, signal):
+    key = trade_key(signal)
 
-if not isinstance(signals, list) or not isinstance(history, list):
-    raise RuntimeError("signals.json and trade_history.json must contain JSON lists.")
+    for old in history:
+        if trade_key(old) == key:
+            old.update(signal)
+            return
 
-closed_keys = {
-    trade_key(item)
-    for item in history
-    if isinstance(item, dict)
-}
+    history.append(signal.copy())
 
-print(f"🚀 V8 monitor started: {len(signals)} signals, {len(history)} history records")
 
-for signal in signals:
-    if not isinstance(signal, dict):
-        continue
+def close_paper_trade(signal, current, reason):
+    """
+    Record a simulated exit trigger.
 
-    status = signal.get("status")
+    Trigger prices are not guaranteed real-world fills.
+    """
 
-    if status not in ("WAITING_ENTRY", "OPEN"):
-        continue
+    if reason == "STOP_LOSS":
+        trigger_price = float(signal["sl"])
+        result = "LOSS"
 
-    symbol = signal.get("symbol", "")
+    else:
+        trigger_price = float(signal["t3"])
+        result = "WIN"
 
-    if not symbol:
-        print("⚠️ Skipping signal with missing symbol")
-        continue
+    entry = float(signal["entry_price"])
 
-    try:
+    signal["status"] = (
+        "STOPPED" if reason == "STOP_LOSS"
+        else "TARGET3"
+    )
+
+    signal["result"] = result
+    signal["exit_time"] = now_ist()
+
+    # Store the trigger separately from the observed price.
+    signal["exit_price"] = round(trigger_price, 2)
+    signal["observed_exit_price"] = round(current, 2)
+    signal["exit_reason"] = reason
+
+    signal["pnl_points"] = round(
+        trigger_price - entry, 2
+    )
+
+    signal["pnl_pct"] = round(
+        ((trigger_price - entry) / entry) * 100, 2
+    )
+
+    signal["paper_trade"] = True
+
+
+def main():
+    print("=" * 45)
+    print("GTF PRO V9 PAPER MONITOR")
+    print("Time:", now_ist())
+    print("=" * 45)
+
+    signals = load_json(SIGNALS_FILE, [])
+    history = load_json(HISTORY_FILE, [])
+
+    changed = False
+
+    for signal in signals:
+
+        status = signal.get("status")
+
+        if status not in ("WAITING_ENTRY", "OPEN"):
+            continue
+
+        symbol = signal.get("symbol")
+
+        if not symbol:
+            continue
+
+        data = get_price_data(symbol)
+
+        if data is None:
+            print(f"Skipping {symbol}: price unavailable")
+            continue
+
+        current = data["price"]
+
         buy = float(signal["buy"])
         sl = float(signal["sl"])
         t1 = float(signal["t1"])
         t2 = float(signal["t2"])
         t3 = float(signal["t3"])
 
-        if not (0 < sl < buy < t1 <= t2 <= t3):
-            print(f"⚠️ Invalid price levels for {symbol}; skipping")
-            continue
+        print(
+            f"{symbol}: ₹{current:.2f} | "
+            f"Status: {status}"
+        )
 
-        current = current_price(symbol)
+        # --------------------------
+        # WAITING FOR PAPER ENTRY
+        # --------------------------
 
-        if current is None:
-            print(f"⏳ {symbol}: price unavailable; no status change")
-            continue
-
-        # Confirm entry only after price reaches the scanner entry level.
         if status == "WAITING_ENTRY":
+
+            created = signal.get("created_at")
+
+            if created:
+                try:
+                    created_dt = datetime.fromisoformat(
+                        created
+                    )
+
+                    if created_dt.tzinfo is None:
+                        created_dt = created_dt.replace(
+                            tzinfo=IST
+                        )
+
+                    age_days = (
+                        datetime.now(IST) - created_dt
+                    ).total_seconds() / 86400
+
+                    if age_days > MAX_WAIT_DAYS:
+                        signal["status"] = "EXPIRED"
+                        signal["exit_time"] = now_ist()
+                        signal["exit_reason"] = (
+                            "ENTRY_NOT_TRIGGERED"
+                        )
+
+                        changed = True
+
+                        send_message(
+                            f"⌛ V9 SIGNAL EXPIRED\n"
+                            f"Symbol: {symbol}\n"
+                            f"No paper entry was recorded.\n"
+                            f"Reference: ₹{buy:.2f}"
+                        )
+
+                        continue
+
+                except Exception as e:
+                    print(
+                        f"Signal date error {symbol}: {e}"
+                    )
+
             if current < buy:
-                print(f"⏳ {symbol}: waiting for entry ₹{buy:.2f}")
                 continue
 
+            max_entry = buy * (
+                1 + MAX_ENTRY_CHASE_PCT / 100
+            )
+
+            if current > max_entry:
+                signal["status"] = "EXPIRED"
+                signal["exit_time"] = now_ist()
+                signal["exit_reason"] = "ENTRY_GAP"
+
+                changed = True
+
+                send_message(
+                    f"⚠️ V9 ENTRY SKIPPED\n"
+                    f"Symbol: {symbol}\n"
+                    f"Reference: ₹{buy:.2f}\n"
+                    f"Observed: ₹{current:.2f}\n"
+                    f"Reason: Price moved too far.\n"
+                    f"No paper entry recorded."
+                )
+
+                continue
+
+            # This is a paper entry, not a real purchase.
             signal["status"] = "OPEN"
-            signal["entry_price"] = current
+            signal["entry_price"] = round(current, 2)
             signal["entry_time"] = now_ist()
             signal["entry_alert"] = True
-            status = "OPEN"
+            signal["paper_trade"] = True
+            signal["observed_price_time"] = data["time"]
 
-            # Persist entry before attempting Telegram delivery.
-            save(SIGNALS_FILE, signals)
+            changed = True
 
-            send(
-                "🚀 BUY ENTRY CONFIRMED — V8\n\n"
-                f"{symbol}\n"
-                f"Entry: ₹{current:.2f}\n"
-                f"Stop Loss: ₹{sl:.2f}\n"
+            send_message(
+                f"🧪 V9 PAPER ENTRY\n"
+                f"Symbol: {symbol}\n"
+                f"Observed entry: ₹{current:.2f}\n"
+                f"Stop-loss trigger: ₹{sl:.2f}\n"
                 f"T1: ₹{t1:.2f}\n"
                 f"T2: ₹{t2:.2f}\n"
-                f"T3: ₹{t3:.2f}"
+                f"T3: ₹{t3:.2f}\n"
+                f"Price time: {data['time']}\n"
+                f"⚠️ Simulated only; no Zerodha order."
             )
 
-        entry = float(signal.get("entry_price") or buy)
+        # --------------------------
+        # MONITOR PAPER POSITION
+        # --------------------------
 
-        # Use the actual confirmed entry for P&L.
-        if entry <= 0:
-            print(f"⚠️ Invalid entry for {symbol}")
+        if signal.get("status") != "OPEN":
             continue
 
-        outcome = None
-        exit_price = None
+        entry = float(signal["entry_price"])
 
-        # Existing policy: stop-loss closes as LOSS;
-        # T3 closes as WIN. T1/T2 are milestones only.
-        if current <= sl:
-            outcome = "LOSS"
-            exit_price = sl
+        # If both levels fall inside the same observed
+        # candle, price order is unknown. Treat stop-loss
+        # first to avoid optimistic simulation.
+        hit_sl = data["low"] <= sl
+        hit_t3 = data["high"] >= t3
 
-        elif current >= t3:
-            outcome = "WIN"
-            exit_price = t3
-
-        if outcome:
-            signal["status"] = "STOPPED" if outcome == "LOSS" else "TARGET3"
-            signal["result"] = outcome
-            signal["exit_price"] = exit_price
-            signal["exit_time"] = now_ist()
-            signal["pnl_points"] = round(exit_price - entry, 2)
-            signal["pnl_pct"] = round(
-                (exit_price - entry) / entry * 100, 2
+        if hit_sl:
+            close_paper_trade(
+                signal, current, "STOP_LOSS"
             )
 
-            if outcome == "WIN":
-                signal["t3_hit"] = True
-                signal.setdefault("t3_time", now_ist())
+            record_history(history, signal)
+            changed = True
 
-            key = trade_key(signal)
+            send_message(
+                f"🛑 V9 PAPER STOP TRIGGERED\n"
+                f"Symbol: {symbol}\n"
+                f"Trigger: ₹{sl:.2f}\n"
+                f"Observed price: ₹{current:.2f}\n"
+                f"Modeled P&L: {signal['pnl_pct']:.2f}%\n"
+                f"⚠️ Not an actual execution."
+            )
 
-            if key not in closed_keys:
-                history.append(dict(signal))
-                closed_keys.add(key)
-
-            # Save both files BEFORE sending the notification.
-            save(SIGNALS_FILE, signals)
-            save(HISTORY_FILE, history)
-
-            if outcome == "LOSS":
-                send(
-                    "🛑 LOSS — STOP LOSS HIT\n\n"
-                    f"{symbol}\n"
-                    f"Entry: ₹{entry:.2f}\n"
-                    f"Exit: ₹{exit_price:.2f}\n"
-                    f"Latest price: ₹{current:.2f}\n"
-                    f"P&L: {signal['pnl_pct']:.2f}%"
-                )
-            else:
-                send(
-                    "🏆 WIN — TARGET 3 HIT\n\n"
-                    f"{symbol}\n"
-                    f"Entry: ₹{entry:.2f}\n"
-                    f"Exit: ₹{exit_price:.2f}\n"
-                    f"Latest price: ₹{current:.2f}\n"
-                    f"P&L: {signal['pnl_pct']:.2f}%"
-                )
-
-            print(f"✅ {symbol} closed: {outcome} ({signal['pnl_pct']:.2f}%)")
             continue
 
         # Record target milestones only once.
-        changed = False
-
-        for target, field, time_field in [
-            (t1, "t1_hit", "t1_time"),
-            (t2, "t2_hit", "t2_time"),
+        for level, price_key, time_key in [
+            (1, "t1", "t1_time"),
+            (2, "t2", "t2_time"),
+            (3, "t3", "t3_time")
         ]:
-            if current >= target and not signal.get(field, False):
-                signal[field] = True
-                signal[time_field] = now_ist()
+            flag = f"t{level}_hit"
+            target = float(signal[price_key])
+
+            if (
+                not signal.get(flag, False)
+                and data["high"] >= target
+            ):
+                signal[flag] = True
+                signal[time_key] = now_ist()
                 changed = True
 
-                send(
-                    f"🎯 {field.upper().replace('_HIT', '')} HIT\n\n"
-                    f"{symbol}\n"
-                    f"Entry: ₹{entry:.2f}\n"
-                    f"Latest price: ₹{current:.2f}\n"
+                send_message(
+                    f"🎯 V9 PAPER TARGET {level}\n"
+                    f"Symbol: {symbol}\n"
                     f"Target: ₹{target:.2f}\n"
-                    f"Unrealised P&L: {(current-entry)/entry*100:.2f}%"
+                    f"Observed price: ₹{current:.2f}\n"
+                    f"⚠️ Target touch is not a confirmed fill."
                 )
 
-        if changed:
-            save(SIGNALS_FILE, signals)
+        if hit_t3:
+            close_paper_trade(
+                signal, current, "TARGET3"
+            )
 
-    except Exception as e:
-        print(f"❌ Monitor error for {symbol}: {e}")
+            record_history(history, signal)
+            changed = True
 
-# Always save the final state.
-save(SIGNALS_FILE, signals)
-save(HISTORY_FILE, history)
+            send_message(
+                f"✅ V9 PAPER TRADE CLOSED\n"
+                f"Symbol: {symbol}\n"
+                f"Modeled exit trigger: ₹{t3:.2f}\n"
+                f"Observed price: ₹{current:.2f}\n"
+                f"Modeled P&L: {signal['pnl_pct']:.2f}%\n"
+                f"⚠️ Simulated result, not actual profit."
+            )
 
-print(
-    f"✅ Monitor completed | "
-    f"Open: {sum(1 for s in signals if isinstance(s, dict) and s.get('status') == 'OPEN')} | "
-    f"Closed history: {len(history)}"
-)
+    if changed:
+        save_json(SIGNALS_FILE, signals)
+        save_json(HISTORY_FILE, history)
+
+    print("=" * 45)
+    print("V9 PAPER MONITOR FINISHED")
+    print("Signals:", len(signals))
+    print("History records:", len(history))
+    print("=" * 45)
+
+
+if __name__ == "__main__":
+    main()
