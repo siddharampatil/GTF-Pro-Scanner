@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "signal_id": "TECHM.NS_20261015_111053",
+    "symbol": "TECHM.NS",
+    "created_at": "2026-10-15T11:10:53+05:30",
+    "buy": 1628.8,
+    "sl": 1561.54,
+    "t1": 1696.06,
+    "t2": 1763.31,
+    "t3": 1830.57,
+    "score": 100,
+    "rsi": 63.16,
+    "adx": 13.78,
+    "rvol": 1.93,
+    "atr": 44.84,
+    "status": "TARGET3",
+    "entry_alert": true,
+    "entry_price": 1637.0,
+    "entry_time": "2026-10-15T14:07:22+05:30",
+    "t1_hit": true,
+    "t1_time": "2026-10-16T14:02:21+05:30",
+    "t2_hit": true,
+    "t2_time": "2026-10-16T14:02:22+05:30",
+    "t3_hit": true,
+    "t3_time": null,
+    "exit_price": 1830.57,
+    "exit_time": "2026-10-21T16:09:48+05:30",
+    "result": "WIN",
+    "pnl_pct": 11.82,
+    "pnl_points": 193.57
+  }
+]
