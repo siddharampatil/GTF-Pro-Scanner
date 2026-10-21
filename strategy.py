@@ -1,4 +1,4 @@
-import time
+import warnings
 import pandas as pd
 import yfinance as yf
 
@@ -6,146 +6,123 @@ from ta.trend import EMAIndicator, MACD, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
+warnings.filterwarnings("ignore")
 
-# =========================================================
-# GTF PRO SCANNER V8.1
-# Strategy engine only
-# =========================================================
+# ==========================================
+# GTF PRO SCANNER V9 - SAFER TRADE STRATEGY
+# ==========================================
 
-def safe_float(value, default=0.0):
+MIN_DATA = 220
+MIN_ADX = 20
+MIN_RVOL = 1.20
+MIN_RSI = 52
+MAX_RSI = 68
+MIN_REWARD_RISK = 2.0
+
+# Cache the market trend to avoid downloading Nifty
+# separately for every stock.
+_MARKET_BULLISH = None
+
+
+def download_data(symbol, period="2y"):
     try:
-        if pd.isna(value):
-            return default
-        return float(value)
-    except Exception:
-        return default
+        df = yf.download(
+            symbol,
+            period=period,
+            interval="1d",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=20
+        )
+
+        if df is None or df.empty:
+            return None
+
+        # Handle yfinance MultiIndex columns.
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
+        df = df.loc[:, ~df.columns.duplicated()]
+        required = ["Open", "High", "Low", "Close", "Volume"]
+
+        if not all(col in df.columns for col in required):
+            return None
+
+        df = df[required].copy()
+
+        for col in required:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        df = df.dropna()
+
+        if len(df) < MIN_DATA:
+            return None
+
+        return df
+
+    except Exception as e:
+        print(f"Download error {symbol}: {e}")
+        return None
 
 
-# =========================================================
-# DATA DOWNLOAD
-# =========================================================
+def market_is_bullish():
+    """
+    Only allow fresh long signals when Nifty's daily
+    trend meets the bullish filter.
+    """
+    global _MARKET_BULLISH
 
-def download_stock(symbol, interval="1d", period="2y"):
+    if _MARKET_BULLISH is not None:
+        return _MARKET_BULLISH
 
-    for attempt in range(3):
+    df = download_data("^NSEI")
 
-        try:
+    if df is None:
+        # Fail closed: do not issue fresh long signals
+        # when the market trend cannot be verified.
+        _MARKET_BULLISH = False
+        print("Market filter unavailable: fresh longs blocked.")
+        return False
 
-            df = yf.download(
-                tickers=symbol,
-                period=period,
-                interval=interval,
-                auto_adjust=True,
-                progress=False,
-                threads=False
-            )
+    close = df["Close"]
+    ema20 = EMAIndicator(close, window=20).ema_indicator()
+    ema50 = EMAIndicator(close, window=50).ema_indicator()
 
-            if df is None or df.empty:
-                time.sleep(1)
-                continue
+    last = len(df) - 1
 
-            # Fix yfinance MultiIndex
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
+    _MARKET_BULLISH = bool(
+        close.iloc[last] > ema20.iloc[last]
+        and close.iloc[last] > ema50.iloc[last]
+        and ema20.iloc[last] > ema50.iloc[last]
+    )
 
-            df = df.dropna()
+    return _MARKET_BULLISH
 
-            if len(df) >= 200 or interval == "1wk":
-                return df
-
-        except Exception as e:
-            print(f"{symbol}: {e}")
-
-        time.sleep(1)
-
-    return None
-
-
-# =========================================================
-# MARKET TREND
-# =========================================================
-
-def get_market_trend():
-
-    try:
-
-        nifty = download_stock("^NSEI")
-
-        if nifty is None:
-            return "🟡 Unknown"
-
-        close = nifty["Close"]
-
-        ema20 = EMAIndicator(close, 20).ema_indicator()
-        ema50 = EMAIndicator(close, 50).ema_indicator()
-
-        last_close = safe_float(close.iloc[-1])
-        last_ema20 = safe_float(ema20.iloc[-1])
-        last_ema50 = safe_float(ema50.iloc[-1])
-
-        if last_close > last_ema20 > last_ema50:
-            return "🟢 Bullish"
-
-        if last_close < last_ema20 < last_ema50:
-            return "🔴 Bearish"
-
-        return "🟡 Neutral"
-
-    except Exception:
-        return "🟡 Unknown"
-
-
-MARKET_CONDITION = get_market_trend()
-
-
-# =========================================================
-# DEMAND ZONE
-# =========================================================
-
-def identify_demand_zone(close, high, low, lookback=100):
-
-    try:
-
-        body = (close - close.shift(1)).abs()
-        avg_body = body.rolling(20).mean()
-
-        start = max(20, len(close) - lookback)
-
-        for i in range(len(close) - 2, start, -1):
-
-            current_body = safe_float(body.iloc[i])
-            average_body = safe_float(avg_body.iloc[i])
-
-            if average_body <= 0:
-                continue
-
-            bullish = close.iloc[i] > close.iloc[i - 1]
-
-            if bullish and current_body > average_body * 1.5:
-
-                zone_low = safe_float(low.iloc[i - 1])
-                zone_high = safe_float(high.iloc[i - 1])
-
-                if zone_low > 0 and zone_high > zone_low:
-                    return zone_low, zone_high
-
-    except Exception:
-        pass
-
-    return None
-
-
-# =========================================================
-# MAIN SCANNER
-# =========================================================
 
 def scan_stock(symbol):
+    """
+    Return a signal dictionary compatible with the
+    existing main.py scanner.
+
+    This strategy screens long setups only.
+    A signal is not a guarantee of profit.
+    """
 
     try:
+        # Do not issue new long signals in a bearish
+        # or unverified market.
+        if not market_is_bullish():
+            return None
 
-        df = download_stock(symbol)
+        symbol = str(symbol).strip()
 
-        if df is None or len(df) < 200:
+        if not symbol.endswith(".NS") and not symbol.startswith("^"):
+            symbol += ".NS"
+
+        df = download_data(symbol)
+
+        if df is None:
             return None
 
         close = df["Close"]
@@ -153,532 +130,222 @@ def scan_stock(symbol):
         low = df["Low"]
         volume = df["Volume"]
 
-        # =================================================
-        # INDICATORS
-        # =================================================
+        # --------------------------
+        # Technical indicators
+        # --------------------------
 
-        ema20 = EMAIndicator(close, 20).ema_indicator()
-        ema50 = EMAIndicator(close, 50).ema_indicator()
-        ema200 = EMAIndicator(close, 200).ema_indicator()
+        df["EMA20"] = EMAIndicator(
+            close, window=20
+        ).ema_indicator()
 
-        rsi = RSIIndicator(close, 14).rsi()
+        df["EMA50"] = EMAIndicator(
+            close, window=50
+        ).ema_indicator()
 
-        macd = MACD(close)
+        df["EMA200"] = EMAIndicator(
+            close, window=200
+        ).ema_indicator()
 
-        macd_line = macd.macd()
-        macd_signal = macd.macd_signal()
-        macd_hist = macd.macd_diff()
+        df["RSI"] = RSIIndicator(
+            close, window=14
+        ).rsi()
 
-        adx = ADXIndicator(
-            high,
-            low,
-            close,
-            14
+        macd_obj = MACD(close)
+        df["MACD"] = macd_obj.macd()
+        df["MACD_SIGNAL"] = macd_obj.macd_signal()
+
+        df["ADX"] = ADXIndicator(
+            high, low, close, window=14
         ).adx()
 
-        atr = AverageTrueRange(
-            high,
-            low,
-            close,
-            14
+        df["ATR"] = AverageTrueRange(
+            high, low, close, window=14
         ).average_true_range()
 
-        avg_volume = volume.rolling(20).mean()
+        df["VOL_AVG"] = volume.rolling(20).mean()
 
-        # =================================================
-        # CURRENT VALUES
-        # =================================================
+        df = df.dropna()
 
-        buy = safe_float(close.iloc[-1])
-
-        ema20_v = safe_float(ema20.iloc[-1])
-        ema50_v = safe_float(ema50.iloc[-1])
-        ema200_v = safe_float(ema200.iloc[-1])
-
-        rsi_v = safe_float(rsi.iloc[-1])
-        adx_v = safe_float(adx.iloc[-1])
-        atr_v = safe_float(atr.iloc[-1])
-
-        current_volume = safe_float(volume.iloc[-1])
-        average_volume = safe_float(avg_volume.iloc[-1], 1)
-
-        rvol = current_volume / average_volume
-
-        if buy <= 0:
+        if len(df) < 30:
             return None
 
-        if atr_v <= 0:
+        # Use the latest completed daily candle.
+        # Do not use today's incomplete candle.
+        if len(df) < 3:
             return None
 
-        # =================================================
-        # BASIC DATA VALIDATION
-        # =================================================
+        candle = df.iloc[-2]
+        previous = df.iloc[-3]
 
-        if any(
-            pd.isna(x)
-            for x in [
-                ema20_v,
-                ema50_v,
-                ema200_v,
-                rsi_v,
-                adx_v,
-                atr_v
-            ]
+        entry = float(candle["Close"])
+        ema20 = float(candle["EMA20"])
+        ema50 = float(candle["EMA50"])
+        ema200 = float(candle["EMA200"])
+        rsi = float(candle["RSI"])
+        adx = float(candle["ADX"])
+        atr = float(candle["ATR"])
+        macd = float(candle["MACD"])
+        macd_signal = float(candle["MACD_SIGNAL"])
+
+        avg_volume = float(candle["VOL_AVG"])
+        current_volume = float(candle["Volume"])
+
+        if entry <= 0 or atr <= 0 or avg_volume <= 0:
+            return None
+
+        rvol = current_volume / avg_volume
+
+        # --------------------------
+        # Trend and quality filters
+        # --------------------------
+
+        if not (
+            entry > ema20 > ema50 > ema200
         ):
             return None
 
-        # =================================================
-        # HARD FILTERS
-        # =================================================
-
-        # Avoid extremely overextended stocks
-        if rsi_v > 78:
+        if not MIN_RSI <= rsi <= MAX_RSI:
             return None
 
-        # Don't reject neutral market.
-        # Only block strong bearish Nifty.
-        if MARKET_CONDITION == "🔴 Bearish":
-
-            # Allow exceptionally strong stocks even
-            # when market is weak.
-            if not (
-                buy > ema20_v
-                and ema20_v > ema50_v
-                and rsi_v >= 55
-                and adx_v >= 25
-            ):
-                return None
-
-        # =================================================
-        # SCORE ENGINE
-        # =================================================
-
-        score = 0
-        reasons = []
-
-        # -------------------------------------------------
-        # TREND
-        # -------------------------------------------------
-
-        if buy > ema20_v:
-
-            score += 10
-            reasons.append("✅ Price above EMA20")
-
-        if ema20_v > ema50_v:
-
-            score += 10
-            reasons.append("✅ EMA20 above EMA50")
-
-        if ema50_v > ema200_v:
-
-            score += 15
-            reasons.append("✅ EMA50 above EMA200")
-
-        # Strong alignment bonus
-        if buy > ema20_v > ema50_v > ema200_v:
-
-            score += 5
-            reasons.append("🔥 Full bullish EMA alignment")
-
-        # -------------------------------------------------
-        # RSI
-        # -------------------------------------------------
-
-        if 55 <= rsi_v <= 68:
-
-            score += 15
-            reasons.append(
-                f"✅ RSI healthy ({rsi_v:.2f})"
-            )
-
-        elif 50 <= rsi_v < 55:
-
-            score += 8
-            reasons.append(
-                f"🟡 RSI improving ({rsi_v:.2f})"
-            )
-
-        elif 68 < rsi_v <= 72:
-
-            score += 8
-            reasons.append(
-                f"⚠ RSI elevated ({rsi_v:.2f})"
-            )
-
-        elif 72 < rsi_v <= 78:
-
-            score += 3
-            reasons.append(
-                f"⚠ RSI high ({rsi_v:.2f})"
-            )
-
-        # -------------------------------------------------
-        # MACD
-        # -------------------------------------------------
-
-        macd_v = safe_float(macd_line.iloc[-1])
-        signal_v = safe_float(macd_signal.iloc[-1])
-        hist_v = safe_float(macd_hist.iloc[-1])
-
-        if macd_v > signal_v:
-
-            score += 10
-            reasons.append("✅ MACD bullish")
-
-        if hist_v > 0:
-
-            score += 5
-            reasons.append("✅ MACD histogram positive")
-
-        # -------------------------------------------------
-        # ADX
-        # -------------------------------------------------
-
-        if adx_v >= 30:
-
-            score += 15
-            reasons.append(
-                f"🔥 Strong ADX ({adx_v:.2f})"
-            )
-
-        elif adx_v >= 25:
-
-            score += 10
-            reasons.append(
-                f"✅ Good ADX ({adx_v:.2f})"
-            )
-
-        elif adx_v >= 20:
-
-            score += 5
-            reasons.append(
-                f"🟡 Developing trend ({adx_v:.2f})"
-            )
-
-        # -------------------------------------------------
-        # RELATIVE VOLUME
-        # -------------------------------------------------
-
-        if rvol >= 3:
-
-            score += 15
-            reasons.append(
-                f"🔥 Very high RVOL ({rvol:.2f}x)"
-            )
-
-        elif rvol >= 2:
-
-            score += 12
-            reasons.append(
-                f"✅ Strong RVOL ({rvol:.2f}x)"
-            )
-
-        elif rvol >= 1.5:
-
-            score += 8
-            reasons.append(
-                f"✅ Good RVOL ({rvol:.2f}x)"
-            )
-
-        elif rvol >= 1.1:
-
-            score += 3
-            reasons.append(
-                f"🟡 Improving volume ({rvol:.2f}x)"
-            )
-
-        # =================================================
-        # BREAKOUT DETECTION
-        # =================================================
-
-        prior20_high = safe_float(
-            high.iloc[-21:-1].max()
-        )
-
-        prior50_high = safe_float(
-            high.iloc[-51:-1].max()
-        )
-
-        prior100_high = safe_float(
-            high.iloc[-101:-1].max()
-        )
-
-        breakout20 = buy > prior20_high
-        breakout50 = buy > prior50_high
-        breakout100 = buy > prior100_high
-
-        # Recent breakout
-        if breakout20:
-
-            score += 15
-            reasons.append(
-                "🚀 20-day breakout"
-            )
-
-            # Volume confirmation
-            if rvol >= 1.5:
-
-                score += 5
-                reasons.append(
-                    "🔥 Breakout volume confirmed"
-                )
-
-        elif breakout50:
-
-            score += 10
-            reasons.append(
-                "🚀 50-day breakout"
-            )
-
-        elif breakout100:
-
-            score += 8
-            reasons.append(
-                "🚀 100-day breakout"
-            )
-
-        # =================================================
-        # 200-DAY HIGH
-        # =================================================
-
-        prior200_high = safe_float(
-            high.iloc[-201:-1].max()
-        )
-
-        if prior200_high > 0 and buy >= prior200_high:
-
-            score += 8
-            reasons.append(
-                "🚀 200-day high"
-            )
-
-        # =================================================
-        # WEEKLY TREND
-        # =================================================
-
-        try:
-
-            weekly = close.resample("W").last()
-
-            if len(weekly) >= 50:
-
-                weekly20 = EMAIndicator(
-                    weekly,
-                    20
-                ).ema_indicator()
-
-                weekly50 = EMAIndicator(
-                    weekly,
-                    50
-                ).ema_indicator()
-
-                weekly_close = safe_float(
-                    weekly.iloc[-1]
-                )
-
-                weekly20_v = safe_float(
-                    weekly20.iloc[-1]
-                )
-
-                weekly50_v = safe_float(
-                    weekly50.iloc[-1]
-                )
-
-                if (
-                    weekly_close >
-                    weekly20_v >
-                    weekly50_v
-                ):
-
-                    score += 10
-                    reasons.append(
-                        "✅ Weekly trend bullish"
-                    )
-
-        except Exception:
-            pass
-
-        # =================================================
-        # DEMAND ZONE
-        # =================================================
-
-        zone = identify_demand_zone(
-            close,
-            high,
-            low
-        )
-
-        if zone:
-
-            zone_low, zone_high = zone
-
-            # Price near zone
-            zone_range = zone_high - zone_low
-
-            if zone_range > 0:
-
-                distance = abs(
-                    buy - zone_high
-                )
-
-                if distance <= max(
-                    zone_range * 2,
-                    atr_v
-                ):
-
-                    score += 5
-                    reasons.append(
-                        "🏦 Near demand zone"
-                    )
-
-        # =================================================
-        # PRICE MOMENTUM
-        # =================================================
-
-        if len(close) >= 10:
-
-            price_10d_ago = safe_float(
-                close.iloc[-10]
-            )
-
-            if price_10d_ago > 0:
-
-                momentum = (
-                    (buy - price_10d_ago)
-                    / price_10d_ago
-                ) * 100
-
-                if 3 <= momentum <= 12:
-
-                    score += 5
-                    reasons.append(
-                        f"📈 Healthy momentum ({momentum:.1f}%)"
-                    )
-
-                elif momentum > 12:
-
-                    score += 2
-                    reasons.append(
-                        f"⚠ Fast momentum ({momentum:.1f}%)"
-                    )
-
-        # =================================================
-        # MARKET SUPPORT
-        # =================================================
-
-        if MARKET_CONDITION == "🟢 Bullish":
-
-            score += 5
-            reasons.append(
-                "🌐 Nifty market supportive"
-            )
-
-        elif MARKET_CONDITION == "🟡 Neutral":
-
-            score += 2
-            reasons.append(
-                "🌐 Nifty market neutral"
-            )
-
-        # =================================================
-        # FINAL SCORE
-        # =================================================
-
-        score = max(
-            0,
-            min(score, 100)
-        )
-
-        # =================================================
-        # QUALITY FILTER
-        # =================================================
-
-        if score < 80:
+        if adx < MIN_ADX:
             return None
 
-        # =================================================
-        # CONFIDENCE
-        # =================================================
-
-        if score >= 92:
-
-            trend = "🟢 Super Bullish"
-            confidence = "💎 Institutional"
-
-        elif score >= 87:
-
-            trend = "🟢 Strong Bullish"
-            confidence = "🔥 Excellent"
-
-        elif score >= 82:
-
-            trend = "🟢 Bullish"
-            confidence = "✅ High"
-
-        else:
-
-            trend = "🟢 Bullish"
-            confidence = "🟡 Good"
-
-        # =================================================
-        # RISK MANAGEMENT
-        # =================================================
-
-        # ATR stop
-        sl = buy - (1.5 * atr_v)
-
-        if sl <= 0 or sl >= buy:
+        if rvol < MIN_RVOL:
             return None
 
-        risk = buy - sl
+        # Avoid stocks already stretched too far
+        # above their 20-day EMA.
+        if entry - ema20 > 2.0 * atr:
+            return None
+
+        # --------------------------
+        # Breakout confirmation
+        # --------------------------
+
+        # Compare the latest completed candle against
+        # the preceding 20 completed daily highs.
+        prior_20_high = float(
+            df["High"].iloc[-22:-2].max()
+        )
+
+        breakout = entry > prior_20_high
+
+        # Alternative: a breakout retest that holds
+        # above the prior resistance area.
+        retest = bool(
+            float(candle["Low"]) <= prior_20_high
+            and entry > prior_20_high
+            and entry > float(previous["Close"])
+        )
+
+        if not (breakout or retest):
+            return None
+
+        # Require positive MACD momentum.
+        if macd <= macd_signal:
+            return None
+
+        # --------------------------
+        # Stop-loss calculation
+        # --------------------------
+
+        # Use the recent swing low and ATR together.
+        recent_swing_low = float(
+            df["Low"].iloc[-7:-1].min()
+        )
+
+        atr_stop = entry - (1.5 * atr)
+
+        # The stop is placed below the entry using
+        # the tighter of these two protective levels.
+        sl = max(recent_swing_low, atr_stop)
+
+        risk = entry - sl
 
         if risk <= 0:
             return None
 
-        t1 = buy + risk
-        t2 = buy + (2 * risk)
-        t3 = buy + (3 * risk)
+        # Reject unusually tight or wide stops.
+        if risk < 0.8 * atr:
+            return None
 
-        # =================================================
-        # RESULT
-        # =================================================
+        if risk > 2.0 * atr:
+            return None
 
-        return {
+        # --------------------------
+        # Targets: minimum 2R
+        # --------------------------
 
-            "symbol": symbol.replace(".NS", ""),
+        t1 = entry + (2.0 * risk)
+        t2 = entry + (3.0 * risk)
+        t3 = entry + (4.0 * risk)
 
+        reward_risk = (t1 - entry) / risk
+
+        if reward_risk < MIN_REWARD_RISK:
+            return None
+
+        # --------------------------
+        # Quality score (not probability)
+        # --------------------------
+
+        score = 0
+
+        # Trend strength
+        score += 25
+
+        # Momentum
+        if 55 <= rsi <= 65:
+            score += 15
+        else:
+            score += 10
+
+        # ADX trend confirmation
+        if adx >= 30:
+            score += 15
+        else:
+            score += 10
+
+        # Relative volume
+        if rvol >= 1.5:
+            score += 15
+        else:
+            score += 10
+
+        # MACD confirmation
+        score += 15
+
+        # Confirmed breakout
+        score += 15
+
+        score = min(score, 100)
+
+        result = {
+            "symbol": symbol,
             "score": int(score),
-
-            "trend": trend,
-
-            "confidence": confidence,
-
-            "market": MARKET_CONDITION,
-
-            "reason": "\n".join(reasons),
-
-            "buy": round(buy, 2),
-
+            "buy": round(entry, 2),
             "sl": round(sl, 2),
-
             "t1": round(t1, 2),
-
             "t2": round(t2, 2),
-
             "t3": round(t3, 2),
-
-            "rsi": round(rsi_v, 2),
-
+            "rsi": round(rsi, 2),
+            "adx": round(adx, 2),
             "rvol": round(rvol, 2),
-
-            "adx": round(adx_v, 2),
-
-            "atr": round(atr_v, 2)
+            "atr": round(atr, 2),
+            "reward_risk": round(reward_risk, 2),
+            "setup": "CONFIRMED_BREAKOUT"
         }
 
+        print(
+            f"V9 QUALIFIED: {symbol} | "
+            f"Score={score} | "
+            f"Entry={entry:.2f} | "
+            f"SL={sl:.2f} | "
+            f"R:R={reward_risk:.2f}"
+        )
+
+        return result
+
     except Exception as e:
-
-        print(f"{symbol}: {e}")
-
+        print(f"V9 scan error {symbol}: {e}")
         return None
