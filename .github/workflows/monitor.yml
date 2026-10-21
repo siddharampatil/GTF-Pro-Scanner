@@ -10,9 +10,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: gtf-pro-monitor
+  cancel-in-progress: false
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout Repository
@@ -31,23 +36,47 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Check Tracking Files
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          for filename in ["signals.json", "trade_history.json"]:
+              if not os.path.exists(filename):
+                  print(f"Creating missing file: {filename}")
+                  with open(filename, "w", encoding="utf-8") as f:
+                      json.dump([], f, indent=2)
+
+              with open(filename, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+
+              if not isinstance(data, list):
+                  raise ValueError(
+                      f"{filename} must contain a JSON list. "
+                      "Stopping to protect existing data."
+                  )
+
+              print(f"{filename}: {len(data)} records")
+          PY
+
       - name: Run Monitor
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
           echo "Starting GTF Monitor..."
-          python monitor.py
+          python -u monitor.py
 
-      - name: Commit Updated Signals
+      - name: Commit Updated Trade Records
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
 
-          git add signals.json
+          git add signals.json trade_history.json
 
           if ! git diff --cached --quiet; then
-            git commit -m "Update signal status"
+            git commit -m "Update trade monitoring records"
             git push
           else
             echo "No changes to commit."
