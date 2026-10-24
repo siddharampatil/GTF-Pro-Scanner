@@ -1,99 +1,98 @@
 import os
 import json
+import time
 import requests
+
 from datetime import datetime, timezone, timedelta
 
 from strategy import scan_stock
 from stock_list import get_stock_list
 
+
 # ==========================================
-# GTF PRO SCANNER V9
-# SAFER SIGNAL SELECTION
+# GTF PRO SCANNER V10
+# MAXIMUM 5 SWING-TRADE SIGNALS
 # ==========================================
 
-BOT_TOKEN = os.environ["BOT_TOKEN"]
-CHAT_ID = os.environ["CHAT_ID"]
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+CHAT_ID = os.environ.get("CHAT_ID", "")
 
-URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-
-SIGNALS_FILE = "signals.json"
-HISTORY_FILE = "trade_history.json"
+TELEGRAM_URL = (
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+)
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
-MIN_SCORE = 85
-MIN_RVOL = 1.5
-TOP_N = 10
+SIGNALS_FILE = "signals.json"
 
-# ==========================================
-# UTILITIES
-# ==========================================
+MAX_SIGNALS = 5
+MIN_SCORE = 80
+
+ACTIVE_STATUSES = {
+    "WAITING_ENTRY",
+    "OPEN"
+}
+
 
 def now_ist():
-    return datetime.now(IST).isoformat(timespec="seconds")
+    return datetime.now(IST)
 
 
-def normalize_symbol(symbol):
-    symbol = str(symbol).strip().upper()
-
-    if not symbol.endswith(".NS") and not symbol.startswith("^"):
-        symbol += ".NS"
-
-    return symbol
+def timestamp():
+    return now_ist().isoformat()
 
 
-def load_json(path, default):
+def load_signals():
+    """Load existing signals without discarding history."""
+
+    if not os.path.exists(SIGNALS_FILE):
+        return []
+
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(SIGNALS_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        if isinstance(data, type(default)):
+        if isinstance(data, list):
             return data
 
-        print(f"WARNING: Invalid format in {path}")
-        return default
+        if isinstance(data, dict):
+            if isinstance(data.get("signals"), list):
+                return data["signals"]
 
-    except FileNotFoundError:
-        return default
+        print("WARNING: Unexpected signals.json format.")
+        return []
 
-    except Exception as e:
-        print(f"WARNING: Cannot read {path}: {e}")
-        return default
-
-
-def save_json(path, data):
-    tmp = path + ".tmp"
-
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-    os.replace(tmp, path)
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"WARNING: Could not load signals: {exc}")
+        raise
 
 
-def send_message(message):
-    # Keep Telegram messages below its message limit.
-    chunks = []
+def save_signals(signals):
+    """Write signals safely to disk."""
 
-    while len(message) > 3900:
-        split_at = message.rfind("\n", 0, 3900)
+    temp_file = SIGNALS_FILE + ".tmp"
 
-        if split_at <= 0:
-            split_at = 3900
+    with open(temp_file, "w", encoding="utf-8") as f:
+        json.dump(signals, f, indent=2, ensure_ascii=False)
 
-        chunks.append(message[:split_at])
-        message = message[split_at:].lstrip("\n")
+    os.replace(temp_file, SIGNALS_FILE)
 
-    if message:
-        chunks.append(message)
 
-    for chunk in chunks:
+def send_telegram(message):
+    """Send a Telegram message if credentials exist."""
+
+    if not BOT_TOKEN or not CHAT_ID:
+        print("Telegram credentials missing.")
+        return False
+
+    try:
         response = requests.post(
-            URL,
-            data={
+            TELEGRAM_URL,
+            json={
                 "chat_id": CHAT_ID,
-                "text": chunk
+                "text": message
             },
-            timeout=25
+            timeout=20
         )
 
         response.raise_for_status()
@@ -101,255 +100,272 @@ def send_message(message):
         result = response.json()
 
         if not result.get("ok"):
-            raise RuntimeError(
-                f"Telegram rejected message: {result}"
-            )
+            print("Telegram API rejected the message.")
+            return False
+
+        return True
+
+    except Exception as exc:
+        print(f"Telegram error: {exc}")
+        return False
 
 
-def fmt(value):
-    return f"{float(value):,.2f}"
+def get_active_symbols(signals):
+    """Prevent duplicate active signals for a stock."""
+
+    active = set()
+
+    for signal in signals:
+        if not isinstance(signal, dict):
+            continue
+
+        status = str(signal.get("status", "")).upper()
+        symbol = str(signal.get("symbol", "")).upper()
+
+        if status in ACTIVE_STATUSES and symbol:
+            active.add(symbol.replace(".NS", ""))
+
+    return active
 
 
-# ==========================================
-# MAIN SCANNER
-# ==========================================
+def build_signal(candidate):
+    """Create a single-target paper-trading signal."""
+
+    created = timestamp()
+
+    return {
+        "signal_id": (
+            f"{candidate['symbol']}_"
+            f"{now_ist().strftime('%Y%m%d_%H%M%S')}"
+        ),
+
+        "symbol": candidate["symbol"],
+        "direction": "BUY",
+        "setup": candidate["setup"],
+
+        "status": "WAITING_ENTRY",
+
+        "created_at": created,
+        "signal_candle_date": candidate.get(
+            "signal_candle_date", ""
+        ),
+
+        "buy": candidate["buy"],
+        "sl": candidate["sl"],
+        "target": candidate["target"],
+
+        "score": candidate["score"],
+        "rvol": candidate["rvol"],
+        "rsi": candidate["rsi"],
+        "adx": candidate["adx"],
+        "atr": candidate["atr"],
+
+        "risk_per_share": candidate["risk_per_share"],
+        "reward_per_share": candidate["reward_per_share"],
+        "reward_risk": candidate["reward_risk"],
+
+        "entry_price": None,
+        "exit_price": None,
+        "exit_reason": None
+    }
+
+
+def format_report(scanned, qualified, new_signals):
+    """Create the V10 Telegram report."""
+
+    lines = [
+        "🔥 GTF PRO SCANNER V10",
+        "Swing Trading | NSE Cash",
+        "",
+        f"Time: {now_ist().strftime('%d-%m-%Y %H:%M IST')}",
+        f"Stocks scanned: {scanned}",
+        f"Qualified candidates: {qualified}",
+        f"New signals: {len(new_signals)}",
+        "",
+        "━━━━━━━━━━━━━━━━━━"
+    ]
+
+    if not new_signals:
+        lines.extend([
+            "",
+            "NO NEW TRADE SIGNALS",
+            "",
+            "No setup passed the selection rules,",
+            "or existing active signals blocked",
+           "duplicate entries.",
+            "",
+            "No trade is also a valid outcome."
+        ])
+
+    for index, signal in enumerate(new_signals, start=1):
+        lines.extend([
+            "",
+            f"📌 SIGNAL {index}: {signal['symbol']}",
+            f"Setup: {signal['setup']}",
+            f"Quality score: {signal['score']}/100",
+            "",
+            f"Entry trigger: ₹{signal['buy']:.2f}",
+            f"Stop-loss: ₹{signal['sl']:.2f}",
+            f"ONE target: ₹{signal['target']:.2f}",
+            "",
+            f"Planned reward:risk = 1:{signal['reward_risk']:.2f}",
+            f"Relative volume: {signal['rvol']:.2f}x",
+            f"RSI: {signal['rsi']:.1f}",
+            f"ADX: {signal['adx']:.1f}",
+            "",
+            "Status: WAITING FOR ENTRY",
+            "Instrument: NSE cash equity",
+            "Holding plan: Swing trade, 2–10 sessions",
+            "━━━━━━━━━━━━━━━━━━"
+        ])
+
+    lines.extend([
+        "",
+        "⚠️ IMPORTANT",
+        "• Paper-test before risking real money.",
+        "• Score is NOT win probability.",
+        "• 98–99% accuracy is not guaranteed.",
+        "• Entry is a trigger, not a guaranteed fill.",
+        "• Verify live price and liquidity before entry.",
+        "• Calculate quantity from your risk limit.",
+        "• This scanner does not place broker orders."
+    ])
+
+    return "\n".join(lines)
+
 
 def main():
-
     print("=" * 45)
-    print("GTF PRO SCANNER V9 STARTED")
-    print("Time:", now_ist())
+    print("GTF PRO SCANNER V10")
+    print("Starting NSE swing scan...")
     print("=" * 45)
 
-    stocks = get_stock_list()
+    signals = load_signals()
+    active_symbols = get_active_symbols(signals)
+
+    try:
+        stocks = list(dict.fromkeys(get_stock_list()))
+    except Exception as exc:
+        message = (
+            "⚠️ GTF PRO SCANNER V10\n\n"
+            f"Could not load NSE stock list:\n{exc}"
+        )
+        print(message)
+        send_telegram(message)
+        raise
 
     if not stocks:
-        raise RuntimeError(
-            "Stock list is empty. Scanner stopped."
-        )
+        raise RuntimeError("NSE stock list is empty.")
 
-    results = []
+    candidates = []
+    scanned = 0
 
-    print(f"Total stocks to scan: {len(stocks)}")
-
-    for index, stock in enumerate(stocks, 1):
+    for symbol in stocks:
+        scanned += 1
 
         try:
-            result = scan_stock(stock)
+            clean_symbol = (
+                str(symbol).strip().upper().replace(".NS", "")
+            )
+
+            if not clean_symbol:
+                continue
+
+            # Do not generate a second active signal
+            # for a stock that already has one.
+            if clean_symbol in active_symbols:
+                continue
+
+            result = scan_stock(symbol)
 
             if not result:
                 continue
 
-            score = float(result.get("score", 0))
-            rvol = float(result.get("rvol", 0))
+            score = int(result.get("score", 0))
+            reward_risk = float(
+                result.get("reward_risk", 0)
+            )
 
             if score < MIN_SCORE:
                 continue
 
-            if rvol < MIN_RVOL:
+            if reward_risk < 2.0:
                 continue
 
-            result["symbol"] = normalize_symbol(
-                result["symbol"]
-            )
+            required = [
+                "symbol",
+                "buy",
+                "sl",
+                "target",
+                "rvol",
+                "rsi",
+                "adx",
+                "atr",
+                "risk_per_share",
+                "reward_per_share"
+            ]
 
-            results.append(result)
+            if not all(key in result for key in required):
+                print(
+                    f"Skipping {symbol}: missing V10 fields."
+                )
+                continue
 
-        except Exception as e:
-            print(f"ERROR {stock}: {e}")
+            buy = float(result["buy"])
+            sl = float(result["sl"])
+            target = float(result["target"])
 
-        if index % 50 == 0:
-            print(f"Progress: {index}/{len(stocks)}")
+            if not (sl < buy < target):
+                print(
+                    f"Skipping {symbol}: invalid price levels."
+                )
+                continue
 
-    results.sort(
-        key=lambda x: (
-            float(x.get("score", 0)),
-            float(x.get("adx", 0)),
-            float(x.get("rvol", 0))
+            candidates.append(result)
+
+        except Exception as exc:
+            print(f"Error scanning {symbol}: {exc}")
+
+        # Avoid hammering the data provider.
+        time.sleep(0.15)
+
+    # Highest scores first; volume is a tie-breaker.
+    candidates.sort(
+        key=lambda item: (
+            int(item.get("score", 0)),
+            float(item.get("rvol", 0))
         ),
         reverse=True
     )
 
-    top_results = results[:TOP_N]
-
-    # Load existing records.
-    # Never discard closed signals or trade history.
-    signals = load_json(SIGNALS_FILE, [])
-    history = load_json(HISTORY_FILE, [])
-
-    # Prevent duplicate active signals for a stock.
-    active = {}
-
-    for signal in signals:
-
-        if signal.get("status") in (
-            "WAITING_ENTRY",
-            "OPEN"
-        ):
-            symbol = signal.get("symbol")
-
-            if symbol:
-                active[symbol] = signal
+    # At most five new calls in this scan.
+    selected = candidates[:MAX_SIGNALS]
 
     new_signals = []
-    created_signals = []
 
-    for item in top_results:
-
-        symbol = normalize_symbol(item["symbol"])
-
-        # Keep the existing active trade instead of
-        # creating another signal for the same stock.
-        if symbol in active:
-            continue
-
-        buy = float(item["buy"])
-        sl = float(item["sl"])
-        t1 = float(item["t1"])
-        t2 = float(item["t2"])
-        t3 = float(item["t3"])
-
-        risk = buy - sl
-
-        if buy <= 0 or risk <= 0:
-            print(f"Rejected invalid risk levels: {symbol}")
-            continue
-
-        reward_risk = (t1 - buy) / risk
-
-        if reward_risk < 2.0:
-            print(f"Rejected reward/risk: {symbol}")
-            continue
-
-        signal = {
-            "signal_id": (
-                f"{symbol}_"
-                f"{datetime.now(IST).strftime('%Y%m%d_%H%M%S')}"
-            ),
-            "symbol": symbol,
-            "created_at": now_ist(),
-
-            "buy": round(buy, 2),
-            "sl": round(sl, 2),
-            "t1": round(t1, 2),
-            "t2": round(t2, 2),
-            "t3": round(t3, 2),
-
-            "score": int(item.get("score", 0)),
-            "rsi": round(float(item.get("rsi", 0)), 2),
-            "adx": round(float(item.get("adx", 0)), 2),
-            "rvol": round(float(item.get("rvol", 0)), 2),
-            "atr": round(float(item.get("atr", 0)), 2),
-
-            "reward_risk": round(reward_risk, 2),
-            "setup": item.get(
-                "setup", "CONFIRMED_BREAKOUT"
-            ),
-
-            "status": "WAITING_ENTRY",
-
-            "entry_alert": False,
-            "entry_price": None,
-            "entry_time": None,
-
-            "t1_hit": False,
-            "t1_time": None,
-            "t2_hit": False,
-            "t2_time": None,
-            "t3_hit": False,
-            "t3_time": None,
-
-            "exit_price": None,
-            "exit_time": None,
-            "result": None,
-            "pnl_pct": None,
-            "pnl_points": None
-        }
-
+    for candidate in selected:
+        signal = build_signal(candidate)
+        signals.append(signal)
         new_signals.append(signal)
-        created_signals.append(signal)
 
-        # Prevent duplicate signals within this run.
-        active[symbol] = signal
+        # Prevent duplicates within this same run.
+        active_symbols.add(signal["symbol"])
 
-    # Preserve ALL existing records, including closed
-    # signals, and append newly created signals.
-    updated_signals = signals + new_signals
+    save_signals(signals)
 
-    # Save before sending Telegram notifications.
-    save_json(SIGNALS_FILE, updated_signals)
+    report = format_report(
+        scanned=scanned,
+        qualified=len(candidates),
+        new_signals=new_signals
+    )
 
-    scanned = len(stocks)
-    qualified = len(results)
-
-    lines = [
-        "🔥 GTF PRO SCANNER V9",
-        "",
-        f"Time: {now_ist()}",
-        f"Stocks scanned: {scanned}",
-        f"Qualified setups: {qualified}",
-        f"New signals: {len(created_signals)}",
-        "",
-        "⚠️ PAPER-TEST THESE SIGNALS FIRST",
-        "Score is not a win probability.",
-        "Entry is based on a completed daily candle.",
-        ""
-    ]
-
-    if created_signals:
-
-        lines.append("📊 NEW QUALIFIED SETUPS")
-        lines.append("")
-
-        for number, signal in enumerate(
-            created_signals, 1
-        ):
-
-            lines.extend([
-                f"{number}. {signal['symbol']}",
-                f"Setup: {signal['setup']}",
-                f"Score: {signal['score']}/100",
-                f"Reference entry: ₹{fmt(signal['buy'])}",
-                f"Stop-loss: ₹{fmt(signal['sl'])}",
-                f"Target 1: ₹{fmt(signal['t1'])}",
-                f"Target 2: ₹{fmt(signal['t2'])}",
-                f"Target 3: ₹{fmt(signal['t3'])}",
-                f"Reward/risk: 1:{signal['reward_risk']:.2f}",
-                f"RSI: {signal['rsi']}",
-                f"ADX: {signal['adx']}",
-                f"Relative volume: {signal['rvol']}x",
-                "Status: WAITING FOR ENTRY",
-                ""
-            ])
-
-    else:
-
-        lines.extend([
-            "No new setups passed all V9 filters.",
-            "No trade is also a valid outcome.",
-            ""
-        ])
-
-    lines.extend([
-        "Risk reminder:",
-        "Verify the live price before entering.",
-        "Calculate position size from your stop-loss.",
-        "A stop-loss cannot guarantee an exact exit.",
-        "This scanner does not place broker orders."
-    ])
-
-    message = "\n".join(lines)
-
-    send_message(message)
+    print(report)
+    send_telegram(report)
 
     print("=" * 45)
-    print("V9 SCAN COMPLETED")
-    print("Scanned:", scanned)
-    print("Qualified:", qualified)
-    print("New signals:", len(created_signals))
-    print("Signals saved:", len(updated_signals))
-    print("Trade-history records:", len(history))
-    print("Telegram notification sent.")
+    print(f"Stocks scanned: {scanned}")
+    print(f"Qualified candidates: {len(candidates)}")
+    print(f"New signals: {len(new_signals)}")
     print("=" * 45)
 
 
