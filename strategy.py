@@ -1,4 +1,7 @@
 import warnings
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import pandas as pd
 import yfinance as yf
 
@@ -10,11 +13,12 @@ warnings.filterwarnings("ignore")
 
 # ==========================================
 # GTF PRO SCANNER V10
-# SWING TRADING STRATEGY
+# SWING TRADING: APPROX. 2-10 TRADING DAYS
 # ==========================================
 
-MIN_DATA = 220
+IST = ZoneInfo("Asia/Kolkata")
 
+MIN_DATA = 220
 MIN_SCORE = 80
 MIN_ADX = 22
 MIN_RVOL = 1.30
@@ -23,17 +27,13 @@ MIN_RSI = 52
 MAX_RSI = 68
 
 MIN_REWARD_RISK = 2.0
-
 MAX_EXTENSION_ATR = 2.0
 
-# Cache the market trend so we do not download
-# Nifty data separately for every stock.
 _MARKET_BULLISH = None
 
 
 def download_data(symbol, period="2y"):
     """Download and validate daily stock/index data."""
-
     try:
         ticker = symbol.strip().upper()
 
@@ -64,9 +64,7 @@ def download_data(symbol, period="2y"):
         df = df[required].copy()
 
         for col in required:
-            df[col] = pd.to_numeric(
-                df[col], errors="coerce"
-            )
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
         df = df.dropna(subset=required)
         df = df[~df.index.duplicated(keep="last")]
@@ -85,12 +83,34 @@ def download_data(symbol, period="2y"):
         return None
 
 
-def market_is_bullish():
+def latest_completed_position(df):
     """
-    Trade only when Nifty shows a bullish daily trend.
-    Fail closed when market data is unavailable.
-    """
+    Return the position of the latest completed daily candle.
 
+    Yahoo Finance daily data is date-indexed. During the Indian
+    trading session, today's daily candle may still be forming.
+    After the session, use today's candle only if its date is
+    earlier than the current Indian calendar date.
+    """
+    if df is None or df.empty:
+        return None
+
+    today_ist = datetime.now(IST).date()
+    latest_date = pd.Timestamp(df.index[-1]).date()
+
+    if latest_date >= today_ist:
+        position = len(df) - 2
+    else:
+        position = len(df) - 1
+
+    if position < 0:
+        return None
+
+    return position
+
+
+def market_is_bullish():
+    """Trade only when Nifty's completed daily trend is bullish."""
     global _MARKET_BULLISH
 
     if _MARKET_BULLISH is not None:
@@ -103,24 +123,25 @@ def market_is_bullish():
         _MARKET_BULLISH = False
         return False
 
-    # Use the last completed daily candle.
-    candle = df.iloc[-2]
+    pos = latest_completed_position(df)
 
-    close = float(candle["Close"])
+    if pos is None:
+        _MARKET_BULLISH = False
+        return False
+
+    close = float(df["Close"].iloc[pos])
 
     ema20 = float(
         EMAIndicator(df["Close"], window=20)
-        .ema_indicator().iloc[-2]
+        .ema_indicator().iloc[pos]
     )
 
     ema50 = float(
         EMAIndicator(df["Close"], window=50)
-        .ema_indicator().iloc[-2]
+        .ema_indicator().iloc[pos]
     )
 
-    _MARKET_BULLISH = (
-        close > ema20 > ema50
-    )
+    _MARKET_BULLISH = close > ema20 > ema50
 
     print(
         "MARKET FILTER:",
@@ -131,13 +152,7 @@ def market_is_bullish():
 
 
 def scan_stock(symbol):
-    """
-    Find a potential bullish swing-trading setup.
-
-    Returns a dictionary for a qualifying stock,
-    otherwise returns None.
-    """
-
+    """Return a potential bullish swing setup or None."""
     try:
         if not market_is_bullish():
             return None
@@ -147,12 +162,16 @@ def scan_stock(symbol):
         if df is None:
             return None
 
+        pos = latest_completed_position(df)
+
+        if pos is None or pos < 21:
+            return None
+
         close_series = df["Close"]
         high_series = df["High"]
         low_series = df["Low"]
         volume_series = df["Volume"]
 
-        # Indicators are calculated using daily candles.
         df["EMA20"] = EMAIndicator(
             close_series, window=20
         ).ema_indicator()
@@ -170,7 +189,6 @@ def scan_stock(symbol):
         ).rsi()
 
         macd = MACD(close_series)
-
         df["MACD"] = macd.macd()
         df["MACD_SIGNAL"] = macd.macd_signal()
 
@@ -193,18 +211,12 @@ def scan_stock(symbol):
         )
 
         df["ATR"] = atr.average_true_range()
+        df["AVG_VOLUME20"] = volume_series.rolling(20).mean()
 
-        df["AVG_VOLUME20"] = (
-            volume_series.rolling(20).mean()
-        )
+        candle = df.iloc[pos]
 
-        # The newest daily candle can be incomplete.
-        # Use the previous completed candle for signals.
-        candle = df.iloc[-2]
-
-        # Historical reference period excludes the
-        # signal candle and the newest possibly partial day.
-        prior = df.iloc[-22:-2]
+        # Twenty completed sessions before the signal candle.
+        prior = df.iloc[pos - 20:pos]
 
         if len(prior) < 20:
             return None
@@ -223,7 +235,8 @@ def scan_stock(symbol):
             candle["MACD"],
             candle["MACD_SIGNAL"],
             candle["ATR"],
-            candle["AVG_VOLUME20"]
+            candle["AVG_VOLUME20"],
+            candle["Volume"]
         ]
 
         if pd.isna(required_values).any():
@@ -253,48 +266,34 @@ def scan_stock(symbol):
         if atr_value <= 0 or avg_volume <= 0:
             return None
 
-        # Relative volume.
         rvol = volume / avg_volume
-
-        # Breakout level from the previous 20 completed
-        # sessions, excluding the signal candle.
         prior_high = float(prior["High"].max())
 
         # ------------------------------------------
-        # STRICT ENTRY FILTERS
+        # STRICT SETUP FILTERS
         # ------------------------------------------
 
-        # 1. Strong bullish stock trend.
         trend_ok = (
             close > ema20
             and ema20 > ema50
             and ema50 > ema200
         )
 
-        # 2. Avoid excessively extended stocks.
         extension_atr = (close - ema20) / atr_value
 
         extension_ok = (
             0 <= extension_atr <= MAX_EXTENSION_ATR
         )
 
-        # 3. Momentum must be positive but controlled.
         rsi_ok = MIN_RSI <= rsi <= MAX_RSI
 
-        # 4. Trend must have adequate strength.
         adx_ok = (
             adx_value >= MIN_ADX
             and plus_di > minus_di
         )
 
-        # 5. Volume must be above average.
         volume_ok = rvol >= MIN_RVOL
-
-        # 6. MACD must confirm positive momentum.
         macd_ok = macd_value > macd_signal
-
-        # 7. Completed candle must break above
-        # the previous 20-session high.
         breakout_ok = close > prior_high
 
         if not all([
@@ -312,18 +311,12 @@ def scan_stock(symbol):
         # ENTRY, STOP-LOSS AND ONE TARGET
         # ------------------------------------------
 
-        # Entry trigger is slightly above the breakout
-        # candle high. This is a planned trigger, not
-        # a guaranteed execution price.
         buy = high + (0.05 * atr_value)
 
-        # Recent support: previous completed candles.
         swing_low = float(
-            df["Low"].iloc[-12:-2].min()
+            df["Low"].iloc[max(0, pos - 10):pos].min()
         )
 
-        # Use the tighter of support-based and ATR-based
-        # stops while keeping the stop below the entry.
         sl = max(
             swing_low,
             buy - (1.5 * atr_value)
@@ -334,56 +327,27 @@ def scan_stock(symbol):
         if risk <= 0:
             return None
 
-        # Reject stops that are too tight or too wide.
         risk_atr = risk / atr_value
 
         if not 0.5 <= risk_atr <= 2.0:
             return None
 
-        # Exactly one target: minimum 1:2 planned R:R.
         target = buy + (MIN_REWARD_RISK * risk)
-
         reward_risk = (target - buy) / risk
 
         if reward_risk < MIN_REWARD_RISK:
             return None
 
         # ------------------------------------------
-        # SETUP QUALITY SCORE
-        # This is NOT a probability of winning.
+        # SETUP QUALITY SCORE, NOT WIN PROBABILITY
         # ------------------------------------------
 
-        score = 0
+        score = 25 + 20 + 10
 
-        # Trend quality: 25 points.
-        score += 25
-
-        # Confirmed breakout: 20 points.
-        score += 20
-
-        # RSI momentum: 10 points.
+        score += 10 if adx_value >= 30 else 7
+        score += 15 if rvol >= 2.0 else 10
         score += 10
-
-        # Trend strength: 10 points.
-        if adx_value >= 30:
-            score += 10
-        else:
-            score += 7
-
-        # Relative volume: 15 points.
-        if rvol >= 2.0:
-            score += 15
-        else:
-            score += 10
-
-        # MACD confirmation: 10 points.
-        score += 10
-
-        # Controlled distance from EMA20: 10 points.
-        if extension_atr <= 1.0:
-            score += 10
-        else:
-            score += 7
+        score += 10 if extension_atr <= 1.0 else 7
 
         if score < MIN_SCORE:
             return None
@@ -395,23 +359,17 @@ def scan_stock(symbol):
             "direction": "BUY",
             "setup": "20-DAY BREAKOUT",
             "score": int(score),
-
             "buy": round(buy, 2),
             "sl": round(sl, 2),
             "target": round(target, 2),
-
             "risk_per_share": round(risk, 2),
             "reward_per_share": round(target - buy, 2),
             "reward_risk": round(reward_risk, 2),
-
             "rvol": round(rvol, 2),
             "rsi": round(rsi, 2),
             "adx": round(adx_value, 2),
             "atr": round(atr_value, 2),
-
-            "signal_candle_date": str(
-                df.index[-2].date()
-            )
+            "signal_candle_date": str(df.index[pos].date())
         }
 
     except Exception as exc:
