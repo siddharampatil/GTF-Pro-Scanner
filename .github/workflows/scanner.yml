@@ -1,10 +1,10 @@
-name: GTF PRO Scanner V9
+name: GTF PRO Scanner V10
 
 on:
   workflow_dispatch:
 
   schedule:
-    - cron: "*/15 4-10 * * 1-5"
+    - cron: "30 11 * * 1-5"
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Repository
@@ -36,30 +36,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run V9 Scanner
+      - name: Run V10 Scanner
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
 
-      - name: Run V9 Paper Monitor
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python monitor.py
-
-      - name: Commit Signal and Trade History
+      - name: Commit Signal Updates
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add signals.json trade_history.json
+          git add signals.json
 
           if git diff --cached --quiet; then
-            echo "No signal or trade-history changes to commit"
+            echo "No signal changes to commit"
             exit 0
           fi
 
-          git commit -m "GTF V9 update signals and paper trade history"
-
+          git commit -m "GTF V10 update scanner signals"
           git push origin HEAD:main
