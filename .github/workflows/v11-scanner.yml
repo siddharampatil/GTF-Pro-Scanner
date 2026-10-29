@@ -21,7 +21,7 @@ jobs:
       - name: Checkout V11 branch
         uses: actions/checkout@v4
         with:
-          ref: v11-dual-mode
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
