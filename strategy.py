@@ -207,3 +207,5 @@ def scan_stock_v11(symbol, mode):
         "market_price_date": str(df.index[-1]),
         "status": "PAPER_ONLY",
     }
+
+
