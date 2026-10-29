@@ -1,0 +1,49 @@
+name: GTF PRO SCANNER V11
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 4 * * 1-5"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gtf-pro-scanner-v11
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout V11 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v11-dual-mode
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy yfinance ta requests
+
+      - name: Run V11 scanner
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          PYTHONUNBUFFERED: "1"
+        run: python main_v11.py
+
+      - name: Upload V11 signals
+        if: always() && hashFiles('signals_v11.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: v11-signals
+          path: signals_v11.json
+          retention-days: 14
