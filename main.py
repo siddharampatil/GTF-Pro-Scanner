@@ -1,28 +1,26 @@
-GTF PRO SCANNER V11.2
-
-NSE CASH EQUITY PAPER TRADING ONLY
 
 import os
 import json
-import time
-import uuid
 import logging
-from datetime import datetime, time as dtime, timedelta
-from zoneinfo import ZoneInfo
-
-import pandas as pd
-import yfinance as yf
 import requests
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+from datetime import datetime, timedelta, time
+from zoneinfo import ZoneInfo
 
 from ta.trend import EMAIndicator, MACD, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
-==============================
 
-CONFIGURATION
+# ============================================================
+# GTF PRO SCANNER V11.2
+# NSE CASH EQUITY - PAPER TRADING ONLY
+# ============================================================
 
-==============================
+VERSION = "V11.2"
 
 IST = ZoneInfo("Asia/Kolkata")
 
@@ -30,20 +28,19 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHAT_ID = os.getenv("CHAT_ID", "")
 
 TELEGRAM_URL = (
-f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-if BOT_TOKEN else ""
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 )
 
 SIGNALS_FILE = "signals.json"
 HISTORY_FILE = "trade_history.json"
-SCAN_STATE_FILE = "scan_state.json"
+STATE_FILE = "scan_state.json"
 
 MAX_NEW_SIGNALS = 5
-
 MIN_DAILY_ROWS = 220
 
 MIN_ADX = 22
 MIN_RVOL = 1.30
+
 MIN_RSI = 50
 MAX_RSI = 72
 
@@ -53,1012 +50,1152 @@ MIN_RR_SHORT = 1.5
 MAX_ENTRY_AGE_MINUTES = 90
 MAX_SWING_ENTRY_AGE_DAYS = 5
 
-MARKET_OPEN = dtime(9, 15)
-MARKET_CLOSE = dtime(15, 30)
-SQUARE_OFF_TIME = dtime(15, 20)
-
-Do not create fresh intraday shorts late in the session.
-
-SHORT_ENTRY_CUTOFF = dtime(14, 0)
-
-Scan only once per 30-minute slot.
+MARKET_OPEN = time(9, 15)
+MARKET_CLOSE = time(15, 30)
+SQUARE_OFF_TIME = time(15, 20)
+SHORT_ENTRY_CUTOFF = time(14, 0)
 
 MAX_SCAN_STATE = 100
 
-logging.basicConfig(
-level=logging.INFO,
-format="%(asctime)s %(levelname)s %(message)s"
-)
-
-==============================
-
-STOCK UNIVERSE
-
-==============================
 
 STOCKS = [
-"RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS",
-"ICICIBANK.NS", "SBIN.NS", "AXISBANK.NS",
-"KOTAKBANK.NS", "LT.NS", "BHARTIARTL.NS",
-"ITC.NS", "HINDUNILVR.NS", "BAJFINANCE.NS",
-"MARUTI.NS", "TATAMOTORS.NS", "M&M.NS",
-"SUNPHARMA.NS", "TITAN.NS", "ULTRACEMCO.NS",
-"NTPC.NS", "POWERGRID.NS", "ONGC.NS",
-"COALINDIA.NS", "TATASTEEL.NS", "JSWSTEEL.NS",
-"HCLTECH.NS", "WIPRO.NS", "TECHM.NS",
-"ADANIPORTS.NS", "ASIANPAINT.NS",
-"BAJAJFINSV.NS", "NESTLEIND.NS", "GRASIM.NS",
-"CIPLA.NS", "DRREDDY.NS", "DIVISLAB.NS",
-"APOLLOHOSP.NS", "EICHERMOT.NS",
-"HEROMOTOCO.NS", "BAJAJ-AUTO.NS",
-"INDUSINDBK.NS", "FEDERALBNK.NS",
-"BANKBARODA.NS", "PNB.NS", "IDFCFIRSTB.NS",
-"DLF.NS", "BEL.NS", "HAL.NS",
-"TRENT.NS", "ZOMATO.NS"
+    "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS",
+    "ICICIBANK.NS", "SBIN.NS", "AXISBANK.NS",
+    "KOTAKBANK.NS", "LT.NS", "BHARTIARTL.NS",
+    "ITC.NS", "HINDUNILVR.NS", "BAJFINANCE.NS",
+    "MARUTI.NS", "TATAMOTORS.NS", "M&M.NS",
+    "SUNPHARMA.NS", "TITAN.NS", "ULTRACEMCO.NS",
+    "NTPC.NS", "POWERGRID.NS", "ONGC.NS",
+    "COALINDIA.NS", "TATASTEEL.NS", "JSWSTEEL.NS",
+    "HCLTECH.NS", "WIPRO.NS", "TECHM.NS",
+    "ADANIPORTS.NS", "ASIANPAINT.NS",
+    "BAJAJFINSV.NS", "NESTLEIND.NS", "GRASIM.NS",
+    "CIPLA.NS", "DRREDDY.NS", "DIVISLAB.NS",
+    "APOLLOHOSP.NS", "EICHERMOT.NS",
+    "HEROMOTOCO.NS", "BAJAJ-AUTO.NS",
+    "INDUSINDBK.NS", "FEDERALBNK.NS",
+    "BANKBARODA.NS", "PNB.NS", "IDFCFIRSTB.NS",
+    "DLF.NS", "BEL.NS", "HAL.NS",
+    "TRENT.NS", "ZOMATO.NS"
 ]
 
-==============================
 
-DIAGNOSTICS
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
 
-==============================
+log = logging.getLogger("GTF")
 
-DIAGNOSTICS = {
-"daily_download_ok": 0,
-"intraday_download_ok": 0,
-"download_fail": 0
-}
 
-REJECTIONS = {}
-
-def reject(reason):
-REJECTIONS[reason] = REJECTIONS.get(reason, 0) + 1
-return None
-
-==============================
-
-TIME FUNCTIONS
-
-==============================
+# ============================================================
+# BASIC HELPERS
+# ============================================================
 
 def now_ist():
-return datetime.now(IST)
+    return datetime.now(IST)
 
-def stamp():
-return now_ist().isoformat(timespec="seconds")
 
-==============================
+def today_string():
+    return now_ist().strftime("%Y-%m-%d")
 
-JSON FUNCTIONS
 
-==============================
+def load_json(path, default):
+    try:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as exc:
+        log.warning("Could not read %s: %s", path, exc)
 
-def load_json(path):
-if not os.path.exists(path):
-return []
+    return default
 
-with open(path, "r", encoding="utf-8") as f:
-    data = json.load(f)
-
-if not isinstance(data, list):
-    raise ValueError(
-        f"{path} must contain a JSON list."
-    )
-
-return data
 
 def save_json(path, data):
-tmp = path + ".tmp"
+    temp_path = path + ".tmp"
 
-with open(tmp, "w", encoding="utf-8") as f:
-    json.dump(
-        data,
-        f,
-        indent=2,
-        ensure_ascii=False
-    )
+    with open(temp_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, default=str)
 
-os.replace(tmp, path)
+    os.replace(temp_path, path)
 
-==============================
 
-TELEGRAM
+def send_telegram(message):
+    if not BOT_TOKEN or not CHAT_ID:
+        log.warning("Telegram credentials are missing.")
+        return False
 
-==============================
-
-def telegram(message):
-
-if not TELEGRAM_URL or not CHAT_ID:
-    logging.info("Telegram not configured.")
-    return
-
-try:
-    response = requests.post(
-        TELEGRAM_URL,
-        data={
-            "chat_id": CHAT_ID,
-            "text": message
-        },
-        timeout=15
-    )
-
-    response.raise_for_status()
-
-except Exception as exc:
-    logging.warning(
-        "Telegram notification failed: %s", exc
-    )
-
-==============================
-
-YAHOO DATA CLEANING
-
-==============================
-
-def clean_yf_frame(df):
-
-if df is None or df.empty:
-    return None
-
-if isinstance(df.columns, pd.MultiIndex):
-    df.columns = df.columns.get_level_values(0)
-
-df.columns = [
-    str(c).title() for c in df.columns
-]
-
-required = [
-    "Open", "High", "Low", "Close", "Volume"
-]
-
-if not all(c in df.columns for c in required):
-    return None
-
-df = df[required].copy()
-
-for c in required:
-    df[c] = pd.to_numeric(
-        df[c], errors="coerce"
-    )
-
-df = df.dropna()
-
-return df if not df.empty else None
-
-==============================
-
-DAILY DATA
-
-==============================
-
-def download_daily(symbol):
-
-try:
-    df = yf.download(
-        symbol,
-        period="2y",
-        interval="1d",
-        auto_adjust=True,
-        progress=False,
-        threads=False,
-        timeout=20
-    )
-
-    df = clean_yf_frame(df)
-
-    if df is None or len(df) < MIN_DAILY_ROWS:
-        DIAGNOSTICS["download_fail"] += 1
-        return None
-
-    DIAGNOSTICS["daily_download_ok"] += 1
-
-    return df
-
-except Exception as exc:
-
-    DIAGNOSTICS["download_fail"] += 1
-
-    logging.warning(
-        "Daily download failed %s: %s",
-        symbol, exc
-    )
-
-    return None
-
-==============================
-
-INTRADAY DATA
-
-==============================
-
-def download_intraday(symbol):
-
-try:
-    df = yf.download(
-        symbol,
-        period="5d",
-        interval="5m",
-        auto_adjust=True,
-        progress=False,
-        threads=False,
-        timeout=20
-    )
-
-    df = clean_yf_frame(df)
-
-    if df is None or len(df) < 60:
-        DIAGNOSTICS["download_fail"] += 1
-        return None
-
-    idx = pd.DatetimeIndex(df.index)
-
-    if idx.tz is None:
-        idx = idx.tz_localize("UTC")
-
-    idx = idx.tz_convert(IST)
-
-    df.index = idx
-
-    current = now_ist()
-
-    # Remove currently forming candle.
-    if (
-        len(df)
-        and df.index[-1].date() == current.date()
-    ):
-
-        candle_end = (
-            df.index[-1].to_pydatetime()
-            + timedelta(minutes=5)
+    try:
+        response = requests.post(
+            TELEGRAM_URL,
+            data={
+                "chat_id": CHAT_ID,
+                "text": message
+            },
+            timeout=15
         )
 
-        if candle_end > current:
-            df = df.iloc[:-1]
+        response.raise_for_status()
+        result = response.json()
 
-    if df.empty:
-        DIAGNOSTICS["download_fail"] += 1
-        return None
+        return bool(result.get("ok"))
 
-    age = (
-        now_ist()
-        - df.index[-1].to_pydatetime()
-    ).total_seconds() / 60
+    except Exception as exc:
+        log.error("Telegram error: %s", exc)
+        return False
 
-    if age < -5 or age > 20:
-        DIAGNOSTICS["download_fail"] += 1
-        return None
 
-    DIAGNOSTICS["intraday_download_ok"] += 1
+def symbol_name(symbol):
+    return symbol.replace(".NS", "")
+
+
+def safe_float(value, default=0.0):
+    try:
+        result = float(value)
+
+        if np.isfinite(result):
+            return result
+
+    except Exception:
+        pass
+
+    return default
+
+
+# ============================================================
+# YAHOO FINANCE DATA
+# ============================================================
+
+def clean_yf_frame(data):
+    if data is None or data.empty:
+        return pd.DataFrame()
+
+    df = data.copy()
+
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+
+    required = ["Open", "High", "Low", "Close", "Volume"]
+
+    for column in required:
+        if column not in df.columns:
+            return pd.DataFrame()
+
+    df = df[required].copy()
+
+    for column in required:
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce"
+        )
+
+    df = df.dropna()
+    df = df[~df.index.duplicated(keep="last")]
+    df = df.sort_index()
 
     return df
 
-except Exception as exc:
 
-    DIAGNOSTICS["download_fail"] += 1
+def download_daily(symbol):
+    try:
+        raw = yf.download(
+            symbol,
+            period="2y",
+            interval="1d",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=20
+        )
 
-    logging.warning(
-        "Intraday download failed %s: %s",
-        symbol, exc
-    )
+        df = clean_yf_frame(raw)
 
-    return None
+        if len(df) < MIN_DAILY_ROWS:
+            return pd.DataFrame()
 
-==============================
+        return df
 
-MARKET REGIME
+    except Exception as exc:
+        log.warning("Daily download failed for %s: %s", symbol, exc)
+        return pd.DataFrame()
 
-==============================
 
-def market_regime():
+def download_intraday(symbol):
+    try:
+        raw = yf.download(
+            symbol,
+            period="5d",
+            interval="5m",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=20
+        )
 
-df = download_daily("^NSEI")
+        df = clean_yf_frame(raw)
 
-if df is None:
-    return "SIDEWAYS", None, {}
+        if len(df) < 30:
+            return pd.DataFrame()
 
-try:
+        # Exclude the currently forming 5-minute candle.
+        current_time = pd.Timestamp.now(tz="UTC")
 
-    close = df["Close"]
+        index = pd.DatetimeIndex(df.index)
 
-    ema20 = EMAIndicator(
-        close, window=20
+        if index.tz is None:
+            index = index.tz_localize("UTC")
+        else:
+            index = index.tz_convert("UTC")
+
+        df.index = index
+
+        latest_time = df.index[-1]
+
+        if (current_time - latest_time) > pd.Timedelta(minutes=20):
+            return pd.DataFrame()
+
+        df = df.iloc[:-1]
+
+        if len(df) < 25:
+            return pd.DataFrame()
+
+        return df
+
+    except Exception as exc:
+        log.warning("Intraday download failed for %s: %s", symbol, exc)
+        return pd.DataFrame()
+
+
+# ============================================================
+# INDICATORS
+# ============================================================
+
+def add_indicators(df):
+    df = df.copy()
+
+    df["EMA9"] = EMAIndicator(
+        close=df["Close"], window=9
     ).ema_indicator()
 
-    ema50 = EMAIndicator(
-        close, window=50
+    df["EMA20"] = EMAIndicator(
+        close=df["Close"], window=20
     ).ema_indicator()
 
-    adx_obj = ADXIndicator(
-        df["High"],
-        df["Low"],
-        close,
+    df["EMA50"] = EMAIndicator(
+        close=df["Close"], window=50
+    ).ema_indicator()
+
+    df["EMA200"] = EMAIndicator(
+        close=df["Close"], window=200
+    ).ema_indicator()
+
+    df["RSI"] = RSIIndicator(
+        close=df["Close"], window=14
+    ).rsi()
+
+    macd = MACD(close=df["Close"])
+
+    df["MACD"] = macd.macd()
+    df["MACD_SIGNAL"] = macd.macd_signal()
+
+    adx = ADXIndicator(
+        high=df["High"],
+        low=df["Low"],
+        close=df["Close"],
         window=14
     )
 
-    pdi = adx_obj.adx_pos()
-    mdi = adx_obj.adx_neg()
-    adx = adx_obj.adx()
-
-    c = float(close.iloc[-1])
-    e20 = float(ema20.iloc[-1])
-    e50 = float(ema50.iloc[-1])
-
-    adx_value = float(adx.iloc[-1])
-    plus_di = float(pdi.iloc[-1])
-    minus_di = float(mdi.iloc[-1])
-
-    details = {
-        "ema20": round(e20, 2),
-        "ema50": round(e50, 2),
-        "adx": round(adx_value, 1),
-        "plus_di": round(plus_di, 1),
-        "minus_di": round(minus_di, 1)
-    }
-
-    if (
-        c > e20 > e50
-        and plus_di > minus_di
-    ):
-        return "BULLISH", c, details
-
-    if (
-        c < e20 < e50
-        and minus_di > plus_di
-    ):
-        return "BEARISH", c, details
-
-    return "SIDEWAYS", c, details
-
-except Exception as exc:
-
-    logging.warning(
-        "Market regime calculation failed: %s",
-        exc
-    )
-
-    return "SIDEWAYS", None, {}
-
-==============================
-
-SWING BUY CANDIDATE
-
-==============================
-
-def swing_candidate(symbol):
-
-df = download_daily(symbol)
-
-if df is None:
-    return reject("DAILY_DATA_UNAVAILABLE")
-
-try:
-
-    c = df["Close"]
-
-    ema20 = EMAIndicator(c, 20).ema_indicator()
-    ema50 = EMAIndicator(c, 50).ema_indicator()
-    ema200 = EMAIndicator(c, 200).ema_indicator()
-
-    rsi = RSIIndicator(c, 14).rsi()
-
-    macd = MACD(c)
-
-    adx_obj = ADXIndicator(
-        df["High"], df["Low"], c, 14
-    )
-
-    adx = adx_obj.adx()
-    pdi = adx_obj.adx_pos()
-    mdi = adx_obj.adx_neg()
+    df["ADX"] = adx.adx()
+    df["PLUS_DI"] = adx.adx_pos()
+    df["MINUS_DI"] = adx.adx_neg()
 
     atr = AverageTrueRange(
-        df["High"], df["Low"], c, 14
-    ).average_true_range()
-
-    avg_vol = df["Volume"].rolling(20).mean()
-
-    i = len(df) - 1
-
-    vals = [
-        ema20.iloc[i],
-        ema50.iloc[i],
-        ema200.iloc[i],
-        rsi.iloc[i],
-        adx.iloc[i],
-        pdi.iloc[i],
-        mdi.iloc[i],
-        atr.iloc[i],
-        avg_vol.iloc[i],
-        macd.macd().iloc[i],
-        macd.macd_signal().iloc[i]
-    ]
-
-    if any(pd.isna(x) for x in vals):
-        return reject("INDICATOR_DATA_MISSING")
-
-    price = float(c.iloc[i])
-    av = float(atr.iloc[i])
-
-    volume_average = float(avg_vol.iloc[i])
-
-    rvol = (
-        float(df["Volume"].iloc[i] / volume_average)
-        if volume_average > 0 else 0
+        high=df["High"],
+        low=df["Low"],
+        close=df["Close"],
+        window=14
     )
 
-    extension = (
-        (price - float(ema20.iloc[i])) / av
-        if av > 0 else 99
+    df["ATR"] = atr.average_true_range()
+
+    df["VOL_AVG20"] = df["Volume"].rolling(20).mean()
+
+    df["RVOL"] = (
+        df["Volume"] / df["VOL_AVG20"].replace(0, np.nan)
     )
 
-    prior_high = float(
+    return df.dropna()
+
+
+# ============================================================
+# MARKET REGIME
+# ============================================================
+
+def market_regime():
+    result = {
+        "regime": "SIDEWAYS",
+        "nifty": 0,
+        "ema20": 0,
+        "ema50": 0,
+        "adx": 0,
+        "plus_di": 0,
+        "minus_di": 0
+    }
+
+    df = download_daily("^NSEI")
+
+    if df.empty:
+        log.warning("Nifty data unavailable. Using SIDEWAYS.")
+        return result
+
+    df = add_indicators(df)
+
+    if len(df) < 5:
+        return result
+
+    last = df.iloc[-1]
+
+    close = safe_float(last["Close"])
+    ema20 = safe_float(last["EMA20"])
+    ema50 = safe_float(last["EMA50"])
+    adx = safe_float(last["ADX"])
+    plus_di = safe_float(last["PLUS_DI"])
+    minus_di = safe_float(last["MINUS_DI"])
+
+    regime = "SIDEWAYS"
+
+    if (
+        close > ema20 > ema50
+        and plus_di > minus_di
+        and adx >= MIN_ADX
+    ):
+        regime = "BULLISH"
+
+    elif (
+        close < ema20 < ema50
+        and minus_di > plus_di
+        and adx >= MIN_ADX
+    ):
+        regime = "BEARISH"
+
+    result.update({
+        "regime": regime,
+        "nifty": round(close, 2),
+        "ema20": round(ema20, 2),
+        "ema50": round(ema50, 2),
+        "adx": round(adx, 2),
+        "plus_di": round(plus_di, 2),
+        "minus_di": round(minus_di, 2)
+    })
+
+    return result
+
+
+# ============================================================
+# SWING BUY CANDIDATE
+# ============================================================
+
+def swing_candidate(symbol, df):
+    if df.empty or len(df) < MIN_DAILY_ROWS:
+        return None, "insufficient daily data"
+
+    df = add_indicators(df)
+
+    if len(df) < 25:
+        return None, "indicator data insufficient"
+
+    last = df.iloc[-1]
+    previous = df.iloc[-2]
+
+    close = safe_float(last["Close"])
+    high = safe_float(last["High"])
+    low = safe_float(last["Low"])
+
+    ema20 = safe_float(last["EMA20"])
+    ema50 = safe_float(last["EMA50"])
+    ema200 = safe_float(last["EMA200"])
+
+    rsi = safe_float(last["RSI"])
+    adx = safe_float(last["ADX"])
+    plus_di = safe_float(last["PLUS_DI"])
+    minus_di = safe_float(last["MINUS_DI"])
+
+    atr = safe_float(last["ATR"])
+    rvol = safe_float(last["RVOL"])
+
+    if not (close > ema20 > ema50 > ema200):
+        return None, "daily trend not bullish"
+
+    if not (MIN_RSI <= rsi <= MAX_RSI):
+        return None, "RSI outside range"
+
+    if adx < MIN_ADX:
+        return None, "ADX too low"
+
+    if plus_di <= minus_di:
+        return None, "positive DI confirmation missing"
+
+    if rvol < MIN_RVOL:
+        return None, "volume confirmation missing"
+
+    if safe_float(last["MACD"]) <= safe_float(last["MACD_SIGNAL"]):
+        return None, "MACD not bullish"
+
+    previous_high = safe_float(
         df["High"].iloc[-21:-1].max()
     )
 
-    checks = [
-        (
-            price > ema20.iloc[i]
-            > ema50.iloc[i]
-            > ema200.iloc[i]
-        ),
-        0 <= extension <= 2.0,
-        MIN_RSI <= rsi.iloc[i] <= MAX_RSI,
-        adx.iloc[i] >= MIN_ADX,
-        pdi.iloc[i] > mdi.iloc[i],
-        rvol >= MIN_RVOL,
-        (
-            macd.macd().iloc[i]
-            > macd.macd_signal().iloc[i]
-        ),
-        price > prior_high
-    ]
+    if close <= previous_high:
+        return None, "20-day breakout missing"
 
-    if not all(checks):
-        return reject("SWING_FILTER_FAILED")
+    if atr <= 0:
+        return None, "invalid ATR"
 
-    entry = float(
-        df["High"].iloc[i] + 0.05 * av
-    )
+    extension = (close - ema20) / atr
 
-    recent_low = float(
+    if extension < 0 or extension > 2.0:
+        return None, "price extension too high or invalid"
+
+    entry = high + (0.05 * atr)
+
+    recent_low = safe_float(
         df["Low"].iloc[-10:].min()
     )
 
     stop = max(
         recent_low,
-        entry - 1.5 * av
+        entry - (1.5 * atr)
     )
 
+    if stop >= entry:
+        return None, "invalid stop loss"
+
     risk = entry - stop
+    target = entry + (MIN_RR_SWING * risk)
 
-    if risk <= 0 or risk > 2 * av:
-        return reject("SWING_RISK_FAILED")
-
-    target = entry + MIN_RR_SWING * risk
+    if risk <= 0:
+        return None, "invalid risk"
 
     return {
         "symbol": symbol,
-        "strategy": "V11_SWING",
-        "direction": "BUY",
-        "entry_trigger": round(entry, 2),
-        "stop_loss": round(stop, 2),
+        "name": symbol_name(symbol),
+        "side": "BUY",
+        "strategy": "SWING",
+        "entry": round(entry, 2),
+        "stop": round(stop, 2),
         "target": round(target, 2),
-        "score": 100,
+        "rr": round((target - entry) / risk, 2),
+        "score": 80,
+        "rsi": round(rsi, 2),
+        "adx": round(adx, 2),
         "rvol": round(rvol, 2),
-        "rsi": round(float(rsi.iloc[i]), 1),
-        "adx": round(float(adx.iloc[i]), 1),
-        "reward_risk": MIN_RR_SWING,
-        "signal_candle": str(df.index[i].date())
-    }
+        "created_at": now_ist().isoformat(),
+        "status": "WAITING_ENTRY"
+    }, "qualified"
 
-except Exception as exc:
+# ============================================================
+# INTRADAY SHORT CANDIDATE
+# PAPER TRADING ONLY - MUST SQUARE OFF INTRADAY
+# ============================================================
 
-    logging.warning(
-        "Swing calculation failed %s: %s",
-        symbol, exc
-    )
+def short_candidate(symbol, df):
+    if df.empty or len(df) < 30:
+        return None, "insufficient intraday data"
 
-    return reject("SWING_CALCULATION_ERROR")
+    df = add_indicators(df)
 
-==============================
+    if len(df) < 20:
+        return None, "intraday indicators insufficient"
 
-INTRADAY SHORT CANDIDATE
+    last = df.iloc[-1]
 
-==============================
+    close = safe_float(last["Close"])
+    low = safe_float(last["Low"])
 
-def short_candidate(symbol):
+    ema9 = safe_float(last["EMA9"])
+    ema20 = safe_float(last["EMA20"])
 
-df = download_intraday(symbol)
+    rsi = safe_float(last["RSI"])
+    adx = safe_float(last["ADX"])
 
-if df is None or len(df) < 60:
-    return reject("INTRADAY_DATA_UNAVAILABLE")
+    plus_di = safe_float(last["PLUS_DI"])
+    minus_di = safe_float(last["MINUS_DI"])
 
-try:
+    atr = safe_float(last["ATR"])
+    rvol = safe_float(last["RVOL"])
 
-    c = df["Close"]
+    if close >= ema9 or ema9 >= ema20:
+        return None, "intraday trend not bearish"
 
-    ema9 = EMAIndicator(c, 9).ema_indicator()
-    ema20 = EMAIndicator(c, 20).ema_indicator()
+    if rsi >= 45:
+        return None, "RSI not bearish"
 
-    rsi = RSIIndicator(c, 14).rsi()
+    if adx < 18:
+        return None, "intraday ADX too low"
 
-    adx_obj = ADXIndicator(
-        df["High"], df["Low"], c, 14
-    )
+    if minus_di <= plus_di:
+        return None, "negative DI confirmation missing"
 
-    adx = adx_obj.adx()
-    mdi = adx_obj.adx_neg()
-    pdi = adx_obj.adx_pos()
+    if rvol < MIN_RVOL:
+        return None, "intraday volume too low"
 
-    atr = AverageTrueRange(
-        df["High"], df["Low"], c, 14
-    ).average_true_range()
-
-    avg_vol = df["Volume"].rolling(20).mean()
-
-    i = len(df) - 1
-
-    vals = [
-        ema9.iloc[i],
-        ema20.iloc[i],
-        rsi.iloc[i],
-        adx.iloc[i],
-        mdi.iloc[i],
-        pdi.iloc[i],
-        atr.iloc[i],
-        avg_vol.iloc[i]
-    ]
-
-    if any(pd.isna(x) for x in vals):
-        return reject("SHORT_INDICATOR_MISSING")
-
-    price = float(c.iloc[i])
-    av = float(atr.iloc[i])
-
-    volume_average = float(avg_vol.iloc[i])
-
-    rvol = (
-        float(df["Volume"].iloc[i] / volume_average)
-        if volume_average > 0 else 0
-    )
-
-    breakdown = float(
+    previous_low = safe_float(
         df["Low"].iloc[-21:-1].min()
     )
 
-    if not (
-        price < ema9.iloc[i] < ema20.iloc[i]
-        and price < breakdown
-        and rsi.iloc[i] < 45
-        and adx.iloc[i] >= 18
-        and mdi.iloc[i] > pdi.iloc[i]
-        and rvol >= MIN_RVOL
-    ):
-        return reject("SHORT_FILTER_FAILED")
+    if low >= previous_low:
+        return None, "20-bar breakdown missing"
 
-    entry = price
+    if atr <= 0:
+        return None, "invalid intraday ATR"
 
-    stop = max(
-        float(df["High"].iloc[-6:].max()),
-        entry + 0.8 * av
+    entry = close
+
+    recent_high = safe_float(
+        df["High"].iloc[-6:].max()
     )
 
+    stop = max(
+        recent_high,
+        entry + (0.8 * atr)
+    )
+
+    if stop <= entry:
+        return None, "invalid short stop"
+
     risk = stop - entry
+    target = entry - (MIN_RR_SHORT * risk)
 
-    if risk <= 0 or risk > 2.5 * av:
-        return reject("SHORT_RISK_FAILED")
-
-    target = entry - MIN_RR_SHORT * risk
-
-    if target <= 0:
-        return reject("SHORT_TARGET_INVALID")
+    if target <= 0 or risk <= 0:
+        return None, "invalid short target"
 
     return {
         "symbol": symbol,
-        "strategy": "V11_INTRADAY_SHORT",
-        "direction": "SHORT",
-        "entry_trigger": round(entry, 2),
-        "stop_loss": round(stop, 2),
+        "name": symbol_name(symbol),
+        "side": "SHORT",
+        "strategy": "INTRADAY",
+        "entry": round(entry, 2),
+        "stop": round(stop, 2),
         "target": round(target, 2),
-        "score": 85,
+        "rr": round((entry - target) / risk, 2),
+        "score": 80,
+        "rsi": round(rsi, 2),
+        "adx": round(adx, 2),
         "rvol": round(rvol, 2),
-        "rsi": round(float(rsi.iloc[i]), 1),
-        "adx": round(float(adx.iloc[i]), 1),
-        "reward_risk": MIN_RR_SHORT,
-        "signal_candle": str(df.index[i])
-    }
+        "created_at": now_ist().isoformat(),
+        "status": "WAITING_ENTRY"
+    }, "qualified"
 
-except Exception as exc:
 
-    logging.warning(
-        "Short calculation failed %s: %s",
-        symbol, exc
+# ============================================================
+# SIGNAL MANAGEMENT
+# ============================================================
+
+def active_symbol_exists(signals, symbol):
+    for signal in signals:
+        if (
+            signal.get("symbol") == symbol
+            and signal.get("status") in [
+                "WAITING_ENTRY",
+                "OPEN"
+            ]
+        ):
+            return True
+
+    return False
+
+
+def create_signal(candidate, signals):
+    signal = candidate.copy()
+
+    signal["id"] = (
+        symbol_name(signal["symbol"])
+        + "_"
+        + now_ist().strftime("%Y%m%d%H%M%S")
     )
 
-    return reject("SHORT_CALCULATION_ERROR")
+    signal["entry_time"] = None
+    signal["exit_time"] = None
+    signal["exit_price"] = None
+    signal["pnl_percent"] = None
 
-==============================
+    signal["version"] = VERSION
 
-ACTIVE SYMBOLS
+    signals.append(signal)
 
-==============================
+    return signal
 
-def active_symbol_set(signals):
 
-return {
-    s.get("symbol")
-    for s in signals
-    if s.get("status") in (
-        "WAITING_ENTRY", "OPEN"
-    )
-}
+def close_trade(signal, price, reason):
+    entry = safe_float(signal.get("actual_entry", signal["entry"]))
 
-==============================
+    if entry <= 0:
+        return
 
-CREATE PAPER RECORD
-
-==============================
-
-def create_record(candidate):
-
-return {
-    "signal_id": str(uuid.uuid4()),
-    **candidate,
-    "status": "WAITING_ENTRY",
-    "created_at": stamp(),
-    "entry_price": None,
-    "entered_at": None,
-    "exit_price": None,
-    "exited_at": None,
-    "exit_reason": None,
-    "strategy_version": "V11.2"
-}
-
-==============================
-
-MONITOR EXISTING TRADES
-
-==============================
-
-def monitor_one(signal, history, current_time):
-
-symbol = signal["symbol"]
-
-direction = signal.get("direction", "BUY")
-short = direction == "SHORT"
-
-if short and current_time.time() >= SQUARE_OFF_TIME:
-
-    if signal["status"] == "OPEN":
-
-        px = (
-            signal.get("last_price")
-            or signal["entry_price"]
-        )
-
-        close_signal(
-            signal,
-            history,
-            float(px),
-            "MANDATORY_SQUARE_OFF"
-        )
-
+    if signal["side"] == "BUY":
+        pnl = ((price - entry) / entry) * 100
     else:
+        pnl = ((entry - price) / entry) * 100
 
-        signal["status"] = "EXPIRED"
-        signal["exit_reason"] = (
-            "NO_ENTRY_BEFORE_SQUARE_OFF"
-        )
-        signal["exited_at"] = stamp()
+    signal["status"] = "CLOSED"
+    signal["exit_price"] = round(price, 2)
+    signal["exit_time"] = now_ist().isoformat()
+    signal["pnl_percent"] = round(pnl, 2)
+    signal["exit_reason"] = reason
 
-    return
-
-df = download_intraday(symbol)
-
-if df is None:
-    return
-
-candle = df.iloc[-1]
-
-high, low, op, close = map(
-    float,
-    [
-        candle["High"],
-        candle["Low"],
-        candle["Open"],
-        candle["Close"]
-    ]
-)
-
-signal["last_price"] = close
-
-entry_trigger = float(signal["entry_trigger"])
-sl = float(signal["stop_loss"])
-target = float(signal["target"])
-
-if signal["status"] == "WAITING_ENTRY":
-
-    created = datetime.fromisoformat(
-        signal["created_at"]
+    log.info(
+        "Closed %s %s P&L %.2f%%",
+        signal["symbol"],
+        signal["side"],
+        pnl
     )
 
-    if created.tzinfo is None:
-        created = created.replace(tzinfo=IST)
 
-    age_seconds = (
-        current_time - created
-    ).total_seconds()
+# ============================================================
+# PAPER TRADE MONITOR
+# ============================================================
 
-    if short:
-        expired = (
-            age_seconds > MAX_ENTRY_AGE_MINUTES * 60
+def monitor_signals(signals, history):
+    messages = []
+
+    current = now_ist()
+    current_time = current.time()
+
+    for signal in signals:
+
+        status = signal.get("status")
+
+        if status not in ["WAITING_ENTRY", "OPEN"]:
+            continue
+
+        symbol = signal["symbol"]
+        side = signal["side"]
+        strategy = signal["strategy"]
+
+        # ----------------------------------------------------
+        # Expire old waiting signals
+        # ----------------------------------------------------
+
+        try:
+            created = datetime.fromisoformat(
+                signal["created_at"]
+            )
+
+            if created.tzinfo is None:
+                created = created.replace(tzinfo=IST)
+
+            age = current - created
+
+        except Exception:
+            age = timedelta(days=999)
+
+        if status == "WAITING_ENTRY":
+
+            if strategy == "INTRADAY":
+                if current_time >= SQUARE_OFF_TIME:
+                    signal["status"] = "EXPIRED"
+                    signal["exit_reason"] = "intraday entry expired"
+
+                    messages.append(
+                        f"⌛ EXPIRED: {signal['name']} SHORT\n"
+                        f"Reason: Intraday entry window closed."
+                    )
+                    continue
+
+            elif age > timedelta(days=MAX_SWING_ENTRY_AGE_DAYS):
+                signal["status"] = "EXPIRED"
+                signal["exit_reason"] = "swing entry expired"
+
+                messages.append(
+                    f"⌛ EXPIRED: {signal['name']} BUY\n"
+                    f"Reason: Entry window expired."
+                )
+                continue
+
+        # ----------------------------------------------------
+        # Download recent intraday candles
+        # ----------------------------------------------------
+
+        df = download_intraday(symbol)
+
+        if df.empty:
+            continue
+
+        last_price = safe_float(df["Close"].iloc[-1])
+
+        if last_price <= 0:
+            continue
+
+        # ----------------------------------------------------
+        # Waiting entry
+        # ----------------------------------------------------
+
+        if status == "WAITING_ENTRY":
+
+            entry = safe_float(signal["entry"])
+
+            if strategy == "INTRADAY" and current_time >= SQUARE_OFF_TIME:
+                signal["status"] = "EXPIRED"
+                signal["exit_reason"] = "intraday entry cutoff"
+
+                continue
+
+            if side == "BUY":
+                triggered = safe_float(df["High"].iloc[-1]) >= entry
+            else:
+                triggered = safe_float(df["Low"].iloc[-1]) <= entry
+
+            if not triggered:
+                continue
+
+            signal["status"] = "OPEN"
+            signal["actual_entry"] = round(entry, 2)
+            signal["entry_time"] = current.isoformat()
+
+            messages.append(
+                f"🟢 PAPER ENTRY\n"
+                f"{signal['name']} ({side})\n"
+                f"Entry: {entry:.2f}\n"
+                f"Stop: {signal['stop']:.2f}\n"
+                f"Target: {signal['target']:.2f}\n"
+                f"Strategy: {strategy}"
+            )
+
+            status = "OPEN"
+
+        # ----------------------------------------------------
+        # Open trade monitoring
+        # ----------------------------------------------------
+
+        if status != "OPEN":
+            continue
+
+        entry = safe_float(
+            signal.get("actual_entry", signal["entry"])
         )
-    else:
-        expired = (
-            age_seconds
-            > MAX_SWING_ENTRY_AGE_DAYS * 24 * 60 * 60
+
+        stop = safe_float(signal["stop"])
+        target = safe_float(signal["target"])
+
+        candle_high = safe_float(df["High"].iloc[-1])
+        candle_low = safe_float(df["Low"].iloc[-1])
+
+        exit_reason = None
+        exit_price = None
+
+        if side == "BUY":
+
+            # Conservative handling when stop and target
+            # are both touched in the same candle.
+            if candle_low <= stop:
+                exit_reason = "STOP LOSS"
+                exit_price = stop
+
+            elif candle_high >= target:
+                exit_reason = "TARGET HIT"
+                exit_price = target
+
+        else:
+
+            if candle_high >= stop:
+                exit_reason = "STOP LOSS"
+                exit_price = stop
+
+            elif candle_low <= target:
+                exit_reason = "TARGET HIT"
+                exit_price = target
+
+        # Mandatory intraday square-off for short paper trades.
+        if (
+            exit_reason is None
+            and strategy == "INTRADAY"
+            and current_time >= SQUARE_OFF_TIME
+        ):
+            exit_reason = "INTRADAY SQUARE OFF"
+            exit_price = last_price
+
+        if exit_reason:
+
+            close_trade(
+                signal,
+                exit_price,
+                exit_reason
+            )
+
+            history.append(signal.copy())
+
+            messages.append(
+                f"🔴 PAPER EXIT\n"
+                f"{signal['name']} ({side})\n"
+                f"Exit: {exit_price:.2f}\n"
+                f"Reason: {exit_reason}\n"
+                f"P&L: {signal['pnl_percent']:.2f}%"
+            )
+
+    return messages
+
+
+# ============================================================
+# SCAN SLOT CONTROL
+# ============================================================
+
+def current_scan_slot():
+    current = now_ist()
+
+    half_hour = "A" if current.minute < 30 else "B"
+
+    return current.strftime("%Y-%m-%d-%H-") + half_hour
+
+
+def can_scan(state):
+    current = now_ist()
+
+    if current.weekday() >= 5:
+        return False
+
+    if not (MARKET_OPEN <= current.time() <= SHORT_ENTRY_CUTOFF):
+        return False
+
+    slot = current_scan_slot()
+
+    if state.get("last_slot") == slot:
+        return False
+
+    return True
+
+# ============================================================
+# SCANNER MAIN LOOP
+# ============================================================
+
+def run_scanner():
+
+    signals = load_json(SIGNALS_FILE, [])
+    history = load_json(HISTORY_FILE, [])
+    state = load_json(STATE_FILE, {})
+
+    if not isinstance(signals, list):
+        signals = []
+
+    if not isinstance(history, list):
+        history = []
+
+    if not isinstance(state, dict):
+        state = {}
+
+    log.info("Starting GTF PRO SCANNER %s", VERSION)
+
+    # --------------------------------------------------------
+    # Monitor existing paper trades first
+    # --------------------------------------------------------
+
+    monitor_messages = monitor_signals(signals, history)
+
+    for message in monitor_messages:
+        send_telegram(message)
+
+    save_json(SIGNALS_FILE, signals)
+    save_json(HISTORY_FILE, history)
+
+    # --------------------------------------------------------
+    # Check market regime
+    # --------------------------------------------------------
+
+    market = market_regime()
+    regime = market["regime"]
+
+    log.info("Market regime: %s", regime)
+    log.info("Nifty: %s", market["nifty"])
+
+    # --------------------------------------------------------
+    # Scan slot control
+    # --------------------------------------------------------
+
+    if not can_scan(state):
+
+        report = (
+            f"📊 GTF PRO SCANNER {VERSION}\n"
+            f"Time: {now_ist().strftime('%d-%m-%Y %H:%M IST')}\n"
+            f"Market: {regime}\n"
+            f"Nifty: {market['nifty']}\n"
+            f"Status: Outside scan window or slot already scanned."
         )
 
-    if expired:
+        log.info(report.replace("\n", " | "))
 
-        signal["status"] = "EXPIRED"
-        signal["exit_reason"] = "ENTRY_WINDOW_EXPIRED"
-        signal["exited_at"] = stamp()
+        save_json(SIGNALS_FILE, signals)
+        save_json(HISTORY_FILE, history)
 
         return
 
-    triggered = (
-        low <= entry_trigger
-        if short
-        else high >= entry_trigger
-    )
+    state["last_slot"] = current_scan_slot()
 
-    if not triggered:
-        return
+    # --------------------------------------------------------
+    # Candidate scanning
+    # --------------------------------------------------------
 
-    if short:
+    candidates = []
+    daily_ok = 0
+    intraday_ok = 0
+    failures = 0
+    checked = 0
 
-        entry = (
-            min(entry_trigger, op)
-            if op < entry_trigger
-            else entry_trigger
+    rejection_reasons = {}
+
+    def reject(reason):
+        rejection_reasons[reason] = (
+            rejection_reasons.get(reason, 0) + 1
         )
 
-        if high >= sl:
+    for symbol in STOCKS:
 
-            signal["status"] = "EXPIRED"
-            signal["exit_reason"] = (
-                "STOP_TOUCHED_ON_ENTRY_CANDLE"
-            )
-            signal["exited_at"] = stamp()
+        if len(candidates) >= MAX_NEW_SIGNALS:
+            break
 
-            return
+        if active_symbol_exists(signals, symbol):
+            reject("already active")
+            continue
 
-    else:
-
-        entry = (
-            max(entry_trigger, op)
-            if op > entry_trigger
-            else entry_trigger
-        )
-
-        if low <= sl:
-
-            signal["status"] = "EXPIRED"
-            signal["exit_reason"] = (
-                "STOP_TOUCHED_ON_ENTRY_CANDLE"
-            )
-            signal["exited_at"] = stamp()
-
-            return
-
-    signal["status"] = "OPEN"
-    signal["entry_price"] = round(entry, 2)
-    signal["entered_at"] = stamp()
-
-    telegram(
-        f"🟢 V11.2 PAPER ENTRY\n"
-        f"{symbol} {direction}\n"
-        f"Entry: {entry:.2f}\n"
-        f"SL: {sl:.2f}\n"
-        f"Target: {target:.2f}"
-    )
-
-    return
-
-if signal["status"] != "OPEN":
-    return
-
-if short:
-
-    if high >= sl:
-
-        close_signal(
-            signal,
-            history,
-            sl if op <= sl else op,
-            "STOP_LOSS"
-        )
-
-    elif low <= target:
-
-        close_signal(
-            signal,
-            history,
-            target if op >= target else op,
-            "TARGET"
-        )
-
-else:
-
-    if low <= sl:
-
-        close_signal(
-            signal,
-            history,
-            sl if op >= sl else op,
-            "STOP_LOSS"
-        )
-
-    elif high >= target:
-
-        close_signal(
-            signal,
-            history,
-            target if op <= target else op,
-            "TARGET"
-        )
-
-==============================
-
-CLOSE PAPER TRADE
-
-==============================
-
-def close_signal(
-signal,
-history,
-exit_price,
-reason
-):
-
-if signal.get("status") == "CLOSED":
-    return
-
-entry = float(signal["entry_price"])
-
-direction = signal.get("direction", "BUY")
-
-if direction == "SHORT":
-
-    pnl = (
-        (entry - exit_price) / entry * 100
-    )
-
-else:
-
-    pnl = (
-        (exit_price - entry) / entry * 100
-    )
-
-signal.update({
-
-    "status": "CLOSED",
-    "exit_price": round(exit_price, 2),
-    "exited_at": stamp(),
-    "exit_reason": reason,
-    "pnl_percent": round(pnl, 2)
-
-})
-
-if not any(
-    x.get("signal_id") == signal.get("signal_id")
-    for x in history
-):
-
-    history.append({
-
-        "signal_id": signal["signal_id"],
-        "symbol": signal["symbol"],
-        "strategy": signal.get("strategy"),
-        "direction": direction,
-        "entry_price": entry,
-        "exit_price": round(exit_price, 2),
-        "pnl_percent": round(pnl, 2),
-        "exit_reason": reason,
-        "entered_at": signal.get("entered_at"),
-        "exited_at": signal["exited_at"]
-
-    })
-
-telegram(
-    f"🏁 V11.2 PAPER EXIT\n"
-    f"{signal['symbol']} {direction}\n"
-    f"Exit: {exit_price:.2f}\n"
-    f"Reason: {reason}\n"
-    f"P&L: {pnl:.2f}%"
-)
-
-==============================
-
-MAIN SCANNER
-
-==============================
-
-def main():
-
-current = now_ist()
-
-logging.info("Starting GTF PRO SCANNER V11.2")
-
-signals = load_json(SIGNALS_FILE)
-history = load_json(HISTORY_FILE)
-scan_state = load_json(SCAN_STATE_FILE)
-
-# --------------------------
-# MONITOR EXISTING TRADES
-# --------------------------
-
-for signal in signals:
-
-    if signal.get("status") in (
-        "WAITING_ENTRY", "OPEN"
-    ) and signal.get("symbol"):
+        checked += 1
 
         try:
 
-            monitor_one(
-                signal,
-                history,
-                current
+            candidate = None
+            reason = "no setup"
+
+            # ------------------------------------------------
+            # BULLISH: Swing BUY
+            # ------------------------------------------------
+
+            if regime == "BULLISH":
+
+                daily = download_daily(symbol)
+
+                if daily.empty:
+                    failures += 1
+                    reject("daily data unavailable")
+                    continue
+
+                daily_ok += 1
+
+                candidate, reason = swing_candidate(
+                    symbol,
+                    daily
+                )
+
+            # ------------------------------------------------
+            # BEARISH: Intraday SHORT
+            # ------------------------------------------------
+
+            elif regime == "BEARISH":
+
+                intraday = download_intraday(symbol)
+
+                if intraday.empty:
+                    failures += 1
+                    reject("intraday data unavailable")
+                    continue
+
+                intraday_ok += 1
+
+                candidate, reason = short_candidate(
+                    symbol,
+                    intraday
+                )
+
+            # ------------------------------------------------
+            # SIDEWAYS: Test both strategies
+            # ------------------------------------------------
+
+            else:
+
+                daily = download_daily(symbol)
+
+                if not daily.empty:
+                    daily_ok += 1
+
+                    candidate, reason = swing_candidate(
+                        symbol,
+                        daily
+                    )
+
+                if candidate is None:
+
+                    intraday = download_intraday(symbol)
+
+                    if not intraday.empty:
+                        intraday_ok += 1
+
+                        candidate, reason = short_candidate(
+                            symbol,
+                            intraday
+                        )
+
+            if candidate is None:
+                reject(reason)
+                continue
+
+            candidates.append(candidate)
+
+            log.info(
+                "Qualified: %s %s score=%s",
+                symbol,
+                candidate["side"],
+                candidate["score"]
             )
 
         except Exception as exc:
 
-            logging.exception(
-                "Monitor error %s: %s",
-                signal.get("symbol"),
+            failures += 1
+
+            log.exception(
+                "Error scanning %s: %s",
+                symbol,
                 exc
             )
 
-        time.sleep(0.15)
+            reject("unexpected error")
 
-# --------------------------
-# MARKET REGIME
-# --------------------------
+    # --------------------------------------------------------
+    # Create new paper signals
+    # --------------------------------------------------------
 
-regime, nifty, market_details = market_regime()
+    new_signals = []
 
-logging.info(
-    "Market regime=%s Nifty=%s details=%s",
-    regime,
-    nifty,
-    market_details
-)
+    for candidate in candidates[:MAX_NEW_SIGNALS]:
 
-new_records = []
+        if active_symbol_exists(signals, candidate["symbol"]):
+            continue
 
-weekday = current.weekday() < 5
+        signal = create_signal(candidate, signals)
 
-in_market_hours = (
-    weekday
-    and MARKET_OPEN <= current.time() < MARKET_CLOSE
-)
+        new_signals.append(signal)
 
-# --------------------------
-# SCAN SLOT
-# --------------------------
+    # --------------------------------------------------------
+    # Save scan state
+    # --------------------------------------------------------
 
-# Hour is included so the scanner does not
-# accidentally scan only twice per day.
+    state["last_run"] = now_ist().isoformat()
+    state["last_regime"] = regime
+    state["last_checked"] = checked
+    state["last_candidates"] = len(candidates)
 
-half_hour = (
-    "A" if current.minute < 30 else "B"
-)
+    state["scan_count"] = state.get("scan_count", 0) + 1
 
-slot = (
-    current.strftime("%Y-%m-%d-%H-")
-    + half_hour
-)
+    state["history"] = state.get("history", [])[-MAX_SCAN_STATE:]
 
-already_
+    save_json(SIGNALS_FILE, signals)
+    save_json(HISTORY_FILE, history)
+    save_json(STATE_FILE, state)
+
+    # --------------------------------------------------------
+    # Telegram messages for new signals
+    # --------------------------------------------------------
+
+    for signal in new_signals:
+
+        message = (
+            f"📈 GTF PRO PAPER SIGNAL {VERSION}\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"Stock: {signal['name']}\n"
+            f"Side: {signal['side']}\n"
+            f"Strategy: {signal['strategy']}\n"
+            f"Entry: ₹{signal['entry']:.2f}\n"
+            f"Stop Loss: ₹{signal['stop']:.2f}\n"
+            f"Target: ₹{signal['target']:.2f}\n"
+            f"Risk Reward: 1:{signal['rr']:.2f}\n"
+            f"RSI: {signal['rsi']}\n"
+            f"ADX: {signal['adx']}\n"
+            f"Relative Volume: {signal['rvol']}\n"
+            f"Status: WAITING ENTRY\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"Paper trading only. Not a buy/sell guarantee."
+        )
+
+        send_telegram(message)
+
+    # --------------------------------------------------------
+    # Final diagnostic report
+    # --------------------------------------------------------
+
+    open_count = sum(
+        1 for s in signals
+        if s.get("status") == "OPEN"
+    )
+
+    waiting_count = sum(
+        1 for s in signals
+        if s.get("status") == "WAITING_ENTRY"
+    )
+
+    closed_count = sum(
+        1 for s in history
+        if s.get("status") == "CLOSED"
+    )
+
+    report = (
+        f"📊 GTF PRO SCANNER {VERSION}\n"
+        f"Time: {now_ist().strftime('%d-%m-%Y %H:%M IST')}\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"Market: {regime}\n"
+        f"Nifty: {market['nifty']}\n"
+        f"EMA20: {market['ema20']}\n"
+        f"EMA50: {market['ema50']}\n"
+        f"ADX: {market['adx']}\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"Stocks checked: {checked}\n"
+        f"Daily data OK: {daily_ok}\n"
+        f"Intraday data OK: {intraday_ok}\n"
+        f"Data failures: {failures}\n"
+        f"Qualified candidates: {len(candidates)}\n"
+        f"New paper signals: {len(new_signals)}\n"
+        f"Open: {open_count}\n"
+        f"Waiting: {waiting_count}\n"
+        f"Closed: {closed_count}\n"
+    )
+
+    if rejection_reasons:
+
+        report += "\nTop rejection reasons:\n"
+
+        sorted_reasons = sorted(
+            rejection_reasons.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+
+        for reason, count in sorted_reasons[:6]:
+
+            report += f"• {reason}: {count}\n"
+
+    if not new_signals:
+        report += "\nNo new setup this run."
+
+    report += (
+        "\n\n⚠️ Paper trading only. "
+        "Signals are not guaranteed profitable."
+    )
+
+    log.info("\n%s", report)
+
+    send_telegram(report)
+
+
+# ============================================================
+# PROGRAM ENTRY POINT
+# ============================================================
+
+if __name__ == "__main__":
+
+    try:
+        run_scanner()
+
+    except Exception as exc:
+
+        log.exception("Scanner crashed: %s", exc)
+
+        send_telegram(
+            f"🚨 GTF PRO SCANNER {VERSION} ERROR\n"
+            f"{str(exc)[:1000]}"
+        )
+
+        raise
