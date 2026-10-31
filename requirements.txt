@@ -3,5 +3,3 @@ pandas
 numpy
 ta
 requests
-python-telegram-bot==22.2
-nsetools
