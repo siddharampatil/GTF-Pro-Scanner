@@ -13,12 +13,13 @@
     "adx": 24.46,
     "rvol": 1.91,
     "created_at": "2026-11-03T09:34:03.295340+05:30",
-    "status": "WAITING_ENTRY",
+    "status": "EXPIRED",
     "id": "PNB_20261103093407",
     "entry_time": null,
     "exit_time": null,
     "exit_price": null,
     "pnl_percent": null,
-    "version": "V11.2"
+    "version": "V11.2",
+    "exit_reason": "intraday entry expired"
   }
 ]
