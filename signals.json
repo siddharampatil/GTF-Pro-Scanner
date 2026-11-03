@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "symbol": "PNB.NS",
+    "name": "PNB",
+    "side": "SHORT",
+    "strategy": "INTRADAY",
+    "entry": 122.04,
+    "stop": 123.33,
+    "target": 120.1,
+    "rr": 1.5,
+    "score": 80,
+    "rsi": 25.55,
+    "adx": 24.46,
+    "rvol": 1.91,
+    "created_at": "2026-11-03T09:34:03.295340+05:30",
+    "status": "WAITING_ENTRY",
+    "id": "PNB_20261103093407",
+    "entry_time": null,
+    "exit_time": null,
+    "exit_price": null,
+    "pnl_percent": null,
+    "version": "V11.2"
+  }
+]
