@@ -1,15 +1,8 @@
 
-"""
-GTF PRO V12.0
-NSE INTRADAY PAPER TRADING SCANNER
-BUY + SHORT | 15-minute trend | 5-minute entry
-No live broker orders.
-"""
-
 import os
 import json
 import logging
-from datetime import datetime, time as dtime, timedelta
+from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -20,17 +13,15 @@ from ta.trend import EMAIndicator, ADXIndicator
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 
-IST = ZoneInfo("Asia/Kolkata")
 
-# =============== CONFIGURATION ===============
+# ==========================================
+# GTF PRO V12.0 — INTRADAY PAPER SCANNER
+# ==========================================
+
+IST = ZoneInfo("Asia/Kolkata")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHAT_ID = os.getenv("CHAT_ID", "")
-
-TELEGRAM_URL = (
-    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    if BOT_TOKEN else ""
-)
 
 CAPITAL = 25000.0
 RISK_PER_TRADE = 0.005
@@ -39,82 +30,75 @@ MAX_CAPITAL_USE = 0.90
 
 MAX_DAILY_SIGNALS = 3
 MAX_ACTIVE_TRADES = 2
-
 MIN_REWARD_RISK = 2.0
 
-MARKET_OPEN = dtime(9, 15)
-LAST_ENTRY_TIME = dtime(14, 45)
-SQUARE_OFF_TIME = dtime(15, 15)
-MARKET_CLOSE = dtime(15, 30)
+MARKET_OPEN = time(9, 15)
+LAST_ENTRY_TIME = time(14, 45)
+SQUARE_OFF_TIME = time(15, 15)
+MARKET_CLOSE = time(15, 30)
 
 SIGNALS_FILE = "signals.json"
 HISTORY_FILE = "trade_history.json"
 STATE_FILE = "scanner_state.json"
 
-STOCKS = [
-    "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS",
-    "ICICIBANK.NS", "SBIN.NS", "AXISBANK.NS", "KOTAKBANK.NS",
-    "LT.NS", "BHARTIARTL.NS", "ITC.NS", "HINDUNILVR.NS",
-    "BAJFINANCE.NS", "MARUTI.NS", "TATAMOTORS.NS", "M&M.NS",
-    "SUNPHARMA.NS", "TITAN.NS", "ULTRACEMCO.NS", "NTPC.NS",
-    "POWERGRID.NS", "ONGC.NS", "COALINDIA.NS", "TATASTEEL.NS",
-    "JSWSTEEL.NS", "HCLTECH.NS", "WIPRO.NS", "TECHM.NS",
-    "ADANIPORTS.NS", "ASIANPAINT.NS", "BAJAJFINSV.NS",
-    "NESTLEIND.NS", "GRASIM.NS", "CIPLA.NS", "DRREDDY.NS",
-    "DIVISLAB.NS", "APOLLOHOSP.NS", "EICHERMOT.NS",
-    "HEROMOTOCO.NS", "BAJAJ-AUTO.NS", "INDUSINDBK.NS",
-    "FEDERALBNK.NS", "BANKBARODA.NS", "PNB.NS",
-    "IDFCFIRSTB.NS", "DLF.NS", "BEL.NS", "HAL.NS",
-    "TRENT.NS", "ZOMATO.NS"
-]
+LOG_LEVEL = logging.INFO
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s"
+    level=LOG_LEVEL,
+    format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
+STOCKS = [
+    "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
+    "SBIN", "AXISBANK", "KOTAKBANK", "LT", "BHARTIARTL",
+    "ITC", "HINDUNILVR", "BAJFINANCE", "MARUTI",
+    "TATAMOTORS", "M&M", "SUNPHARMA", "TITAN",
+    "ULTRACEMCO", "NTPC", "POWERGRID", "ONGC",
+    "COALINDIA", "TATASTEEL", "JSWSTEEL", "HCLTECH",
+    "WIPRO", "TECHM", "ADANIPORTS", "ASIANPAINT",
+    "BAJAJFINSV", "NESTLEIND", "GRASIM", "CIPLA",
+    "DRREDDY", "DIVISLAB", "APOLLOHOSP", "EICHERMOT",
+    "HEROMOTOCO", "BAJAJ-AUTO", "INDUSINDBK",
+    "FEDERALBNK", "BANKBARODA", "PNB", "IDFCFIRSTB",
+    "DLF", "BEL", "HAL", "TRENT", "ZOMATO"
+]
 
-# =============== TIME HELPERS ===============
 
 def now_ist():
     return datetime.now(IST)
 
 
-def timestamp():
-    return now_ist().isoformat(timespec="seconds")
+def today_string():
+    return now_ist().strftime("%Y-%m-%d")
 
-
-# =============== JSON FILE HELPERS ===============
 
 def load_json(path, default):
-    if not os.path.exists(path):
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
         return default
-
-    with open(path, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    return data
 
 
 def save_json(path, data):
-    temp_path = path + ".tmp"
+    temporary = path + ".tmp"
 
-    with open(temp_path, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=2, ensure_ascii=False)
+    with open(temporary, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
 
-    os.replace(temp_path, path)
+    os.replace(temporary, path)
 
-
-# =============== TELEGRAM ===============
 
 def telegram(message):
-    if not TELEGRAM_URL or not CHAT_ID:
-        logging.warning("Telegram credentials missing.")
+    if not BOT_TOKEN or not CHAT_ID:
+        logging.warning("Telegram credentials are missing.")
         return False
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
     try:
         response = requests.post(
-            TELEGRAM_URL,
+            url,
             data={
                 "chat_id": CHAT_ID,
                 "text": message
@@ -124,16 +108,16 @@ def telegram(message):
         response.raise_for_status()
         return True
 
-    except requests.RequestException as exc:
-        logging.error("Telegram error: %s", exc)
+    except requests.RequestException as error:
+        logging.error("Telegram error: %s", error)
         return False
 
 
-# =============== DATA CLEANING ===============
+def clean_frame(data):
+    if data is None or data.empty:
+        return pd.DataFrame()
 
-def clean_frame(df):
-    if df is None or df.empty:
-        return None
+    df = data.copy()
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -143,7 +127,7 @@ def clean_frame(df):
     required = ["Open", "High", "Low", "Close", "Volume"]
 
     if not all(col in df.columns for col in required):
-        return None
+        return pd.DataFrame()
 
     df = df[required].copy()
 
@@ -151,253 +135,266 @@ def clean_frame(df):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     df = df.dropna()
+    df = df[~df.index.duplicated(keep="last")]
     df = df.sort_index()
 
-    return df if not df.empty else None
+    return df
 
-# =============== MARKET DATA DOWNLOAD ===============
+# ==========================================
+# PART 2 — MARKET DATA AND INDICATORS
+# ==========================================
 
 def download_intraday(symbol):
+    ticker = f"{symbol}.NS"
+
     try:
-        raw = yf.download(
-            symbol,
+        data = yf.download(
+            ticker,
             period="5d",
             interval="5m",
             auto_adjust=True,
             progress=False,
             threads=False,
-            timeout=25
+            prepost=False
         )
 
-        df = clean_frame(raw)
+        df = clean_frame(data)
 
-        if df is None:
-            return None
+        if df.empty:
+            logging.warning("%s: no market data", symbol)
+            return pd.DataFrame()
 
-        index = pd.DatetimeIndex(df.index)
+        # Convert timestamps to Indian Standard Time.
+        if df.index.tz is None:
+            df.index = df.index.tz_localize(IST)
+        else:
+            df.index = df.index.tz_convert(IST)
 
-        if index.tz is None:
-            index = index.tz_localize("UTC")
+        df = df[~df.index.duplicated(keep="last")]
+        df = df.sort_index()
 
-        df.index = index.tz_convert(IST)
+        # Remove the currently forming 5-minute candle.
+        current_time = now_ist()
+        completed_before = current_time - timedelta(minutes=5)
+        df = df[df.index <= completed_before]
 
-        # Remove the currently forming candle.
-        current = now_ist()
-
-        if not df.empty:
-            candle_end = (
-                df.index[-1].to_pydatetime()
-                + timedelta(minutes=5)
-            )
-
-            if candle_end > current:
-                df = df.iloc[:-1]
-
-        if df.empty or len(df) < 30:
-            return None
+        if df.empty:
+            return pd.DataFrame()
 
         # Reject stale data.
-        candle_end = (
-            df.index[-1].to_pydatetime()
-            + timedelta(minutes=5)
-        )
+        latest_candle = df.index[-1]
 
-        age = (
-            current - candle_end
-        ).total_seconds() / 60
+        if current_time - latest_candle > timedelta(minutes=20):
+            logging.warning("%s: stale market data", symbol)
+            return pd.DataFrame()
 
-        if age > 20 or age < -2:
-            return None
+        if len(df) < 30:
+            logging.warning("%s: insufficient candles", symbol)
+            return pd.DataFrame()
 
         return df
 
-    except Exception as exc:
-        logging.warning(
-            "Download failed for %s: %s",
-            symbol, exc
-        )
-        return None
+    except Exception as error:
+        logging.error("%s download failed: %s", symbol, error)
+        return pd.DataFrame()
 
-
-# =============== 15-MINUTE CANDLES ===============
 
 def make_15m(df):
     if df is None or df.empty:
-        return None
+        return pd.DataFrame()
 
-    result = df.resample(
-        "15min",
-        label="right",
-        closed="right"
-    ).agg({
-        "Open": "first",
-        "High": "max",
-        "Low": "min",
-        "Close": "last",
-        "Volume": "sum"
-    })
+    try:
+        candles = df.resample(
+            "15min",
+            origin="start_day",
+            offset="9h15min",
+            label="right",
+            closed="left"
+        ).agg({
+            "Open": "first",
+            "High": "max",
+            "Low": "min",
+            "Close": "last",
+            "Volume": "sum"
+        })
 
-    result = result.dropna()
+        candles = candles.dropna()
 
-    # Keep only completed 15-minute candles.
-    current = now_ist()
+        # Keep only fully completed 15-minute candles.
+        current_time = now_ist()
+        candles = candles[candles.index <= current_time]
 
-    if not result.empty:
-        last_end = result.index[-1].to_pydatetime()
+        return candles
 
-        if last_end > current:
-            result = result.iloc[:-1]
-
-    return result if not result.empty else None
-
-
-# =============== VWAP ===============
-
-def add_vwap(df):
-    data = df.copy()
-
-    typical_price = (
-        data["High"] + data["Low"] + data["Close"]
-    ) / 3
-
-    dates = pd.Series(
-        data.index.date,
-        index=data.index
-    )
-
-    cumulative_pv = (
-        typical_price * data["Volume"]
-    ).groupby(dates).cumsum()
-
-    cumulative_volume = (
-        data["Volume"].groupby(dates).cumsum()
-    )
-
-    data["VWAP"] = (
-        cumulative_pv / cumulative_volume.replace(0, float("nan"))
-    )
-
-    return data
+    except Exception as error:
+        logging.error("15-minute resampling failed: %s", error)
+        return pd.DataFrame()
 
 
-# =============== MARKET DIRECTION ===============
+def add_indicators(df):
+    if df is None or len(df) < 25:
+        return pd.DataFrame()
+
+    result = df.copy()
+
+    try:
+        # Exponential moving averages.
+        result["EMA9"] = EMAIndicator(
+            close=result["Close"],
+            window=9
+        ).ema_indicator()
+
+        result["EMA20"] = EMAIndicator(
+            close=result["Close"],
+            window=20
+        ).ema_indicator()
+
+        # Relative strength index.
+        result["RSI"] = RSIIndicator(
+            close=result["Close"],
+            window=14
+        ).rsi()
+
+        # Average directional index.
+        adx = ADXIndicator(
+            high=result["High"],
+            low=result["Low"],
+            close=result["Close"],
+            window=14
+        )
+
+        result["ADX"] = adx.adx()
+        result["PLUS_DI"] = adx.adx_pos()
+        result["MINUS_DI"] = adx.adx_neg()
+
+        # Average true range.
+        result["ATR"] = AverageTrueRange(
+            high=result["High"],
+            low=result["Low"],
+            close=result["Close"],
+            window=14
+        ).average_true_range()
+
+        # Relative volume.
+        result["AVG_VOLUME"] = (
+            result["Volume"]
+            .rolling(window=20)
+            .mean()
+        )
+
+        result["RVOL"] = (
+            result["Volume"] /
+            result["AVG_VOLUME"].replace(0, pd.NA)
+        )
+
+        # Intraday VWAP, reset each trading day.
+        typical_price = (
+            result["High"] +
+            result["Low"] +
+            result["Close"]
+        ) / 3
+
+        price_volume = typical_price * result["Volume"]
+
+        trading_day = pd.Series(
+            result.index.date,
+            index=result.index
+        )
+
+        cumulative_pv = price_volume.groupby(trading_day).cumsum()
+        cumulative_volume = result["Volume"].groupby(
+            trading_day
+        ).cumsum()
+
+        result["VWAP"] = (
+            cumulative_pv /
+            cumulative_volume.replace(0, pd.NA)
+        )
+
+        result = result.replace(
+            [float("inf"), float("-inf")],
+            pd.NA
+        )
+
+        return result.dropna()
+
+    except Exception as error:
+        logging.error("Indicator calculation failed: %s", error)
+        return pd.DataFrame()
+
 
 def market_direction():
-    df = download_intraday("^NSEI")
+    """
+    Returns:
+        market trend: BULLISH, BEARISH, or NO_TRADE
+        latest Nifty value
+    """
 
-    if df is None:
-        return "NO_TRADE", None, "Nifty data unavailable"
+    try:
+        data = yf.download(
+            "^NSEI",
+            period="5d",
+            interval="5m",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            prepost=False
+        )
 
-    candles = make_15m(df)
+        df = clean_frame(data)
 
-    if candles is None or len(candles) < 25:
-        return "NO_TRADE", None, "Insufficient 15-minute Nifty data"
+        if df.empty:
+            return "NO_TRADE", 0.0
 
-    close = candles["Close"]
+        if df.index.tz is None:
+            df.index = df.index.tz_localize(IST)
+        else:
+            df.index = df.index.tz_convert(IST)
 
-    ema9 = EMAIndicator(
-        close, window=9
-    ).ema_indicator()
+        df = df.sort_index()
 
-    ema20 = EMAIndicator(
-        close, window=20
-    ).ema_indicator()
+        # Exclude incomplete 5-minute candles.
+        df = df[df.index <= now_ist() - timedelta(minutes=5)]
 
-    adx_obj = ADXIndicator(
-        candles["High"],
-        candles["Low"],
-        close,
-        window=14
-    )
+        candles = make_15m(df)
+        candles = add_indicators(candles)
 
-    adx = adx_obj.adx()
-    plus_di = adx_obj.adx_pos()
-    minus_di = adx_obj.adx_neg()
+        if len(candles) < 25:
+            return "NO_TRADE", 0.0
 
-    values = [
-        ema9.iloc[-1],
-        ema20.iloc[-1],
-        adx.iloc[-1],
-        plus_di.iloc[-1],
-        minus_di.iloc[-1]
-    ]
+        last = candles.iloc[-1]
 
-    if any(pd.isna(value) for value in values):
-        return "NO_TRADE", None, "Indicator calculation unavailable"
+        nifty_price = float(last["Close"])
 
-    price = float(close.iloc[-1])
-    strength = float(adx.iloc[-1])
+        bullish = (
+            last["Close"] > last["VWAP"]
+            and last["EMA9"] > last["EMA20"]
+            and last["PLUS_DI"] > last["MINUS_DI"]
+            and last["ADX"] >= 18
+        )
 
-    details = (
-        f"EMA9: {ema9.iloc[-1]:.2f} | "
-        f"EMA20: {ema20.iloc[-1]:.2f} | "
-        f"ADX: {strength:.1f}"
-    )
+        bearish = (
+            last["Close"] < last["VWAP"]
+            and last["EMA9"] < last["EMA20"]
+            and last["MINUS_DI"] > last["PLUS_DI"]
+            and last["ADX"] >= 18
+        )
 
-    # Avoid weak or unclear market conditions.
-    if strength < 20:
-        return "NO_TRADE", price, details
+        if bullish:
+            return "BULLISH", nifty_price
 
-    if (
-        price > ema9.iloc[-1] > ema20.iloc[-1]
-        and plus_di.iloc[-1] > minus_di.iloc[-1]
-    ):
-        return "BULLISH", price, details
+        if bearish:
+            return "BEARISH", nifty_price
 
-    if (
-        price < ema9.iloc[-1] < ema20.iloc[-1]
-        and minus_di.iloc[-1] > plus_di.iloc[-1]
-    ):
-        return "BEARISH", price, details
+        return "NO_TRADE", nifty_price
 
-    return "NO_TRADE", price, details
+    except Exception as error:
+        logging.error("Nifty trend check failed: %s", error)
+        return "NO_TRADE", 0.0
 
-
-# =============== STOCK INDICATORS ===============
-
-def calculate_indicators(df):
-    if df is None or len(df) < 30:
-        return None
-
-    data = add_vwap(df)
-
-    data["EMA9"] = EMAIndicator(
-        data["Close"], window=9
-    ).ema_indicator()
-
-    data["EMA20"] = EMAIndicator(
-        data["Close"], window=20
-    ).ema_indicator()
-
-    data["RSI"] = RSIIndicator(
-        data["Close"], window=14
-    ).rsi()
-
-    adx_obj = ADXIndicator(
-        data["High"],
-        data["Low"],
-        data["Close"],
-        window=14
-    )
-
-    data["ADX"] = adx_obj.adx()
-    data["PLUS_DI"] = adx_obj.adx_pos()
-    data["MINUS_DI"] = adx_obj.adx_neg()
-
-    data["ATR"] = AverageTrueRange(
-        data["High"],
-        data["Low"],
-        data["Close"],
-        window=14
-    ).average_true_range()
-
-    data["AVG_VOLUME"] = (
-        data["Volume"].rolling(20).mean()
-    )
-
-    return data
-
-# =============== POSITION SIZING ===============
+# ==========================================
+# PART 3 — SIGNALS, RISK AND MAIN SCANNER
+# ==========================================
 
 def calculate_quantity(entry, stop):
     risk_per_share = abs(entry - stop)
@@ -406,144 +403,22 @@ def calculate_quantity(entry, stop):
         return 0
 
     risk_amount = CAPITAL * RISK_PER_TRADE
+    quantity_by_risk = int(risk_amount / risk_per_share)
 
-    quantity_by_risk = int(
-        risk_amount / risk_per_share
-    )
+    capital_limit = CAPITAL * MAX_CAPITAL_USE
+    quantity_by_capital = int(capital_limit / entry)
 
-    quantity_by_capital = int(
-        CAPITAL * MAX_CAPITAL_USE / entry
-    )
-
-    return max(
-        0,
-        min(quantity_by_risk, quantity_by_capital)
-    )
+    return max(0, min(quantity_by_risk, quantity_by_capital))
 
 
-# =============== SIGNAL VALIDATION ===============
+def get_daily_signals(signals):
+    today = today_string()
 
-def build_candidate(symbol, market, raw_df):
-    data = calculate_indicators(raw_df)
-
-    if data is None or len(data) < 30:
-        return None, "insufficient indicator data"
-
-    row = data.iloc[-1]
-    previous = data.iloc[-2]
-
-    required = [
-        "Close", "High", "Low", "VWAP",
-        "EMA9", "EMA20", "RSI", "ADX",
-        "PLUS_DI", "MINUS_DI", "ATR",
-        "AVG_VOLUME"
+    return [
+        trade for trade in signals
+        if trade.get("created_at", "").startswith(today)
     ]
 
-    if any(pd.isna(row[x]) for x in required):
-        return None, "indicator unavailable"
-
-    price = float(row["Close"])
-    vwap = float(row["VWAP"])
-    atr = float(row["ATR"])
-    average_volume = float(row["AVG_VOLUME"])
-
-    if price <= 0 or atr <= 0 or average_volume <= 0:
-        return None, "invalid price or volatility"
-
-    rvol = float(row["Volume"]) / average_volume
-
-    if rvol < 1.30:
-        return None, "volume confirmation missing"
-
-    if float(row["ADX"]) < 20:
-        return None, "weak intraday trend"
-
-    if market == "BULLISH":
-        direction = "BUY"
-
-        checks = [
-            price > vwap,
-            row["EMA9"] > row["EMA20"],
-            row["PLUS_DI"] > row["MINUS_DI"],
-            52 <= row["RSI"] <= 70,
-            price > previous["High"]
-        ]
-
-        if not all(checks):
-            return None, "BUY confirmation missing"
-
-        entry = price
-        stop = min(
-            float(row["Low"]) - 0.05 * atr,
-            entry - 1.2 * atr
-        )
-
-        risk = entry - stop
-        target = entry + MIN_REWARD_RISK * risk
-
-    elif market == "BEARISH":
-        direction = "SHORT"
-
-        checks = [
-            price < vwap,
-            row["EMA9"] < row["EMA20"],
-            row["MINUS_DI"] > row["PLUS_DI"],
-            30 <= row["RSI"] <= 48,
-            price < previous["Low"]
-        ]
-
-        if not all(checks):
-            return None, "SHORT confirmation missing"
-
-        entry = price
-        stop = max(
-            float(row["High"]) + 0.05 * atr,
-            entry + 1.2 * atr
-        )
-
-        risk = stop - entry
-        target = entry - MIN_REWARD_RISK * risk
-
-    else:
-        return None, "market direction unclear"
-
-    if risk <= 0:
-        return None, "invalid stop-loss"
-
-    quantity = calculate_quantity(entry, stop)
-
-    if quantity < 1:
-        return None, "capital or risk limit prevents trade"
-
-    capital_required = quantity * entry
-    planned_risk = quantity * risk
-
-    if capital_required > CAPITAL * MAX_CAPITAL_USE:
-        return None, "capital limit exceeded"
-
-    if planned_risk > CAPITAL * RISK_PER_TRADE + 0.01:
-        return None, "risk limit exceeded"
-
-    return {
-        "symbol": symbol,
-        "direction": direction,
-        "entry": round(entry, 2),
-        "stop_loss": round(stop, 2),
-        "target": round(target, 2),
-        "quantity": quantity,
-        "capital_required": round(capital_required, 2),
-        "planned_risk": round(planned_risk, 2),
-        "reward_risk": MIN_REWARD_RISK,
-        "rvol": round(rvol, 2),
-        "rsi": round(float(row["RSI"]), 1),
-        "adx": round(float(row["ADX"]), 1),
-        "vwap": round(vwap, 2),
-        "created_at": timestamp(),
-        "status": "OPEN"
-    }, "qualified"
-
-
-# =============== ACTIVE TRADE HELPERS ===============
 
 def active_trades(signals):
     return [
@@ -552,335 +427,386 @@ def active_trades(signals):
     ]
 
 
-def already_traded_today(signals, symbol, today):
-    for trade in signals:
-        if trade.get("symbol") != symbol:
-            continue
+def daily_pnl(history, signals):
+    today = today_string()
 
-        created = trade.get("created_at", "")
-
-        if created[:10] == today:
-            return True
-
-    return False
-
-
-# =============== TELEGRAM SIGNAL FORMAT ===============
-
-def format_signal(signal, market, nifty):
-    direction = signal["direction"]
-
-    emoji = "🟢" if direction == "BUY" else "🔴"
-
-    return (
-        f"{emoji} GTF PRO V12.0 — PAPER {direction}\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"Stock: {signal['symbol'].replace('.NS', '')}\n"
-        f"Market: {market}\n"
-        f"Nifty: {nifty:.2f}\n"
-        f"Entry: ₹{signal['entry']:.2f}\n"
-        f"Stop-loss: ₹{signal['stop_loss']:.2f}\n"
-        f"Target: ₹{signal['target']:.2f}\n"
-        f"Quantity: {signal['quantity']}\n"
-        f"Capital: ₹{signal['capital_required']:.2f}\n"
-        f"Planned risk: ₹{signal['planned_risk']:.2f}\n"
-        f"Reward/Risk: 1:{signal['reward_risk']:.1f}\n"
-        f"VWAP: ₹{signal['vwap']:.2f}\n"
-        f"RSI: {signal['rsi']}\n"
-        f"ADX: {signal['adx']}\n"
-        f"Relative volume: {signal['rvol']}\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"Paper trading only. No broker order."
+    closed_pnl = sum(
+        float(trade.get("pnl_amount", 0))
+        for trade in history
+        if trade.get("closed_at", "").startswith(today)
     )
 
-# =============== DAILY PERFORMANCE ===============
+    floating_pnl = 0.0
 
-def daily_pnl(history, today):
-    total = 0.0
+    for trade in active_trades(signals):
+        price = float(trade.get("last_price", trade["entry"]))
+        entry = float(trade["entry"])
+        quantity = int(trade["quantity"])
 
-    for trade in history:
-        if trade.get("closed_at", "")[:10] == today:
-            total += float(trade.get("pnl_amount", 0))
+        if trade["side"] == "BUY":
+            floating_pnl += (price - entry) * quantity
+        else:
+            floating_pnl += (entry - price) * quantity
 
-    return round(total, 2)
+    return closed_pnl + floating_pnl
 
 
-# =============== CLOSE PAPER TRADE ===============
+def already_traded_today(symbol, signals):
+    today = today_string()
 
-def close_trade(signal, history, exit_price, reason):
-    entry = float(signal["entry"])
-    quantity = int(signal["quantity"])
-    exit_price = float(exit_price)
+    return any(
+        trade.get("symbol") == symbol
+        and trade.get("created_at", "").startswith(today)
+        for trade in signals
+    )
 
-    if signal["direction"] == "BUY":
+
+def build_candidate(symbol, market, raw_df):
+    df = add_indicators(raw_df)
+
+    if len(df) < 25:
+        return None
+
+    # Use the latest completed candle.
+    last = df.iloc[-1]
+    previous = df.iloc[-2]
+
+    entry = float(last["Close"])
+    atr = float(last["ATR"])
+
+    if atr <= 0 or entry <= 0:
+        return None
+
+    if float(last["ADX"]) < 20:
+        return None
+
+    if float(last["RVOL"]) < 1.30:
+        return None
+
+    side = None
+
+    # BUY setup.
+    if market == "BULLISH":
+        if (
+            last["Close"] > last["VWAP"]
+            and last["EMA9"] > last["EMA20"]
+            and last["PLUS_DI"] > last["MINUS_DI"]
+            and 52 <= last["RSI"] <= 70
+            and last["Close"] > previous["High"]
+        ):
+            side = "BUY"
+
+    # SHORT setup.
+    elif market == "BEARISH":
+        if (
+            last["Close"] < last["VWAP"]
+            and last["EMA9"] < last["EMA20"]
+            and last["MINUS_DI"] > last["PLUS_DI"]
+            and 30 <= last["RSI"] <= 48
+            and last["Close"] < previous["Low"]
+        ):
+            side = "SHORT"
+
+    if side is None:
+        return None
+
+    if side == "BUY":
+        stop = min(
+            float(last["Low"]),
+            entry - (1.2 * atr)
+        )
+
+        risk = entry - stop
+        target = entry + (risk * MIN_REWARD_RR)
+
+    else:
+        stop = max(
+            float(last["High"]),
+            entry + (1.2 * atr)
+        )
+
+        risk = stop - entry
+        target = entry - (risk * MIN_REWARD_RR)
+
+    if risk <= 0 or target <= 0:
+        return None
+
+    quantity = calculate_quantity(entry, stop)
+
+    if quantity <= 0:
+        return None
+
+    return {
+        "symbol": symbol,
+        "side": side,
+        "entry": round(entry, 2),
+        "stop": round(stop, 2),
+        "target": round(target, 2),
+        "quantity": quantity,
+        "risk_amount": round(risk * quantity, 2),
+        "reward_risk": MIN_REWARD_RISK,
+        "last_price": round(entry, 2),
+        "status": "OPEN",
+        "created_at": now_ist().isoformat(),
+        "closed_at": None,
+        "pnl_amount": 0.0
+    }
+
+
+def close_trade(trade, exit_price, reason, history):
+    entry = float(trade["entry"])
+    quantity = int(trade["quantity"])
+
+    if trade["side"] == "BUY":
         pnl = (exit_price - entry) * quantity
     else:
         pnl = (entry - exit_price) * quantity
 
-    signal["status"] = "CLOSED"
-    signal["exit_price"] = round(exit_price, 2)
-    signal["exit_reason"] = reason
-    signal["closed_at"] = timestamp()
-    signal["pnl_amount"] = round(pnl, 2)
+    trade["status"] = "CLOSED"
+    trade["exit"] = round(exit_price, 2)
+    trade["exit_reason"] = reason
+    trade["closed_at"] = now_ist().isoformat()
+    trade["pnl_amount"] = round(pnl, 2)
 
-    history.append({
-        "symbol": signal["symbol"],
-        "direction": signal["direction"],
-        "entry": entry,
-        "exit": round(exit_price, 2),
-        "quantity": quantity,
-        "pnl_amount": round(pnl, 2),
-        "reason": reason,
-        "closed_at": signal["closed_at"]
-    })
+    history.append(trade.copy())
 
-    telegram(
-        f"{'✅' if pnl >= 0 else '❌'} "
-        f"GTF PRO V12.0 — PAPER TRADE CLOSED\n"
-        f"Stock: {signal['symbol']}\n"
-        f"Direction: {signal['direction']}\n"
-        f"Entry: ₹{entry:.2f}\n"
-        f"Exit: ₹{exit_price:.2f}\n"
-        f"Quantity: {quantity}\n"
-        f"P/L: ₹{pnl:+.2f}\n"
-        f"Reason: {reason}"
+    logging.info(
+        "%s closed | %s | P/L: ₹%.2f",
+        trade["symbol"], reason, pnl
     )
 
+    return trade
 
-# =============== TRADE MONITOR ===============
 
 def monitor_trades(signals, history):
-    now = now_ist()
+    changed = False
 
-    for signal in signals:
-        if signal.get("status") != "OPEN":
-            continue
-
-        symbol = signal["symbol"]
+    for trade in active_trades(signals):
+        symbol = trade["symbol"]
         df = download_intraday(symbol)
 
-        if df is None or df.empty:
+        if df.empty:
             continue
 
         candle = df.iloc[-1]
+
+        entry = float(trade["entry"])
+        stop = float(trade["stop"])
+        target = float(trade["target"])
 
         high = float(candle["High"])
         low = float(candle["Low"])
         close = float(candle["Close"])
 
-        entry = float(signal["entry"])
-        stop = float(signal["stop_loss"])
-        target = float(signal["target"])
+        trade["last_price"] = close
 
-        # Square off before market close.
-        if now.time() >= SQUARE_OFF_TIME:
-            close_trade(
-                signal, history, close, "TIME_SQUARE_OFF"
-            )
-            continue
+        exit_price = None
+        reason = None
 
-        if signal["direction"] == "BUY":
-            # Conservative assumption: stop first if both
-            # stop and target occur in the same candle.
+        # Conservative assumption: if both levels are touched
+        # in one candle, record the stop-loss first.
+        if trade["side"] == "BUY":
             if low <= stop:
-                close_trade(
-                    signal, history, stop, "STOP_LOSS"
-                )
+                exit_price = stop
+                reason = "STOP LOSS"
             elif high >= target:
-                close_trade(
-                    signal, history, target, "TARGET"
-                )
+                exit_price = target
+                reason = "TARGET"
 
         else:
             if high >= stop:
-                close_trade(
-                    signal, history, stop, "STOP_LOSS"
-                )
+                exit_price = stop
+                reason = "STOP LOSS"
             elif low <= target:
-                close_trade(
-                    signal, history, target, "TARGET"
-                )
+                exit_price = target
+                reason = "TARGET"
+
+        if now_ist().time() >= SQUARE_OFF_TIME:
+            exit_price = close
+            reason = "TIME SQUARE-OFF"
+
+        if exit_price is not None:
+            close_trade(trade, exit_price, reason, history)
+
+            telegram(
+                f"📕 PAPER TRADE CLOSED\n"
+                f"Symbol: {symbol}\n"
+                f"Side: {trade['side']}\n"
+                f"Exit: ₹{exit_price:.2f}\n"
+                f"Reason: {reason}\n"
+                f"P/L: ₹{trade['pnl_amount']:.2f}"
+            )
+
+        changed = True
+
+    return changed
 
 
-# =============== MAIN SCANNER ===============
+def format_signal(trade, nifty):
+    return (
+        f"📊 GTF PRO V12.0\n"
+        f"━━━━━━━━━━━━━━━━\n"
+        f"📌 {trade['side']} — {trade['symbol']}\n"
+        f"💰 Entry: ₹{trade['entry']:.2f}\n"
+        f"🛑 Stop Loss: ₹{trade['stop']:.2f}\n"
+        f"🎯 Target: ₹{trade['target']:.2f}\n"
+        f"📦 Quantity: {trade['quantity']}\n"
+        f"⚖️ Risk: ₹{trade['risk_amount']:.2f}\n"
+        f"📈 Reward/Risk: 1:{trade['reward_risk']:.1f}\n"
+        f"📊 Nifty: {nifty:.2f}\n"
+        f"💼 Paper Capital: ₹{CAPITAL:.0f}\n"
+        f"━━━━━━━━━━━━━━━━\n"
+        f"⚠️ PAPER TRADE ONLY"
+    )
+
 
 def main():
-    now = now_ist()
-    today = now.strftime("%Y-%m-%d")
+    logging.info("Starting GTF PRO V12.0")
 
     signals = load_json(SIGNALS_FILE, [])
     history = load_json(HISTORY_FILE, [])
     state = load_json(STATE_FILE, {})
 
     if not isinstance(signals, list):
-        raise ValueError("signals.json must contain a list")
+        signals = []
 
     if not isinstance(history, list):
-        raise ValueError("trade_history.json must contain a list")
+        history = []
 
     if not isinstance(state, dict):
-        raise ValueError("scanner_state.json must contain an object")
+        state = {}
 
-    # Monitor open paper trades.
+    # Always monitor existing paper trades first.
     monitor_trades(signals, history)
 
     save_json(SIGNALS_FILE, signals)
     save_json(HISTORY_FILE, history)
 
-    # Do not create signals outside market hours.
-    if now.weekday() >= 5 or not (
-        MARKET_OPEN <= now.time() <= LAST_ENTRY_TIME
-    ):
-        logging.info("Outside entry hours.")
+    current = now_ist()
+    current_time = current.time()
+
+    if current.weekday() >= 5:
+        logging.info("Weekend — scanner stopped.")
         return
 
-    # Prevent repeated scans in the same five-minute slot.
-    slot = now.strftime("%Y-%m-%d-%H-%M")
+    if current_time < MARKET_OPEN or current_time > MARKET_CLOSE:
+        logging.info("Outside market hours.")
+        return
+
+    # New entries are not allowed after the last-entry time.
+    if current_time > LAST_ENTRY_TIME:
+        logging.info("Last entry time passed.")
+        return
+
+    # One scan per 5-minute time slot.
+    slot = current.strftime("%Y-%m-%d-%H-%M")
     slot = slot[:-1] + "0"
 
     if state.get("last_slot") == slot:
-        logging.info("Scan slot already processed.")
+        logging.info("This scan slot was already processed.")
         return
 
-    # Save slot before scanning to avoid duplicate alerts
-    # if the workflow is triggered more than once.
-    state["last_slot"] = slot
-    save_json(STATE_FILE, state)
+    today_signals = get_daily_signals(signals)
 
-    # Enforce daily limits.
-    todays_signals = [
-        s for s in signals
-        if s.get("created_at", "")[:10] == today
-    ]
-
-    if len(todays_signals) >= MAX_DAILY_SIGNALS:
+    if len(today_signals) >= MAX_DAILY_SIGNALS:
         logging.info("Daily signal limit reached.")
+        state["last_slot"] = slot
+        save_json(STATE_FILE, state)
         return
 
-    pnl_today = daily_pnl(history, today)
+    pnl = daily_pnl(history, signals)
 
-    if pnl_today <= -(CAPITAL * MAX_DAILY_LOSS):
-        logging.warning("Daily loss limit reached.")
+    if pnl <= -(CAPITAL * MAX_DAILY_LOSS):
+        logging.warning("Daily loss limit reached. No new entries.")
         telegram(
             "🛑 GTF PRO V12.0\n"
-            "Daily paper loss limit reached.\n"
-            "No more new signals today."
+            "Daily loss limit reached.\n"
+            "No new paper entries will be generated."
         )
+        state["last_slot"] = slot
+        save_json(STATE_FILE, state)
         return
 
-    opened = active_trades(signals)
-
-    if len(opened) >= MAX_ACTIVE_TRADES:
+    if len(active_trades(signals)) >= MAX_ACTIVE_TRADES:
         logging.info("Maximum active trades reached.")
+        state["last_slot"] = slot
+        save_json(STATE_FILE, state)
         return
 
-    market, nifty, market_details = market_direction()
+    market, nifty = market_direction()
 
-    if market == "NO_TRADE" or nifty is None:
-        telegram(
-            "⚪ GTF PRO V12.0 — NO TRADE\n"
-            f"Reason: {market_details}\n"
-            "Waiting for a clear market direction."
-        )
+    logging.info(
+        "Market: %s | Nifty: %.2f",
+        market, nifty
+    )
+
+    if market == "NO_TRADE":
+        logging.info("No clear Nifty trend. No new signals.")
+        state["last_slot"] = slot
+        save_json(STATE_FILE, state)
         return
 
-    candidates = []
-    rejection_count = 0
-    data_failures = 0
-
-    occupied = {
-        trade["symbol"]
-        for trade in active_trades(signals)
-    }
+    new_signals = []
 
     for symbol in STOCKS:
-        if symbol in occupied:
-            continue
+        if len(today_signals) + len(new_signals) >= MAX_DAILY_SIGNALS:
+            break
 
-        if already_traded_today(signals, symbol, today):
+        if len(active_trades(signals)) + len(new_signals) >= MAX_ACTIVE_TRADES:
+            break
+
+        if already_traded_today(symbol, signals):
             continue
 
         df = download_intraday(symbol)
 
-        if df is None:
-            data_failures += 1
+        if df.empty:
             continue
 
-        candidate, reason = build_candidate(
-            symbol, market, df
-        )
+        candidate = build_candidate(symbol, market, df)
 
-        if candidate:
-            candidates.append(candidate)
-        else:
-            rejection_count += 1
-            logging.info(
-                "%s rejected: %s", symbol, reason
-            )
+        if candidate is None:
+            continue
 
-    candidates.sort(
-        key=lambda x: (
-            x["adx"],
-            x["rvol"],
-            x["reward_risk"]
-        ),
-        reverse=True
-    )
+        # Check risk limit again before adding a trade.
+        current_pnl = daily_pnl(history, signals)
 
-    remaining_daily = (
-        MAX_DAILY_SIGNALS - len(todays_signals)
-    )
+        if current_pnl <= -(CAPITAL * MAX_DAILY_LOSS):
+            logging.warning("Daily loss limit reached during scan.")
+            break
 
-    remaining_active = (
-        MAX_ACTIVE_TRADES - len(opened)
-    )
-
-    limit = min(
-        remaining_daily,
-        remaining_active,
-        3
-    )
-
-    selected = candidates[:limit]
-
-    for candidate in selected:
         signals.append(candidate)
+        new_signals.append(candidate)
 
-        telegram(
-            format_signal(
-                candidate, market, nifty
-            )
+        save_json(SIGNALS_FILE, signals)
+
+        telegram(format_signal(candidate, nifty))
+
+        logging.info(
+            "New %s signal: %s",
+            candidate["side"], symbol
         )
 
     save_json(SIGNALS_FILE, signals)
-    save_json(HISTORY_FILE, history)
 
-    todays_open = len(active_trades(signals))
-    todays_pnl = daily_pnl(history, today)
+    state["last_slot"] = slot
+    save_json(STATE_FILE, state)
 
-    report = (
-        "📊 GTF PRO V12.0 — SCAN REPORT\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        f"Time: {now.strftime('%d-%m-%Y %H:%M')} IST\n"
-        f"Market: {market}\n"
-        f"Nifty: {nifty:.2f}\n"
-        f"Market details: {market_details}\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        f"Stocks checked: {len(STOCKS)}\n"
-        f"Data failures: {data_failures}\n"
-        f"Rejected: {rejection_count}\n"
-        f"Qualified: {len(candidates)}\n"
-        f"New calls: {len(selected)}\n"
-        f"Open trades: {todays_open}\n"
-        f"Closed P/L today: ₹{todays_pnl:+.2f}\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "Paper trading only. No broker orders."
+    logging.info(
+        "Scan completed | Market: %s | New signals: %d",
+        market, len(new_signals)
     )
 
-    logging.info(report)
-    telegram(report)
+    telegram(
+        f"📊 GTF PRO V12.0 SCAN REPORT\n"
+        f"Market: {market}\n"
+        f"Nifty: {nifty:.2f}\n"
+        f"New signals: {len(new_signals)}\n"
+        f"Active trades: {len(active_trades(signals))}\n"
+        f"Daily P/L: ₹{daily_pnl(history, signals):.2f}\n"
+        f"Paper capital: ₹{CAPITAL:.0f}"
+    )
 
 
 if __name__ == "__main__":
     main()
-
