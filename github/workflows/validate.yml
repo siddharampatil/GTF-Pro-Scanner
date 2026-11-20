@@ -1,0 +1,29 @@
+
+name: V12 Code Validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "main.py"
+      - "requirements.txt"
+      - ".github/workflows/validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check Python syntax
+        run: python -m py_compile main.py
+
+      - name: Validation successful
+        run: echo "V12 Python syntax check passed"
