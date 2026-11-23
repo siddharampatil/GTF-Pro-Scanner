@@ -1,0 +1,28 @@
+
+name: V12 Telegram Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  telegram-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Test Telegram connection
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          python -c "import os,requests; token=os.environ['BOT_TOKEN']; chat=os.environ['CHAT_ID']; r=requests.post(f'https://api.telegram.org/bot{token}/sendMessage',json={'chat_id':chat,'text':'✅ GTF PRO V12.0 Telegram connection successful'}); print(r.text); r.raise_for_status()"
