@@ -32,9 +32,10 @@ jobs:
         run: python main.py
 
       - name: Save paper trading data
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add signals.json trade_history.json scanner_state.json
+          git add -A
           git diff --cached --quiet || git commit -m "Update V12 paper trading data"
           git push
